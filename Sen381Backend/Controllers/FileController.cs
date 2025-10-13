@@ -21,7 +21,8 @@ namespace Sen381Backend.Controllers
             var fileBytes = ms.ToArray();
 
             var bucket = client.Storage.From("User_Uploads");
-            var fileName = $"{Guid.NewGuid()}_{input.File.FileName}";
+            var originalName = string.IsNullOrWhiteSpace(input.Name) ? input.File.FileName : input.Name;
+            var fileName = $"{Guid.NewGuid()}_{originalName}";
 
             // Upload to Supabase storage
             await bucket.Upload(fileBytes, fileName);
@@ -40,11 +41,19 @@ namespace Sen381Backend.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            // Save file metadata in Supabase DB
-            await client.From<UploadedFile>().Insert(uploadedFile);
+            // Save file metadata in Supabase DB (best-effort)
+            try
+            {
+                await client.From<UploadedFile>().Insert(uploadedFile);
+            }
+            catch (Supabase.Postgrest.Exceptions.PostgrestException ex)
+            {
+                // If the table/columns are not present, don't fail the upload
+                Console.WriteLine($"Postgrest insert warning: {ex.Message}");
+            }
 
 
-            return Ok(new { SignedUrl = signedUrl });
+            return Ok(new { SignedUrl = signedUrl, FileName = fileName });
         }
 
         [HttpGet]

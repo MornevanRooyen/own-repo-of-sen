@@ -56,12 +56,11 @@
                             <div class="session-meta">in @session.TimeUntil</div>
                             <div class="session-card">
                                 <div class="session-title">
-                                    @session.SubjectCode session with @session.TutorName on @session.Date
+                                    @session.Title on @session.When.ToString("dddd, dd MMM yyyy")
                                 </div>
                                 <div class="session-tags">
-                                    <span>@session.Platform</span>
+                                    <span>@session.When.ToString("HH:mm")</span>
                                     <span>@session.Duration</span>
-                                    <span>@session.Time</span>
                                 </div>
                             </div>
                         </article>
@@ -164,7 +163,7 @@
                             <ul class="cal-events">
                                 @foreach (var ev in cell.Events)
                                 {
-                                    <li class="cal-event" title="@ev.Title">
+                                    <li class="cal-event" title="@ev.Title" @onclick:stopPropagation="true" @onclick="() => OpenEditEvent(ev)">
                                         <span class="cal-ico" aria-hidden="true"></span>
                                         <span class="cal-title">@ev.Title</span>
                                     </li>
@@ -248,6 +247,50 @@
         <footer class="modal-foot">
             <button class="btn-plain" @onclick="CloseNewEvent">Cancel</button>
             <button class="btn-save" @onclick="SaveNewEvent">Save</button>
+        </footer>
+    </div>
+}
+
+@* ===== Edit Event Modal ===== *@
+@if (ShowEditEvent)
+{
+    <div class="modal-backdrop" @onclick="CloseEditEvent"></div>
+    <div role="dialog" aria-modal="true" class="modal">
+        <header class="modal-head">
+            <h3>Edit event</h3>
+            <button class="modal-x" @onclick="CloseEditEvent" aria-label="Close">×</button>
+        </header>
+
+        <div class="modal-body">
+            <div class="field-row">
+                <label class="label" for="evt-title-edit">Event title <span class="req">*</span></label>
+                <input id="evt-title-edit" class="ipt" @bind="EditTitle" @bind:event="oninput" />
+            </div>
+            <div class="field-row">
+                <label class="label">Date</label>
+                <div class="date-row">
+                    <select class="sel" @bind="EditDay">
+                        @foreach (var d in Enumerable.Range(1, DateTime.DaysInMonth(EditYear, EditMonth))) { <option value="@d">@d</option> }
+                    </select>
+                    <select class="sel" @bind="EditMonth">
+                        @for (int m = 1; m <= 12; m++) { <option value="@m">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option> }
+                    </select>
+                    <select class="sel" @bind="EditYear">
+                        @foreach (var y in YearOptions) { <option value="@y">@y</option> }
+                    </select>
+                    <select class="sel" @bind="EditHour">
+                        @foreach (var h in HourOptions) { <option value="@h">@h.ToString("D2")</option> }
+                    </select>
+                    <select class="sel" @bind="EditMinute">
+                        @foreach (var m in MinuteOptions) { <option value="@m">@m.ToString("D2")</option> }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <footer class="modal-foot">
+            <button class="btn-plain" @onclick="DeleteEditingEvent">Delete</button>
+            <button class="btn-plain" @onclick="CloseEditEvent">Cancel</button>
+            <button class="btn-save" @onclick="async () => await SaveEditedEvent()">Save</button>
         </footer>
     </div>
 }
@@ -1001,11 +1044,7 @@
         new NotificationItem { SenderName = "Taylor Swift", Body = "replied to your question.", TimeAgo = "13 minutes ago" }
     };
 
-    private List<SessionItem> UpcomingSessions = new()
-    {
-        new SessionItem { SubjectCode = "BUM381", TutorName = "Kanye East", Date = "13th September 2025", Platform = "FaceTime", Duration = "1hr", Time = "14:00", TimeUntil = "3 hrs" },
-        new SessionItem { SubjectCode = "BUM381", TutorName = "Kimberly Kardashian", Date = "15th September 2025", Platform = "Teams", Duration = "2hrs", Time = "14:00", TimeUntil = "2 days" }
-    };
+    // UpcomingSessions is computed from AllEvents in ComputeUpcoming()
 
     protected override async Task OnInitializedAsync()
     {
@@ -1026,19 +1065,22 @@
                 }
             }
             else { StudentName = "User"; UserRole = "Student"; }
+
+            // Load events for this user
+            await LoadEvents(userId);
         }
         catch { StudentName = "User"; UserRole = "Student"; }
     }
 
     public class NotificationItem { public string SenderName { get; set; } = ""; public string Body { get; set; } = ""; public string TimeAgo { get; set; } = ""; }
-    public class SessionItem { public string SubjectCode { get; set; } = ""; public string TutorName { get; set; } = ""; public string Date { get; set; } = ""; public string Platform { get; set; } = ""; public string Duration { get; set; } = ""; public string Time { get; set; } = ""; public string TimeUntil { get; set; } = ""; }
+    public class SessionItem { public string Title { get; set; } = ""; public DateTime When { get; set; } public string Duration { get; set; } = "1 hr"; public string TimeUntil { get; set; } = ""; }
 
     /* ===== Calendar data ===== */
     private DateTime CurrentMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
     private readonly string[] WeekdayNames = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
     private List<CalCell> CalendarCells = new();
 
-    public class CalEvent { public string Title { get; set; } = ""; public DateTime Date { get; set; } }
+    public class CalEvent { public int? Id { get; set; } public string Title { get; set; } = ""; public DateTime Date { get; set; } }
     public class CalCell { public DateTime Date { get; set; } public bool InMonth { get; set; } public List<CalEvent> Events { get; set; } = new(); }
 
     private List<CalEvent> AllEvents = new()
@@ -1124,6 +1166,8 @@
             cell.Events = AllEvents.Where(e => e.Date.Date == date.Date).ToList();
             CalendarCells.Add(cell);
         }
+
+        ComputeUpcoming();
     }
 
     /* ===== Modal state & handlers ===== */
@@ -1144,16 +1188,137 @@
     }
     private void CloseNewEvent() => ShowNewEvent = false;
 
-    private void SaveNewEvent()
+    private async Task SaveNewEvent()
     {
         if (string.IsNullOrWhiteSpace(NewEventTitle)) { ShowRequired = true; return; }
         var days = DateTime.DaysInMonth(NewYear, NewMonth);
         var day = Math.Min(NewDay, days);
         var when = new DateTime(NewYear, NewMonth, day, NewHour, NewMinute, 0);
 
-        AllEvents.Add(new CalEvent { Title = NewEventTitle.Trim(), Date = when });
-        ShowNewEvent = false;
-        // If event is not in the visible month, we still save it (you can navigate to see it)
-        BuildCalendar();
+        try
+        {
+            var uidStr = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
+            if (!int.TryParse(uidStr, out int userId)) { return; }
+
+            var payload = new { UserId = userId, Title = NewEventTitle.Trim(), WhenAt = when, DurationMinutes = 60 };
+            var resp = await Http.PostAsJsonAsync("https://localhost:7228/api/Events", payload);
+            if (resp.IsSuccessStatusCode)
+            {
+                var created = await resp.Content.ReadFromJsonAsync<UserEventDto>();
+                if (created != null)
+                {
+                    AllEvents.Add(new CalEvent { Id = created.Id, Title = created.Title, Date = created.WhenAt });
+                }
+                ShowNewEvent = false;
+                BuildCalendar();
+            }
+            else
+            {
+                var msg = await resp.Content.ReadAsStringAsync();
+                ShowRequired = true;
+                // simple toast via console for now
+                Console.WriteLine($"Create failed: {msg}");
+            }
+        }
+        catch { }
+    }
+
+    private async Task LoadEvents(int userId)
+    {
+        try
+        {
+            var resp = await Http.GetAsync($"https://localhost:7228/api/Events/user/{userId}");
+            if (resp.IsSuccessStatusCode)
+            {
+                var models = await resp.Content.ReadFromJsonAsync<List<UserEventDto>>();
+                if (models != null)
+                {
+                    AllEvents = models.Select(m => new CalEvent { Id = m.Id, Title = m.Title, Date = m.WhenAt }).ToList();
+                    BuildCalendar();
+                }
+            }
+        }
+        catch { }
+    }
+
+    private class UserEventDto { public int Id { get; set; } public int UserId { get; set; } public string Title { get; set; } = string.Empty; public DateTime WhenAt { get; set; } public int DurationMinutes { get; set; } }
+
+    private List<SessionItem> UpcomingSessions = new();
+
+    private void ComputeUpcoming()
+    {
+        var now = DateTime.Now;
+        UpcomingSessions = AllEvents
+            .Where(e => e.Date >= now)
+            .OrderBy(e => e.Date)
+            .Take(5)
+            .Select(e => new SessionItem
+            {
+                Title = e.Title,
+                When = e.Date,
+                Duration = "1 hr",
+                TimeUntil = FormatTimeUntil(e.Date)
+            })
+            .ToList();
+    }
+
+    private static string FormatTimeUntil(DateTime target)
+    {
+        var span = target - DateTime.Now;
+        if (span.TotalMinutes < 1) return "now";
+        if (span.TotalHours < 1) return $"{Math.Floor(span.TotalMinutes)} mins";
+        if (span.TotalDays < 1) return $"{Math.Floor(span.TotalHours)} hrs";
+        return $"{Math.Floor(span.TotalDays)} days";
+    }
+
+    // Edit/Delete state & handlers
+    private bool ShowEditEvent = false;
+    private CalEvent? EditingEvent;
+    private string EditTitle = string.Empty;
+    private int EditDay, EditMonth, EditYear, EditHour, EditMinute;
+
+    private void OpenEditEvent(CalEvent ev)
+    {
+        EditingEvent = ev;
+        EditTitle = ev.Title;
+        EditDay = ev.Date.Day; EditMonth = ev.Date.Month; EditYear = ev.Date.Year;
+        EditHour = ev.Date.Hour; EditMinute = ev.Date.Minute;
+        ShowEditEvent = true;
+    }
+
+    private void CloseEditEvent() => ShowEditEvent = false;
+
+    private async Task SaveEditedEvent()
+    {
+        if (EditingEvent?.Id == null) { ShowEditEvent = false; return; }
+        var days = DateTime.DaysInMonth(EditYear, EditMonth);
+        var day = Math.Min(EditDay, days);
+        var when = new DateTime(EditYear, EditMonth, day, EditHour, EditMinute, 0);
+        var dto = new UserEventDto { Id = EditingEvent.Id.Value, UserId = 0, Title = EditTitle.Trim(), WhenAt = when, DurationMinutes = 60 };
+        var resp = await Http.PutAsJsonAsync($"https://localhost:7228/api/Events/{EditingEvent.Id}", dto);
+        if (resp.IsSuccessStatusCode)
+        {
+            EditingEvent.Title = EditTitle.Trim();
+            EditingEvent.Date = when;
+            ShowEditEvent = false;
+            BuildCalendar();
+        }
+        else
+        {
+            var msg = await resp.Content.ReadAsStringAsync();
+            Console.WriteLine($"Update failed: {msg}");
+        }
+    }
+
+    private async Task DeleteEditingEvent()
+    {
+        if (EditingEvent?.Id == null) { ShowEditEvent = false; return; }
+        var resp = await Http.DeleteAsync($"https://localhost:7228/api/Events/{EditingEvent.Id}");
+        if (resp.IsSuccessStatusCode || resp.StatusCode == System.Net.HttpStatusCode.NoContent)
+        {
+            AllEvents.RemoveAll(e => e.Id == EditingEvent.Id);
+            ShowEditEvent = false;
+            BuildCalendar();
+        }
     }
 }

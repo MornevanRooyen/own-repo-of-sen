@@ -40,16 +40,11 @@
         <a @onclick='() => NavigateTo("/subjects")'>Subjects</a>
         <a @onclick='() => NavigateTo("/peers")'>Peers</a>
 
-        @* this is just to have the admin option available for dev*@
-        <a @onclick='() => NavigateTo("/adminprofile")'>Admin</a>
-
-
-
         @if (IsAdmin)
         {
             <a @onclick='() => NavigateTo("/adminprofile")'>Admin</a>
         }
-        <a @onclick='() => NavigateTo("/")'>Logout</a>
+        <a @onclick='Logout'>Logout</a>
     </nav>
 </aside>
 
@@ -213,8 +208,11 @@
     }
 </style>
 
+@implements IDisposable
+
 @code {
     [Inject] private NavigationManager Nav { get; set; }
+    [Inject] private Frontend.Services.AuthService Auth { get; set; }
 
     [Parameter] public bool IsAdmin { get; set; } = false;
     private bool IsMenuOpen;
@@ -225,5 +223,35 @@
     {
         IsMenuOpen = false;
         Nav.NavigateTo(path);
+    }
+
+    protected override void OnInitialized()
+    {
+        Nav.LocationChanged += HandleLocationChanged;
+        _ = RefreshRoleAsync();
+    }
+
+    private async Task RefreshRoleAsync()
+    {
+        var role = await Auth.GetCurrentUserRoleAsync();
+        IsAdmin = !string.IsNullOrWhiteSpace(role) && role.Trim().Equals("admin", StringComparison.OrdinalIgnoreCase);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        _ = RefreshRoleAsync();
+    }
+
+    private async Task Logout()
+    {
+        await Auth.LogoutAsync();
+        IsAdmin = false;
+        NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        Nav.LocationChanged -= HandleLocationChanged;
     }
 }

@@ -27,6 +27,12 @@ namespace Frontend.Services
             return null;
         }
 
+        public async Task<string?> GetCurrentUserRoleAsync()
+        {
+            var role = await _js.InvokeAsync<string>("localStorage.getItem", "role");
+            return string.IsNullOrWhiteSpace(role) ? null : role;
+        }
+
         public async Task LogoutAsync()
         {
             await _js.InvokeVoidAsync("localStorage.clear");

@@ -29,7 +29,16 @@
     </div>
 
     <div class="hd-actions">
-        <button type="button" class="btn" @onclick="ChangePicture">Change picture</button>
+        <label for="avatarFile" class="btn">Change picture</label>
+        <InputFile id="avatarFile" style="display:none" OnChange="HandleFileSelected" accept="image/*" />
+        @if (isUploading)
+        {
+            <span class="muted">Uploading…</span>
+        }
+        @if (!string.IsNullOrWhiteSpace(uploadError))
+        {
+            <span class="text-danger">@uploadError</span>
+        }
     </div>
 </header>
 
@@ -437,6 +446,8 @@
         margin-top: 4px
     }
 
+    .text-danger { color: #b00020; font-weight: 700 }
+
     .subject-add {
         display: flex;
         gap: 10px;
@@ -482,7 +493,66 @@
 
 @code {
     private string AvatarUrl = "https://placehold.co/160x160/png";
-    private void ChangePicture() { }
+    private bool isUploading = false;
+    private string? uploadError;
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            uploadError = null;
+            isUploading = true;
+            var file = e.File;
+            if (file is null) return;
+
+            // Validate type
+            var mime = file.ContentType ?? "";
+            if (!mime.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            {
+                uploadError = "Please select an image file.";
+                return;
+            }
+
+            // Max original size 5 MB
+            const long maxBytes = 5 * 1024 * 1024;
+
+            // Client-side resize to max 512x512 and get JPEG stream
+            var resized = await file.RequestImageFileAsync("image/jpeg", 512, 512);
+            using var stream = resized.OpenReadStream(maxBytes);
+
+            // Preview immediately as data URL
+            using var msPreview = new MemoryStream();
+            await stream.CopyToAsync(msPreview);
+            var base64 = Convert.ToBase64String(msPreview.ToArray());
+            AvatarUrl = $"data:image/jpeg;base64,{base64}";
+
+            // Upload to backend
+            using var content = new MultipartFormDataContent();
+            var fileContent = new ByteArrayContent(msPreview.ToArray());
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+            content.Add(fileContent, "File", Path.ChangeExtension(file.Name, ".jpg"));
+
+            var resp = await Http.PostAsync("https://localhost:7228/api/File/uploadfile", content);
+            if (resp.IsSuccessStatusCode)
+            {
+                var json = await resp.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                if (json != null && json.TryGetValue("SignedUrl", out var url) && !string.IsNullOrWhiteSpace(url))
+                {
+                    AvatarUrl = url; // use signed URL from storage
+                    uploadError = null;
+                }
+            }
+            else
+            {
+                var details = await resp.Content.ReadAsStringAsync();
+                uploadError = $"Upload failed: {resp.StatusCode}{(string.IsNullOrWhiteSpace(details) ? string.Empty : $" — {details}")}";
+            }
+        }
+        catch (Exception ex)
+        {
+            uploadError = ex.Message;
+        }
+        finally { isUploading = false; }
+    }
 
     private ProfileForm Form = new();
     private string NewSubject = string.Empty;

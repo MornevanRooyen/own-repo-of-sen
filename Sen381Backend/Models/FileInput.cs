@@ -9,7 +9,7 @@ namespace Sen381Backend.Models
     public class FileInput
     {
         public IFormFile File { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }
 
