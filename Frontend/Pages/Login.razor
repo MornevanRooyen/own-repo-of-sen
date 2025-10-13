@@ -1,0 +1,319 @@
+﻿@page "/login"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject Sen381.Data_Access.SupaBaseAuthService SupabaseService
+
+<PageTitle>Login | CampusLearn</PageTitle>
+
+@if (NavigationManager.Uri.Contains("verified=true"))
+{
+    <div class="alert-message success">
+        ✅ Your email has been successfully verified! Please log in.
+    </div>
+}
+
+<main class="login-wrap">
+    <section class="login-card">
+        <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 64 64" width="38" height="38" role="img" focusable="false">
+                <g stroke="#2D3034" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M42 14c-4-4-9-6-14-6C15 8 8 15 8 26s7 18 20 18c5 0 10-2 14-6" />
+                    <path d="M56 12v32H34" />
+                </g>
+            </svg>
+        </div>
+
+        <h1 class="heading">LOGIN</h1>
+
+        <form class="form">
+            <label for="email" class="label">Email</label>
+            <input id="email" type="email" class="input" @bind="Email" />
+            @if (showEmailError)
+            {
+                <p class="text-danger">Please enter a valid email address.</p>
+            }
+
+            <label for="password" class="label">Password</label>
+            <input id="password" type="password" class="input" @bind="Password" />
+            @if (showPasswordError)
+            {
+                <p class="text-danger">Password cannot be empty.</p>
+            }
+
+            <div class="btn-center">
+                <button type="button" class="btn" @onclick="HandleLogin" disabled="@isLoading">
+                    @(isLoading ? "Loading..." : "Login")
+                </button>
+            </div>
+        </form>
+
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <div class="@($"alert-message {(isSuccess ? "success" : "error")}")">@Message</div>
+        }
+
+        <a class="forgot" href="/forgotpassword">Forgot Password?</a>
+    </section>
+</main>
+
+<style>
+    :root {
+        --bg: #FFFFFF;
+        --ink: #2D3034;
+        --nav: #DBE4EE;
+        --panel: #DBE4EE;
+        --white: #FFFFFF;
+        --orange: #F17300;
+        --radius: 18px;
+        --pill: 999px;
+        --shadow: 0 8px 22px rgba(0,0,0,.08);
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+    }
+
+    @@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&family=Outfit:wght@700;800&display=swap');
+
+    *, *::before, *::after {
+        box-sizing: border-box
+    }
+
+    html, body {
+        height: 100%
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Lexend",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+        line-height: 1.45;
+    }
+
+    h1 {
+        font-family: "Outfit",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+        margin: 0;
+    }
+
+    .login-wrap {
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+    }
+
+    .login-card {
+        width: clamp(280px,34vw,380px);
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 26px 26px 22px;
+        text-align: center;
+    }
+
+    .logo {
+        margin-inline: auto;
+    }
+
+    .heading {
+        margin-top: 6px;
+        margin-bottom: 18px;
+        font-weight: 800;
+        letter-spacing: .4px;
+        font-size: clamp(22px,3.2vw,28px);
+    }
+
+    .form {
+        text-align: left;
+        display: grid;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .label {
+        font-weight: 600;
+        font-size: .95rem;
+        margin-top: 6px;
+    }
+
+    .input {
+        height: 34px;
+        border: 0;
+        border-radius: var(--pill);
+        background: var(--white);
+        padding: 0 12px;
+        outline: none;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+        font: inherit;
+        color: var(--ink);
+    }
+
+        .input:focus {
+            box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--ink) 12%, white), 0 0 0 2px color-mix(in oklab, var(--ink) 6%, white);
+        }
+
+    .btn-center {
+        display: flex;
+        justify-content: center;
+        margin-top: 12px;
+    }
+
+    .btn {
+        width: 180px;
+        height: 42px;
+        border: 0;
+        border-radius: 14px;
+        background: var(--orange);
+        color: #fff;
+        font-weight: 800;
+        font-size: 1rem;
+        letter-spacing: .15px;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+    .forgot {
+        display: inline-block;
+        margin-top: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        color: var(--ink);
+    }
+
+        .forgot:hover {
+            text-decoration: underline;
+        }
+
+    .alert-message {
+        margin-top: 14px;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 600;
+        color: white;
+        background-color: var(--orange);
+        animation: fadeIn .3s ease;
+    }
+
+        .alert-message.success {
+            background-color: #28a745;
+        }
+
+        .alert-message.error {
+            background-color: #F17300;
+        }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width:520px) {
+        .login-card {
+            width: 88vw;
+            padding: 22px 18px 18px;
+        }
+
+        .btn {
+            width: 70%;
+        }
+    }
+</style>
+
+@code {
+    private string Email = string.Empty;
+    private string Password = string.Empty;
+    private string Message = string.Empty;
+    private bool showEmailError = false;
+    private bool showPasswordError = false;
+    private bool isLoading = false;
+    private bool isSuccess = false;
+
+    private async Task HandleLogin()
+    {
+        showEmailError = string.IsNullOrWhiteSpace(Email) || !Email.Contains("@");
+        showPasswordError = string.IsNullOrWhiteSpace(Password);
+
+        if (showEmailError || showPasswordError)
+        {
+            Message = "⚠️ Please correct the highlighted fields.";
+            isSuccess = false;
+            return;
+        }
+
+        isLoading = true;
+        Message = string.Empty;
+        isSuccess = false;
+
+        try
+        {
+            var resp = await Http.PostAsJsonAsync("https://localhost:7228/api/Login", new { Email, Password });
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                try
+                {
+                    var errorData = await resp.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                    if (errorData != null && errorData.ContainsKey("error"))
+                        Message = $"⚠ {errorData["error"]}";
+                    else
+                        Message = "⚠ Login failed. Please try again.";
+                }
+                catch
+                {
+                    Message = "⚠ Login failed. Please try again.";
+                }
+
+                isSuccess = false;
+                return;
+            }
+
+            var result = await resp.Content.ReadFromJsonAsync<Dictionary<string, object>>();
+            Message = "✅ Login successful!";
+            isSuccess = true;
+
+            await JS.InvokeVoidAsync("localStorage.setItem", "userId", result["userId"]?.ToString() ?? "");
+            await JS.InvokeVoidAsync("localStorage.setItem", "email", result["email"]?.ToString() ?? "");
+            await JS.InvokeVoidAsync("localStorage.setItem", "role", result["role"]?.ToString() ?? "");
+            await JS.InvokeVoidAsync("localStorage.setItem", "isLoggedIn", "true");
+
+            var accessToken = result.ContainsKey("accessToken") ? result["accessToken"]?.ToString() : null;
+            var refreshToken = result.ContainsKey("refreshToken") ? result["refreshToken"]?.ToString() : null;
+
+            if (!string.IsNullOrWhiteSpace(accessToken))
+                await JS.InvokeVoidAsync("localStorage.setItem", "accessToken", accessToken);
+            if (!string.IsNullOrWhiteSpace(refreshToken))
+                await JS.InvokeVoidAsync("localStorage.setItem", "refreshToken", refreshToken);
+
+            await SupabaseService.InitializeAsync();
+
+            await Task.Delay(800);
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            Message = $"⚠ Unexpected error: {ex.Message}";
+            isSuccess = false;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

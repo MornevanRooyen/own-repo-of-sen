@@ -1,0 +1,28 @@
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\net9.0\Sen381.dll.config
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\net9.0\Sen381.deps.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\net9.0\Sen381.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\net9.0\Sen381.pdb
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\Sen381.csproj.AssemblyReference.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\Sen381.GeneratedMSBuildEditorConfig.editorconfig
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\Sen381.AssemblyInfoInputs.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\Sen381.AssemblyInfo.cs
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\Sen381.csproj.CoreCompileInputs.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\Sen381.sourcelink.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\Sen381.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\refint\Sen381.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\Sen381.pdb
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\net9.0\ref\Sen381.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\bin\Debug\net9.0\Sen381.dll.config
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\bin\Debug\net9.0\Sen381.deps.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\bin\Debug\net9.0\Sen381.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\bin\Debug\net9.0\Sen381.pdb
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\Sen381.csproj.AssemblyReference.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\Sen381.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\Sen381.AssemblyInfoInputs.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\Sen381.AssemblyInfo.cs
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\Sen381.csproj.CoreCompileInputs.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\Sen381.sourcelink.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\Sen381.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\refint\Sen381.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\Sen381.pdb
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381\obj\Debug\net9.0\ref\Sen381.dll

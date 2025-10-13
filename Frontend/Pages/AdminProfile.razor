@@ -1,0 +1,82 @@
+﻿@page "/adminprofile"
+@using Microsoft.AspNetCore.Components.Routing
+
+<!-- Admin Profile — big heading and a grid of rounded buttons -->
+<section class="admin">
+  <h1 class="title">Admin profile <span class="pipe">|</span> <span class="name">Travis K.</span></h1>
+
+  <nav class="grid">
+    <NavLink class="btn-tile" ActiveClass="active" href="admin/tutorapplications" Match="NavLinkMatch.All">
+      Tutor Applications
+    </NavLink>
+        <NavLink class="btn-tile" ActiveClass="active" href="admin/reports">Reports</NavLink>
+        <NavLink class="btn-tile" ActiveClass="active" href="admin/analytics">Analytics</NavLink>
+        <NavLink class="btn-tile" ActiveClass="active" href="admin/manageSubAndTop">Manage Subjects and Topics</NavLink>
+
+  </nav>
+</section>
+
+<style>
+  :root {
+    --ink: #2D3034; /* text */
+    --mist: #DBE4EE; /* light blue buttons */
+    --bg: #FFFFFF;
+    --radius: 1.25rem; /* consistent rounding */
+    --shadow: 0 8px 22px rgba(0,0,0,.06);
+    --ring: color-mix(in oklab, var(--ink) 12%, white);
+    --container: min(1200px, 92vw);
+  }
+
+  *, *::before, *::after { box-sizing: border-box }
+  html, body { height: 100% }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif
+  }
+
+  /* Page wrapper */
+  .admin { width: var(--container); margin-inline: auto; padding: clamp(16px,4vw,28px) }
+
+  /* Heading */
+  .title { margin: 0 0 18px; font-weight: 900; letter-spacing: .2px; font-size: clamp(28px, 4.2vw, 56px) }
+  .title .pipe { margin: 0 10px; opacity: .5 }
+  .title .name { font-weight: 800 }
+
+  /* Grid of buttons */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+    gap: clamp(16px, 3vw, 28px) clamp(20px, 4vw, 60px);
+    padding-top: clamp(8px, 2vw, 16px);
+    max-width: 900px;
+  }
+
+  /* Button tiles (NavLink renders ) */
+  .btn-tile {
+    display: grid;
+    place-items: center;
+    height: clamp(64px, 12vw, 88px);
+    background: var(--mist);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 800;
+    border-radius: 20px;
+    border: 1px solid var(--ring);
+    box-shadow: var(--shadow);
+    padding-inline: 18px;
+    transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+  }
+  .btn-tile:hover { filter: brightness(.98); transform: translateY(-2px) }
+  .btn-tile:active { transform: translateY(0) }
+
+  /* Active NavLink state */
+  .btn-tile.active {
+    outline: 2px solid color-mix(in oklab, var(--ink) 16%, white);
+    box-shadow: 0 10px 26px rgba(0,0,0,.08);
+  }
+
+  /* Responsive */
+  @@media (max-width: 700px) { .grid { grid-template-columns: 1fr } }
+</style>

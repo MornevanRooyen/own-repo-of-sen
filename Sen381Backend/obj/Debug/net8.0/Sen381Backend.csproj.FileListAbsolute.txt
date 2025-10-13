@@ -1,0 +1,496 @@
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\appsettings.Development.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\appsettings.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Sen381Backend.staticwebassets.endpoints.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Sen381Backend.exe
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Sen381Backend.deps.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Sen381Backend.runtimeconfig.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Sen381Backend.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Sen381Backend.pdb
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Bcl.HashCode.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.CoreUtilities.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.PlatformAbstractions.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.CommunicationUtilities.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.CrossPlatEngine.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.Utilities.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Microsoft.VisualStudio.TestPlatform.Common.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\testhost.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\MimeMapping.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Npgsql.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Supabase.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Supabase.Core.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Supabase.Functions.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Supabase.Gotrue.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Supabase.Postgrest.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Supabase.Realtime.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Supabase.Storage.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.Collections.Immutable.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.IO.Pipelines.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.Reactive.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.Text.Encodings.Web.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.Text.Json.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\System.Threading.Channels.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Websocket.Client.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\de\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\es\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\it\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\de\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\de\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\es\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\it\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\it\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Sen381.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Sen381.pdb
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\bin\Debug\net8.0\Sen381.dll.config
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.csproj.AssemblyReference.cache
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.AssemblyInfoInputs.cache
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.AssemblyInfo.cs
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.csproj.CoreCompileInputs.cache
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.MvcApplicationPartsAssemblyInfo.cs
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.MvcApplicationPartsAssemblyInfo.cache
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\scopedcss\bundle\Sen381Backend.styles.css
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\staticwebassets.development.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Ba.DCFF40D0.Up2Date
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\refint\Sen381Backend.dll
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.pdb
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\Sen381Backend.genruntimeconfig.cache
+C:\Sen381 github repo\Test folder\SEN381-CampusLearn-main\Sen381Backend\obj\Debug\net8.0\ref\Sen381Backend.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.csproj.AssemblyReference.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.AssemblyInfoInputs.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.AssemblyInfo.cs
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.csproj.CoreCompileInputs.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.MvcApplicationPartsAssemblyInfo.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.sourcelink.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\appsettings.Development.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\appsettings.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.staticwebassets.endpoints.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.exe
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.deps.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.runtimeconfig.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.pdb
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Bcl.HashCode.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.FileExtensions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Json.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileProviders.Abstractions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileProviders.Physical.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileSystemGlobbing.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\MimeMapping.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Npgsql.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Core.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Functions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Gotrue.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Postgrest.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Realtime.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Storage.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Collections.Immutable.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.IO.Pipelines.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Reactive.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Text.Encodings.Web.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Text.Json.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Threading.Channels.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Websocket.Client.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381.pdb
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381.dll.config
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\scopedcss\bundle\Sen381Backend.styles.css
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\staticwebassets.development.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Ba.DCFF40D0.Up2Date
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\refint\Sen381Backend.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.pdb
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.genruntimeconfig.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\ref\Sen381Backend.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\appsettings.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Sen381Backend.staticwebassets.endpoints.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Sen381Backend.exe
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Sen381Backend.deps.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Sen381Backend.runtimeconfig.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Sen381Backend.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Sen381Backend.pdb
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Bcl.HashCode.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.FileExtensions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Json.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileProviders.Abstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileProviders.Physical.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileSystemGlobbing.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.CoreUtilities.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.PlatformAbstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.CommunicationUtilities.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.CrossPlatEngine.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.TestPlatform.Utilities.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Microsoft.VisualStudio.TestPlatform.Common.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\testhost.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\MimeMapping.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Npgsql.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Supabase.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Supabase.Core.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Supabase.Functions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Supabase.Gotrue.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Supabase.Postgrest.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Supabase.Realtime.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Supabase.Storage.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.Collections.Immutable.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.IO.Pipelines.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.Reactive.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.Text.Encodings.Web.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.Text.Json.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\System.Threading.Channels.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Websocket.Client.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\de\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\es\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\it\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\cs\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\de\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\de\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\es\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\it\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\it\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ko\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pl\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\pt-BR\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Sen381.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Sen381.pdb
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\bin\Debug\net8.0\Sen381.dll.config
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.csproj.AssemblyReference.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.AssemblyInfoInputs.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.AssemblyInfo.cs
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.csproj.CoreCompileInputs.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.sourcelink.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\scopedcss\bundle\Sen381Backend.styles.css
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Ba.DCFF40D0.Up2Date
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\refint\Sen381Backend.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.pdb
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\Sen381Backend.genruntimeconfig.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Sen381Backend\obj\Debug\net8.0\ref\Sen381Backend.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\appsettings.json
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.staticwebassets.endpoints.json
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.exe
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.deps.json
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.runtimeconfig.json
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381Backend.pdb
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Bcl.HashCode.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.FileExtensions.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Json.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileProviders.Abstractions.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileProviders.Physical.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileSystemGlobbing.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\MimeMapping.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Npgsql.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Core.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Functions.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Gotrue.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Postgrest.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Realtime.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Supabase.Storage.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Collections.Immutable.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.IO.Pipelines.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Reactive.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Text.Encodings.Web.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Text.Json.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\System.Threading.Channels.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Websocket.Client.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381.pdb
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\bin\Debug\net8.0\Sen381.dll.config
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.csproj.AssemblyReference.cache
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.AssemblyInfoInputs.cache
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.AssemblyInfo.cs
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.csproj.CoreCompileInputs.cache
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.sourcelink.json
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\scopedcss\bundle\Sen381Backend.styles.css
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Ba.DCFF40D0.Up2Date
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\refint\Sen381Backend.dll
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.pdb
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\Sen381Backend.genruntimeconfig.cache
+C:\Users\Luqmaan Slarmie\OneDrive - belgiumcampus.ac.za\Desktop\SEN381-CampusLearn\Sen381Backend\obj\Debug\net8.0\ref\Sen381Backend.dll

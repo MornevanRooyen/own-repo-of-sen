@@ -1,0 +1,239 @@
+﻿@page "/topichub/learningresources"
+@layout TopicHubLayout
+
+<section class="lr">
+    <h1 class="title">Learning Resources</h1>
+    <h2 class="subtitle">BUM 281</h2>
+
+    <div class="tutor-list">
+        @foreach (var t in tutors)
+        {
+            <details class="tutor" open="@t.Open">
+                <summary>
+                    <span class="avatar"></span>
+                    <span class="tutor-name">@t.Name</span>
+                    <span class="spacer"></span>
+                    <span class="chev" aria-hidden="true"></span>
+                </summary>
+
+                <div class="topics">
+                    @for (int i = 0; i < t.Topics.Count; i++)
+                    {
+                        var topic = t.Topics[i];
+                        var link = $"/topichub/resources/{Uri.EscapeDataString(t.Name)}/{Uri.EscapeDataString(topic.Title)}";
+                        <a class="topic-row" href="@link">
+                            <span class="num">@(i + 1).</span>
+                            <span class="text">@topic.Title</span>
+                            <span class="spacer"></span>
+                            <span class="uploads">
+                                <span class="count">@topic.Uploads</span> Uploads
+                            </span>
+                        </a>
+                    }
+                </div>
+            </details>
+        }
+    </div>
+</section>
+
+@code {
+    private record TopicItem(string Title, int Uploads);
+    private record TutorBlock(string Name, List<TopicItem> Topics, bool Open);
+
+    // Mock data to match the screenshot
+    private List<TutorBlock> tutors = new()
+  {
+    new TutorBlock(
+      "Taylor Swift",
+      new List<TopicItem>{
+        new("Introduction to bum 281", 5),
+        new("Second topic in subject", 13),
+        new("Third topic", 0)
+      },
+      false
+    ),
+    new TutorBlock(
+      "Gracie Abrahams",
+      new List<TopicItem>{
+        new("Introduction to bum 281", 5),
+        new("Second topic in subject", 13),
+        new("Third topic", 0)
+      },
+      true // open like your mock
+    )
+  };
+}
+
+<style>
+    :root {
+        --ink: #2D3034;
+        --mist: #DBE4EE;
+        --white: #FFFFFF;
+        --orange: #F17300;
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --radius: 1.25rem;
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box
+    }
+
+    html, body {
+        margin: 0;
+        color: var(--ink);
+        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif
+    }
+
+    .lr {
+        padding: clamp(12px,3vw,20px)
+    }
+
+    .title {
+        margin: 0;
+        font-weight: 800;
+        font-size: clamp(22px,3.2vw,36px);
+        letter-spacing: .2px
+    }
+
+    .subtitle {
+        margin: 4px 0 12px;
+        font-weight: 800;
+        opacity: .85;
+        font-size: clamp(16px,2.4vw,22px)
+    }
+
+    .tutor-list {
+        display: grid;
+        gap: 12px
+    }
+
+    .tutor {
+        background: var(--mist);
+        border: 1px solid var(--ring);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+        .tutor summary {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            cursor: pointer;
+        }
+
+            .tutor summary::-webkit-details-marker {
+                display: none
+            }
+
+    .avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #9AA0A6
+    }
+
+    .tutor-name {
+        font-weight: 700
+    }
+
+    .spacer {
+        flex: 1
+    }
+
+    .chev {
+        width: 30px;
+        height: 30px;
+        position: relative;
+        display: grid;
+        place-items: center
+    }
+
+        .chev::before, .chev::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 2px;
+            background: var(--ink);
+            transition: transform .18s ease;
+        }
+
+        .chev::before {
+            transform: translateX(-2px) rotate(40deg)
+        }
+
+        .chev::after {
+            transform: translateX( 2px) rotate(-40deg)
+        }
+
+    .tutor[open] .chev::before {
+        transform: translateX(-2px) rotate(-40deg)
+    }
+
+    .tutor[open] .chev::after {
+        transform: translateX( 2px) rotate(40deg)
+    }
+
+    .topics {
+        display: grid;
+        gap: 12px;
+        padding: 0 14px 14px
+    }
+
+    .topic-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--white);
+        border: 1px solid var(--ring);
+        border-radius: 14px;
+        padding: 12px;
+        text-decoration: none;
+        color: var(--ink);
+        box-shadow: var(--shadow);
+    }
+
+    .num {
+        font-weight: 800;
+        opacity: .9
+    }
+
+    .text {
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis
+    }
+
+    .uploads {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--white);
+        padding: 4px;
+        border-radius: 999px;
+        border: 2px solid var(--white);
+        box-shadow: 0 0 0 2px var(--white);
+    }
+
+        .uploads .count {
+            background: var(--orange);
+            color: #fff;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 999px;
+        }
+
+    @@media (max-width: 560px) {
+        .topic-row {
+            padding: 10px
+        }
+
+        .uploads .count {
+            padding: 6px 10px
+        }
+    }
+</style>

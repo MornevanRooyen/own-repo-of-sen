@@ -1,0 +1,642 @@
+﻿@page "/create-profile"
+@using Microsoft.AspNetCore.Components.Forms
+@using Sen381.Business.Models
+@using Sen381.Data_Access
+@inject SupaBaseAuthService SupabaseService
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>Create Profile | CampusLearn</PageTitle>
+
+<!-- ===== Breadcrumb ===== -->
+<nav class="crumbs" aria-label="Breadcrumb">
+    <ol>
+        <li><a href="/">Home</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li aria-current="page">Create profile</li>
+    </ol>
+</nav>
+
+<!-- ===== Page Header ===== -->
+<header class="page-hd">
+    <div class="hd-left">
+        <img class="avatar-xl" src="@AvatarUrl" alt="Profile avatar" />
+        <div class="title-block">
+            <h1 class="title">Create your student profile</h1>
+            <div class="subtitle">Tell us about your programme and year.</div>
+        </div>
+    </div>
+
+    <div class="hd-actions">
+        <button type="button" class="btn" @onclick="ChangePicture">Change picture</button>
+    </div>
+</header>
+
+<!-- ===== Tabs ===== -->
+<nav class="tabs" aria-label="Profile sections">
+    <a class="tab active" href="#details">Profile</a>
+    <span class="tab" aria-disabled="true" title="Available after saving">Activity</span>
+    <span class="tab" aria-disabled="true" title="Available after saving">Enrolments</span>
+    <span class="tab" aria-disabled="true" title="Available after saving">Preferences</span>
+</nav>
+
+<main class="grid">
+    <EditForm Model="@Form" OnValidSubmit="@Save">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="val-summary" />
+
+        <!-- ===== Left column ===== -->
+        <aside class="col-left">
+            <section id="details" class="card">
+                <h2 class="card-hd">Your details</h2>
+                <div class="props fields">
+                    <div class="field">
+                        <label>First name</label>
+                        <InputText class="input" @bind-Value="Form.FirstName" />
+                    </div>
+                    <div class="field">
+                        <label>Last name</label>
+                        <InputText class="input" @bind-Value="Form.LastName" />
+                    </div>
+                    <div class="field">
+                        <label>Email address</label>
+                        <InputText class="input" type="email" @bind-Value="Form.Email" />
+                    </div>
+                    <div class="field">
+                        <label>Phone</label>
+                        <InputText class="input" @bind-Value="Form.Phone" />
+                    </div>
+                    <div class="field">
+                        <label>City/town</label>
+                        <InputText class="input" @bind-Value="Form.City" />
+                    </div>
+                    <div class="field">
+                        <label>Country</label>
+                        <InputText class="input" @bind-Value="Form.Country" />
+                    </div>
+                    <div class="field">
+                        <label>Timezone</label>
+                        <InputText class="input" @bind-Value="Form.Timezone" placeholder="e.g., Africa/Johannesburg" />
+                    </div>
+                    <div class="field">
+                        <label>Website</label>
+                        <InputText class="input" @bind-Value="Form.Website" placeholder="https://…" />
+                    </div>
+                    <div class="field">
+                        <label>Programme</label>
+                        <InputText class="input" @bind-Value="Form.Program" placeholder="e.g., BComp" />
+                    </div>
+                    <div class="field">
+                        <label>Year of study</label>
+                        <InputText class="input" @bind-Value="Form.Year" placeholder="e.g., 2nd Year" />
+                    </div>
+                    <div class="field">
+                        <label>Student ID (optional)</label>
+                        <InputText class="input" @bind-Value="Form.StudentId" />
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-hd">Interests (optional)</h2>
+                <div class="subject-add">
+                    <InputText class="input" @bind-Value="NewInterest" placeholder="Add an interest (e.g., Web Dev)" />
+                    <button type="button" class="btn-cta" @onclick="AddInterest">Add</button>
+                </div>
+
+                @if (Form.Interests.Count > 0)
+                {
+                    <ul class="chip-list">
+                        @foreach (var t in Form.Interests)
+                        {
+                            <li class="chip">
+                                <span class="chip-title">@t</span>
+                                <button class="chip-x" type="button" title="Remove" @onclick="() => RemoveInterest(t)">×</button>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="muted">No interests added yet.</p>
+                }
+            </section>
+
+            <section class="card">
+                <h2 class="card-hd">Contact preference</h2>
+                <div class="field">
+                    <InputSelect class="input" @bind-Value="Form.ContactPreference">
+                        <option value="">Select…</option>
+                        <option>Email</option>
+                        <option>Phone</option>
+                        <option>Either</option>
+                    </InputSelect>
+                </div>
+            </section>
+        </aside>
+
+        <!-- ===== Right column ===== -->
+        <section class="col-right">
+            <section class="card">
+                <h2 class="card-hd">About</h2>
+                <div class="field">
+                    <InputTextArea class="textarea" rows="5" @bind-Value="Form.About"
+                                   placeholder="A short description that appears on your profile…" />
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-hd">Subjects</h2>
+                <div class="subject-add">
+                    <InputText class="input" @bind-Value="NewSubject" placeholder="Add subject code (e.g., BUM281)" />
+                    <button type="button" class="btn-cta" @onclick="AddSubject">Add subject</button>
+                </div>
+
+                @if (Form.Subjects.Count > 0)
+                {
+                    <ul class="chip-list">
+                        @foreach (var s in Form.Subjects)
+                        {
+                            <li class="chip">
+                                <span class="chip-title">@s</span>
+                                <button class="chip-x" type="button" title="Remove" @onclick="() => RemoveSubject(s)">×</button>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="muted">No subjects added yet.</p>
+                }
+            </section>
+
+            <section class="card">
+                <h2 class="card-hd">Actions</h2>
+                <div class="actions">
+                    <button class="btn-cta" type="submit">Save profile</button>
+                    <NavLink class="btn-ghost" href="/dashboard">Skip for now</NavLink>
+                </div>
+            </section>
+        </section>
+    </EditForm>
+</main>
+
+<!-- === KEEP ALL STYLING BELOW === -->
+<style>
+    /* ===== Tokens (same as profile) ===== */ :root {
+        --bg: #f5f7fb;
+        --panel: #fff;
+        --ink: #2D3034;
+        --muted: color-mix(in oklab, var(--ink) 55%, white);
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --primary: #1B998B;
+        --accent: #3a7bdb;
+        --chip: #DBE4EE;
+        --radius: 14px;
+        --shadow: 0 6px 18px rgba(0,0,0,.06);
+        --container: min(1150px,92vw);
+    }
+
+    * {
+        box-sizing: border-box
+    }
+
+    html, body {
+        height: 100%
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: system-ui,-apple-system,"Segoe UI",Inter,Roboto,Arial,sans-serif;
+        line-height: 1.45;
+    }
+
+    a {
+        color: var(--accent);
+        text-decoration: none
+    }
+
+        a:hover {
+            text-decoration: underline
+        }
+    /* ===== Shell / Shared with profile ===== */
+
+    .crumbs {
+        width: var(--container);
+        margin: 10px auto 0;
+        font-size: .92rem
+    }
+
+        .crumbs ol {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .crumbs li::after {
+            content: "/";
+            margin: 0 6px;
+            color: var(--muted)
+        }
+
+        .crumbs li:last-child::after {
+            content: ""
+        }
+
+        .crumbs [aria-current="page"] {
+            color: var(--muted);
+            font-weight: 700
+        }
+
+    .page-hd {
+        width: var(--container);
+        margin: 8px auto 10px;
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .hd-left {
+        display: flex;
+        align-items: center;
+        gap: 14px
+    }
+
+    .avatar-xl {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #cfd5da;
+        flex: 0 0 84px;
+        border: 2px solid var(--ring);
+    }
+
+    .title {
+        margin: 0;
+        font-weight: 800;
+        letter-spacing: .2px;
+        font-size: clamp(20px,3.2vw,28px)
+    }
+
+    .subtitle {
+        margin-top: 2px;
+        color: var(--muted);
+        font-weight: 700
+    }
+
+    .hd-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--ring);
+        background: #eef3f8;
+        color: #122;
+        font-weight: 800;
+        box-shadow: var(--shadow)
+    }
+
+        .btn.primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: transparent
+        }
+
+        .btn:hover {
+            filter: brightness(.98);
+            text-decoration: none
+        }
+
+    .tabs {
+        width: var(--container);
+        margin: 0 auto 10px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap
+    }
+
+    .tab {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 999px;
+        font-weight: 800;
+        background: #e8eef7;
+        color: #1b2b3b;
+        border: 1px solid var(--ring)
+    }
+
+        .tab.active {
+            background: #d9e6ff;
+            color: #14315f;
+            border-color: #c7d7fb
+        }
+
+        .tab[aria-disabled="true"] {
+            opacity: .6;
+            cursor: not-allowed
+        }
+
+    .grid {
+        width: var(--container);
+        margin: 0 auto 24px;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: clamp(14px,3vw,22px)
+    }
+
+    .card {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 14px
+    }
+
+    .card-hd {
+        margin: 0 0 8px;
+        font-weight: 900;
+        font-size: 1.05rem;
+        letter-spacing: .2px
+    }
+    /* ===== Form styling to match profile visual ===== */
+
+    .props.fields {
+        display: grid;
+        gap: 12px
+    }
+
+    .field label {
+        display: block;
+        font-weight: 800;
+        margin-bottom: 6px
+    }
+
+    .input {
+        width: 100%;
+        height: 38px;
+        border: 0;
+        border-radius: 999px;
+        background: #fff;
+        padding: 0 14px;
+        outline: none;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+        font: inherit;
+        color: var(--ink);
+    }
+
+        .input:focus {
+            box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--ink) 16%, white), 0 0 0 2px color-mix(in oklab, var(--ink) 8%, white)
+        }
+
+    .textarea {
+        width: 100%;
+        min-height: 120px;
+        border: 0;
+        border-radius: 12px;
+        background: #fff;
+        padding: 10px 12px;
+        outline: none;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+        font: inherit;
+        color: var(--ink);
+        resize: vertical;
+    }
+
+    .val-summary {
+        margin: 8px 0 0;
+        color: #b00020;
+        font-weight: 700
+    }
+
+    .validation-message {
+        color: #b00020;
+        font-size: .9rem;
+        margin-top: 4px
+    }
+
+    .subject-add {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center
+    }
+
+    .chip-list {
+        list-style: none;
+        margin: 12px 0 0;
+        padding: 0;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap
+    }
+
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--chip);
+        border: 1px solid var(--ring);
+        border-radius: 999px;
+        padding: 6px 10px;
+        box-shadow: var(--shadow)
+    }
+
+    .chip-title {
+        font-weight: 800
+    }
+
+    .chip-x {
+        border: 0;
+        background: transparent;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        color: #333
+    }
+
+    =
+</style>
+
+@code {
+    private string AvatarUrl = "https://placehold.co/160x160/png";
+    private void ChangePicture() { }
+
+    private ProfileForm Form = new();
+    private string NewSubject = string.Empty;
+    private string NewInterest = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uid = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
+            if (string.IsNullOrEmpty(uid) || !int.TryParse(uid, out int userId))
+            {
+                Console.WriteLine("⚠️ Missing or invalid userId — cannot load profile.");
+                return;
+            }
+
+            // ✅ Fetch full user record by ID
+            var response = await Http.GetAsync($"https://localhost:7228/api/Profile/by-id/{userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var user = await response.Content.ReadFromJsonAsync<User>();
+                if (user != null)
+                {
+                    Form.FirstName = user.FirstName ?? "";
+                    Form.LastName = user.LastName ?? "";
+                    Form.Email = user.Email ?? "";
+                    Form.Phone = user.PhoneNum ?? "";
+                    Form.Program = user.Program ?? "";
+                    Form.Year = user.Year ?? "";
+                    Form.City = user.City ?? "";
+                    Form.Country = user.Country ?? "";
+                    Form.Timezone = user.Timezone ?? "";
+                    Form.Website = user.Website ?? "";
+                    Form.About = user.About ?? "";
+                    Form.ContactPreference = user.ContactPreference ?? "";
+                    Form.Subjects = (user.Subjects ?? "").Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+                    Form.Interests = (user.Interests ?? "").Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+
+                    Console.WriteLine($"✅ Profile data loaded for userId {userId}");
+                }
+                else
+                {
+                    Console.WriteLine("⚠️ User record returned null.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"⚠️ Failed to load user data. Status: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error loading profile: {ex.Message}");
+        }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            var uid = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
+            if (!int.TryParse(uid, out int userId))
+            {
+                Console.WriteLine("⚠️ Invalid userId — cannot save.");
+                return;
+            }
+
+            // ✅ Build a plain DTO that matches ProfileUpdateDto in backend
+            var updateDto = new
+            {
+                FirstName = Form.FirstName,
+                LastName = Form.LastName,
+                Email = Form.Email,
+                PhoneNum = Form.Phone,
+                City = Form.City,
+                Country = Form.Country,
+                Timezone = Form.Timezone,
+                Website = Form.Website,
+                Program = Form.Program,
+                Year = Form.Year,
+                StudentId = Form.StudentId,
+                About = Form.About,
+                ContactPreference = Form.ContactPreference,
+                Interests = string.Join(", ", Form.Interests),
+                Subjects = string.Join(", ", Form.Subjects),
+                ProfilePicturePath = AvatarUrl
+            };
+
+            // ✅ Send the clean DTO instead of the User model
+            var response = await Http.PutAsJsonAsync(
+                $"https://localhost:7228/api/Profile/{userId}", updateDto);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("✅ Profile saved successfully.");
+                Nav.NavigateTo("/dashboard");
+            }
+            else
+            {
+                var errorText = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"⚠️ Save failed. Status: {response.StatusCode}, Response: {errorText}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error saving profile: {ex.Message}");
+        }
+    }
+
+
+    private void AddSubject()
+    {
+        var s = (NewSubject ?? string.Empty).Trim().ToUpperInvariant();
+        if (!string.IsNullOrWhiteSpace(s) && !Form.Subjects.Contains(s))
+        {
+            Form.Subjects.Add(s);
+            NewSubject = "";
+        }
+    }
+
+    private void RemoveSubject(string s) => Form.Subjects.Remove(s);
+
+    private void AddInterest()
+    {
+        var t = (NewInterest ?? string.Empty).Trim();
+        if (!string.IsNullOrWhiteSpace(t) && !Form.Interests.Contains(t, StringComparer.OrdinalIgnoreCase))
+        {
+            Form.Interests.Add(t);
+            NewInterest = "";
+        }
+    }
+
+    private void RemoveInterest(string t)
+    {
+        var hit = Form.Interests.FirstOrDefault(x => string.Equals(x, t, StringComparison.OrdinalIgnoreCase));
+        if (hit is not null) Form.Interests.Remove(hit);
+    }
+
+    public class ProfileForm
+    {
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string Program { get; set; } = "";
+        public string Year { get; set; } = "";
+        public string StudentId { get; set; } = "";
+        public string City { get; set; } = "";
+        public string Country { get; set; } = "";
+        public string Timezone { get; set; } = "";
+        public string Website { get; set; } = "";
+        public string About { get; set; } = "";
+        public string ContactPreference { get; set; } = "";
+        public List<string> Subjects { get; set; } = new();
+        public List<string> Interests { get; set; } = new();
+    }
+}

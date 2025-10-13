@@ -1,0 +1,157 @@
+﻿@page "/topichub/tutorprofile"
+@layout TopicHubLayout
+
+
+<section class="tp">
+    <h1 class="title">My BUM 281 Tutor Profile <span class="pipe">|</span> <span class="name">Taylor S.</span></h1>
+    <p class="sub">Upload &amp; view learning resources per topic</p>
+
+    <div class="chips">
+        @for (int i = 0; i < topics.Count; i++)
+        {
+            var t = topics[i];
+            <div class="chip">
+                <span class="num">@((i + 1)).</span>
+                <span class="text">@t</span>
+
+                <span class="spacer"></span>
+
+                <!-- Upload control (no JS required). This will open the file picker. -->
+                <label class="upload" title="Upload resource">
+                    <input type="file" class="file" />
+                    <!-- upload icon (arrow into tray) -->
+                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                        <path d="M12 15V4m0 0l-4 4m4-4l4 4" fill="none" stroke="#2D3034" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" fill="none" stroke="#2D3034" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </label>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    // Placeholder list to match your mock; wire to Subjects/Topics from DB later.
+    private List<string> topics = new()
+  {
+    "Introduction to bum 281",
+    "How to not be a bum",
+    "History of bum",
+    "Blablabla",
+    "Another topic",
+    "Lets fill in all the topics",
+    "Random words",
+    "Last made up topic i pr..."
+  };
+}
+
+<style>
+    :root {
+        --ink: #2D3034;
+        --mist: #DBE4EE;
+        --white: #FFFFFF;
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --radius: 1.25rem;
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box
+    }
+
+    html, body {
+        margin: 0;
+        color: var(--ink);
+        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif
+    }
+
+    /* Section header */
+    .tp {
+        padding: clamp(12px,3vw,20px)
+    }
+
+    .title {
+        margin: 0;
+        font-weight: 800;
+        font-size: clamp(22px,3.2vw,34px);
+        letter-spacing: .2px;
+    }
+
+        .title .pipe {
+            margin-inline: 8px;
+            opacity: .6
+        }
+
+    .sub {
+        margin: 4px 0 14px;
+        opacity: .85;
+        font-weight: 700
+    }
+
+    /* Chips grid (3 cols like the mock) */
+    .chips {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(220px, 1fr));
+        gap: 14px 24px;
+    }
+
+    .chip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--mist);
+        border: 1px solid var(--ring);
+        border-radius: 14px;
+        padding: 10px 12px;
+        box-shadow: var(--shadow);
+        min-height: 46px;
+    }
+
+    .num {
+        font-weight: 800
+    }
+
+    .text {
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .spacer {
+        flex: 1
+    }
+
+    /* Upload button (label + hidden file input) */
+    .upload {
+        display: inline-grid;
+        place-items: center;
+        background: var(--white);
+        border: 1px solid var(--ring);
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+        .upload:hover {
+            filter: brightness(.98)
+        }
+
+    .file {
+        display: none
+    }
+
+    /* Responsive */
+    @@media (max-width: 960px) {
+        .chips {
+            grid-template-columns: repeat(2, minmax(220px, 1fr))
+        }
+    }
+
+    @@media (max-width: 560px) {
+        .chips {
+            grid-template-columns: 1fr
+        }
+    }
+</style>

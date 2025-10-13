@@ -1,0 +1,82 @@
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\obj\Debug\Sen381.csproj.AssemblyReference.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\obj\Debug\Sen381.csproj.CoreCompileInputs.cache
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Sen381.exe.config
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Sen381.exe
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Sen381.pdb
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\obj\Debug\Sen381.exe
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\obj\Debug\Sen381.pdb
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\obj\Debug\Sen381.exe.config
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Microsoft.Bcl.HashCode.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Npgsql.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Buffers.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Collections.Immutable.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Diagnostics.DiagnosticSource.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Memory.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Numerics.Vectors.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Text.Encodings.Web.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Text.Json.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Threading.Channels.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.ValueTuple.dll
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Microsoft.Bcl.HashCode.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\Npgsql.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Buffers.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Collections.Immutable.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Diagnostics.DiagnosticSource.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Memory.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Text.Encodings.Web.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Text.Json.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Threading.Channels.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\bin\Debug\System.ValueTuple.xml
+C:\Users\xavie\OneDrive\Desktop\Sen381\Sen381\obj\Debug\Sen381.csproj.Up2Date
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Sen381.exe.config
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Sen381.exe
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Sen381.pdb
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Microsoft.Bcl.HashCode.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Npgsql.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Buffers.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Collections.Immutable.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Diagnostics.DiagnosticSource.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Memory.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Numerics.Vectors.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Text.Encodings.Web.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Text.Json.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Threading.Channels.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.ValueTuple.dll
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Microsoft.Bcl.HashCode.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Microsoft.Extensions.DependencyInjection.Abstractions.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\Npgsql.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Buffers.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Collections.Immutable.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Diagnostics.DiagnosticSource.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Memory.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Numerics.Vectors.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Text.Encodings.Web.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Text.Json.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Threading.Channels.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\bin\Debug\System.ValueTuple.xml
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\Sen381.csproj.AssemblyReference.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\Sen381.csproj.CoreCompileInputs.cache
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\Sen381.csproj.Up2Date
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\Sen381.exe
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\Sen381.pdb
+C:\Sen381 github repo\SEN381-CampusLearn\Sen381\obj\Debug\Sen381.exe.config

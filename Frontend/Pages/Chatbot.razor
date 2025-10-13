@@ -1,0 +1,153 @@
+﻿@page "/topichub/claratea"
+@layout TopicHubLayout
+
+<!-- Chatbot (3.2.3) -->
+
+<section class="clara">
+    <h1 class="title">Ask <span class="accent">CLARA!</span></h1>
+
+    <div class="chat-window">
+        <div class="msg user">
+            <div class="bubble">Hey Clara, can you help me with my assignment?</div>
+        </div>
+
+        <div class="msg bot">
+            <div class="bubble">Of course! What part are you struggling with?</div>
+        </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-row">
+        <input type="text" class="input" placeholder="type text here to post to ask the chatbot." />
+        <button class="send-btn" aria-label="send">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="#AD1F54">
+                <path d="M3 20v-5l9-3-9-3V4l18 8-18 8z" />
+            </svg>
+        </button>
+    </div>
+</section>
+
+<style>
+    /* ===== Design tokens ===== */
+    :root {
+        --bg: #FFFFFF;
+        --ink: #2D3034;
+        --teal: #1B998B;
+        --bluegray: #DBE4EE;
+        --rose: #AD1F54;
+        --radius: 1.25rem;
+        --shadow: 0 4px 12px rgba(0,0,0,.06);
+        --font-body: "Lexend", system-ui, sans-serif;
+        --font-head: "Outfit", system-ui, sans-serif;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        color: var(--ink);
+        font-family: var(--font-body)
+    }
+
+    .clara {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: clamp(12px,3vw,22px);
+        height: 100%;
+    }
+
+    .title {
+        text-align: center;
+        font-weight: 800;
+        font-family: var(--font-head);
+        font-size: clamp(24px,3vw,32px);
+    }
+
+        .title .accent {
+            font-family: "Outfit", system-ui;
+            font-style: italic;
+            color: var(--rose);
+        }
+
+    /* ===== Chat Area ===== */
+    .chat-window {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        flex: 1;
+        padding: 8px 0;
+    }
+
+    .msg {
+        display: flex;
+    }
+
+        .msg.user {
+            justify-content: flex-start;
+        }
+
+        .msg.bot {
+            justify-content: flex-end;
+        }
+
+    .bubble {
+        max-width: 70%;
+        padding: 14px 18px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        font-weight: 600;
+        font-size: .95rem;
+    }
+
+    .msg.user .bubble {
+        background: var(--teal);
+        color: #fff;
+    }
+
+    .msg.bot .bubble {
+        background: var(--bluegray);
+        color: var(--ink);
+    }
+
+    /* ===== Input Row ===== */
+    .input-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bluegray);
+        border-top: 1px solid rgba(0,0,0,.08);
+        border-radius: 999px;
+        padding: 6px 10px;
+    }
+
+    .input {
+        flex: 1;
+        height: 40px;
+        border: 0;
+        background: transparent;
+        padding: 0 10px;
+        outline: none;
+        font: inherit;
+        color: var(--ink);
+    }
+
+    .send-btn {
+        border: 0;
+        background: none;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        transition: background .2s ease;
+    }
+
+        .send-btn:hover {
+            background: rgba(0,0,0,.06);
+        }
+</style>

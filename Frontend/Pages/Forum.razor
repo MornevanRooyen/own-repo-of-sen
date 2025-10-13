@@ -1,0 +1,201 @@
+﻿@page "/topichub/forum"
+@layout TopicHubLayout
+
+
+<section class="forum">
+    <h1 class="forum-title">BUM 281 [TOPIC CHOICE] FORUM</h1>
+
+    <!-- Message bubbles -->
+    <div class="chat-area">
+        <div class="msg student">
+            <div class="avatar">T</div>
+            <div class="bubble">
+                Taylor | <span class="time">20:47</span>
+            </div>
+        </div>
+
+        <div class="msg anon">
+            <div class="avatar">A/</div>
+            <div class="bubble">
+                Anonymous | <span class="time">20:49</span>
+            </div>
+        </div>
+
+        <div class="msg tutor">
+            <div class="avatar">✦</div>
+            <div class="bubble">
+                Tutor | <span class="time">20:47</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-row">
+        <input type="text" class="input" placeholder="type text here to post to forum." />
+        <button class="send-btn" aria-label="send">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="#2D3034">
+                <path d="M3 20v-5l9-3-9-3V4l18 8-18 8z" />
+            </svg>
+        </button>
+
+        <label class="anon-label">
+            <input type="checkbox" /> anonymous
+        </label>
+    </div>
+</section>
+
+<style>
+    /* ===== Tokens ===== */
+    :root {
+        --bg: #FFFFFF;
+        --ink: #2D3034;
+        --nav: #DBE4EE;
+        --teal: #1B998B;
+        --orange: #F17300;
+        --rose: #AD1F54;
+        --bluegray: #DBE4EE;
+        --radius: 1.25rem;
+        --shadow: 0 4px 12px rgba(0,0,0,.06);
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        color: var(--ink);
+        font-family: "Lexend", system-ui, sans-serif
+    }
+
+    .forum {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: clamp(12px,3vw,22px);
+    }
+
+    .forum-title {
+        text-align: center;
+        font-weight: 800;
+        font-family: "Outfit", system-ui, sans-serif;
+        letter-spacing: .2px;
+    }
+
+    /* ===== Chat Area ===== */
+    .chat-area {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 8px 0;
+    }
+
+    .msg {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .avatar {
+        width: 32px;
+        height: 32px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--nav);
+        font-weight: 800;
+    }
+
+    .bubble {
+        border-radius: 12px;
+        padding: 10px 16px;
+        background: var(--bluegray);
+        font-weight: 600;
+        font-size: .9rem;
+        box-shadow: var(--shadow);
+    }
+
+    .time {
+        font-weight: 500;
+        font-size: .8rem
+    }
+
+    /* Roles / colors */
+    .msg.student .bubble {
+        background: var(--teal);
+        color: #fff
+    }
+
+    .msg.anon .bubble {
+        background: var(--bluegray)
+    }
+
+    .msg.tutor .bubble {
+        background: var(--orange);
+        color: #fff
+    }
+
+    /* ===== Input Row ===== */
+    .input-row {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        border-top: 1px solid rgba(0,0,0,.08);
+        padding-top: 10px;
+    }
+
+    .input {
+        flex: 1;
+        height: 40px;
+        border: 1px solid rgba(0,0,0,.15);
+        border-radius: 999px;
+        padding: 0 14px;
+        font: inherit;
+        outline: none;
+    }
+
+    .send-btn {
+        border: 0;
+        background: none;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        padding: 4px;
+        width: 34px;
+        height: 34px;
+        transition: background .2s ease;
+    }
+
+        .send-btn:hover {
+            background: rgba(0,0,0,.06);
+        }
+
+    .anon-label {
+        display: flex;
+        align-items: center;
+        font-size: .9rem;
+        font-weight: 600;
+        gap: 4px;
+    }
+
+        .anon-label input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--ink);
+        }
+
+    /* Responsive */
+    @@media(max-width:600px) {
+        .forum-title {
+            font-size: 1.2rem
+        }
+
+        .input {
+            font-size: .9rem
+        }
+    }
+</style>

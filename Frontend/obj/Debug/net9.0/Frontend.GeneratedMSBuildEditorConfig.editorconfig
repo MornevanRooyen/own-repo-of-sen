@@ -1,0 +1,137 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = 
+build_property.EnableTrimAnalyzer = false
+build_property.IncludeAllContentForSelfExtract = 
+build_property.TargetFramework = net9.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = Frontend
+build_property.RootNamespace = Frontend
+build_property.ProjectDir = C:\Sen381 github repo\SEN381-CampusLearn\Frontend\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = false
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Sen381 github repo\SEN381-CampusLearn\Frontend
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 9.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/AdminProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5Qcm9maWxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Analytics.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQW5hbHl0aWNzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/BecomeTutor.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQmVjb21lVHV0b3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Chatbot.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hhdGJvdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/CreateProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3JlYXRlUHJvZmlsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Dashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Forum.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRm9ydW0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/LandingPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGFuZGluZ1BhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/LearningResources.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGVhcm5pbmdSZXNvdXJjZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/ManageSubjectsAndTopics.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFuYWdlU3ViamVjdHNBbmRUb3BpY3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Messages.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVzc2FnZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Peers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGVlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Reports.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/SignUp.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2lnblVwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/StudentProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3R1ZGVudFByb2ZpbGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Subjects.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3ViamVjdHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/TopicHub.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVG9waWNIdWIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Topics.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVG9waWNzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/TutorApplication.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHV0b3JBcHBsaWNhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/TutorApplications.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHV0b3JBcHBsaWNhdGlvbnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/TutorProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHV0b3JQcm9maWxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Pages/Tutors.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHV0b3JzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Shared/ClaraPanel.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXENsYXJhUGFuZWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Shared/Navigation.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdmlnYXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/Shared/TopicHubLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFRvcGljSHViTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Sen381 github repo/SEN381-CampusLearn/Frontend/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 

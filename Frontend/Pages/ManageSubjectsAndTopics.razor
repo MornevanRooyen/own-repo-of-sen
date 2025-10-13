@@ -1,0 +1,1015 @@
+﻿@page "/admin/manageSubAndTop"
+@using Microsoft.AspNetCore.Components.Web
+@using System.Threading
+
+<PageTitle>Admin · Manage Subjects & Topics</PageTitle>
+
+<section class="admin-page">
+    <header class="head">
+        <div class="stack">
+            <h1 class="title">Manage Subjects & Topics</h1>
+            <p class="sub">Create, rename, activate/deactivate subjects; edit titles and set the order number to re-position topics.</p>
+        </div>
+
+        <div class="actions">
+            <button class="btn" @onclick="StartAddSubject">+ Add subject</button>
+        </div>
+    </header>
+
+    <section class="split">
+        <!-- LEFT: Subjects -->
+        <article class="card subjects">
+            <header class="card__head">
+                <div>
+                    <h3 class="card__title">Subjects</h3>
+                    <p class="card__sub"><b>Active</b> = visible to students & tutors.</p>
+                </div>
+                <input class="search" placeholder="Search subjects…" @bind="SubjectSearch" @bind:event="oninput" />
+            </header>
+
+            @if (IsAddingSubject)
+            {
+                <div class="subject-add">
+                    <div class="grid-2">
+                        <input class="in" placeholder="Code (unique, e.g. SEN381)" @bind="NewSubjectCode" @bind:event="oninput" />
+                        <input class="in" placeholder="Name (e.g. Software Engineering 3)" @bind="NewSubjectName" @bind:event="oninput" />
+                    </div>
+                    <div class="row">
+                        <label class="lbl">Year</label>
+                        <input class="in sm num" type="number" min="1" max="5" @bind="NewSubjectYear" />
+                        <label class="switch lbl" title="Active = visible to students & tutors">
+                            <span>Active</span>
+                            <input type="checkbox" @bind="NewSubjectActive" />
+                            <i></i>
+                        </label>
+                        <span class="spacer"></span>
+                        <button class="btn" @onclick="AddSubject">Add</button>
+                        <button class="btn ghost" @onclick="CancelAddSubject">Cancel</button>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(SubjectAddError))
+                    {
+                        <div class="error">@SubjectAddError</div>
+                    }
+                </div>
+            }
+
+            <ul class="subject-list">
+                @foreach (var s in SubjectsFiltered)
+                {
+                    var selected = SelectedSubjectId == s.SubjectId;
+                    var editing = EditSubjectId == s.SubjectId;
+
+                    <li class="subject-item @(selected ? "selected" : "")">
+                        @if (!editing)
+                        {
+                            <button type="button" class="subject-btn" @onclick="@(() => SelectSubject(s.SubjectId))">
+                                <div class="info">
+                                    <div class="code">@s.SubjectCode</div>
+                                    <div class="name">@s.Name</div>
+                                </div>
+
+                                <div class="tools">
+                                    <label class="switch" title="Active = visible to students & tutors">
+                                        <span class="switch-text">Active</span>
+                                        <input type="checkbox" checked="@s.IsActive" @onchange="(e) => ToggleActive(s.SubjectId, e)" />
+                                        <i></i>
+                                    </label>
+                                    <button class="icon ghost" title="Edit subject" @onclick="@(() => BeginEditSubject(s))" aria-label="Edit">✎</button>
+                                    <button class="icon danger" title="Delete subject" @onclick="@(() => AskDeleteSubject(s.SubjectId))" aria-label="Delete">🗑</button>
+                                </div>
+                            </button>
+                        }
+                        else
+                        {
+                            <div class="subject-edit">
+                                <div class="grid-2">
+                                    <div class="col">
+                                        <label class="lbl">Code</label>
+                                        <input class="in" @bind="EditSubjectCode" @bind:event="oninput" />
+                                    </div>
+                                    <div class="col">
+                                        <label class="lbl">Name</label>
+                                        <input class="in" @bind="EditSubjectName" @bind:event="oninput" />
+                                    </div>
+                                </div>
+                                <div class="row mt4">
+                                    <label class="lbl">Year</label>
+                                    <input class="in sm num" type="number" min="1" max="5" @bind="EditSubjectYear" />
+                                    <label class="switch lbl" title="Active = visible to students & tutors">
+                                        <span>Active</span>
+                                        <input type="checkbox" checked="@EditSubjectActive" @onchange="(e) => EditSubjectActive = ParseBool(e)" />
+                                        <i></i>
+                                    </label>
+                                    <span class="spacer"></span>
+                                    <button class="icon success big" title="Save" @onclick="SaveSubjectEdit">✓ Save</button>
+                                    <button class="icon ghost big" title="Cancel" @onclick="CancelSubjectEdit">✕ Cancel</button>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(SubjectEditError))
+                                {
+                                    <div class="error">@SubjectEditError</div>
+                                }
+                            </div>
+                        }
+
+                        @if (ConfirmDeleteSubjectId == s.SubjectId)
+                        {
+                            <div class="confirm">
+                                <div class="confirm__text">Delete “@s.SubjectCode — @s.Name”? This removes its topics too.</div>
+                                <div class="confirm__actions">
+                                    <button class="btn danger" @onclick="@(() => DeleteSubject(s.SubjectId))">Delete</button>
+                                    <button class="btn ghost" @onclick="CancelDeleteSubject">Cancel</button>
+                                </div>
+                            </div>
+                        }
+                    </li>
+                }
+            </ul>
+        </article>
+
+        <!-- RIGHT: Topics -->
+        <article class="card topics">
+            @if (SelectedSubject is null)
+            {
+                <header class="card__head">
+                    <h3 class="card__title">Topics</h3>
+                </header>
+                <div class="state empty">Select a subject to view and manage its topics.</div>
+            }
+            else
+            {
+                <header class="card__head">
+                    <div>
+                        <h3 class="card__title">Topics · @SelectedSubject.SubjectCode <span class="muted">·</span> @SelectedSubject.Name</h3>
+                        <p class="card__sub">Change the <b>#</b> to reorder (1 = top). @if(!string.IsNullOrWhiteSpace(TopicSearch)){
+                        <span class="muted">Ordering disabled while filtering.</span>
+                    }
+</p>
+                </div>
+                <div class="row">
+                    <input class="search" placeholder="Search topics…" @bind="TopicSearch" @bind:event="oninput" />
+                    <button class="btn" @onclick="NewTopic">+ Add topic</button>
+                </div>
+            </header>
+
+            @if (TopicsFiltered.Count == 0)
+            {
+                <div class="state empty">No topics match your search.</div>
+            }
+            else
+            {
+                <ul class="topic-list">
+                    @for (int i = 0; i < TopicsFiltered.Count; i++)
+                    {
+                        var t = TopicsFiltered[i];
+                        var isEditing = EditingTopicId == t.TopicId;
+
+                        <li @key="t.TopicId" class="topic-row @(ReorderedTopicId == t.TopicId ? "slide" : "")">
+                            <div class="order">
+                                <!-- KEY THE INPUT SO ITS VALUE TRAVELS WITH THE TOPIC -->
+                                <input @key="t.TopicId"
+                                       class="order-input"
+                                       type="number"
+                                       min="1"
+                                       max="@CurrentTopics.Count"
+                                       value="@GetOrder(t.TopicId)"
+                                       inputmode="numeric" pattern="[0-9]*"
+                                       disabled="@(!string.IsNullOrWhiteSpace(TopicSearch))"
+                                       @onchange="(e) => OnOrderChange(t.TopicId, e)" />
+                                <div class="nudges">
+                                    <button class="nudge" title="Move up" disabled="@(!CanMoveUp(t.TopicId) || !string.IsNullOrWhiteSpace(TopicSearch))" @onclick="@(() => Nudge(t.TopicId, -1))">↑</button>
+                                    <button class="nudge" title="Move down" disabled="@(!CanMoveDown(t.TopicId) || !string.IsNullOrWhiteSpace(TopicSearch))" @onclick="@(() => Nudge(t.TopicId, 1))">↓</button>
+                                </div>
+                            </div>
+
+                            @if (!isEditing)
+                            {
+                                <span class="title">@t.Title</span>
+                            }
+                            else
+                            {
+                                <input class="edit"
+                                       @ref="EditTopicInputRef"
+                                       @bind="EditingTitle" @bind:event="oninput"
+                                       @onkeydown="OnEditTopicKeyDown" />
+                            }
+
+                            <span class="spacer"></span>
+
+                            @if (!isEditing)
+                            {
+                                <button class="icon ghost" title="Rename" @onclick="@(() => BeginEditTopic(t))" aria-label="Rename">✎</button>
+                                <button class="icon danger" title="Delete" @onclick="@(() => AskDeleteTopic(t.TopicId))" aria-label="Delete">🗑</button>
+                            }
+                            else
+                            {
+                                <button class="icon success" title="Save" @onclick="SaveTopicEdit" aria-label="Save">✓</button>
+                                <button class="icon ghost" title="Cancel" @onclick="CancelTopicEdit" aria-label="Cancel">✕</button>
+                            }
+
+                            @if (ConfirmDeleteTopicId == t.TopicId)
+                            {
+                                <div class="confirm-row">
+                                    <div class="confirm__text">Delete “@t.Title”? This can’t be undone.</div>
+                                    <div class="confirm__actions">
+                                        <button class="btn danger" @onclick="@(() => DeleteTopic(t.TopicId))">Delete</button>
+                                        <button class="btn ghost" @onclick="CancelDeleteTopic">Cancel</button>
+                                    </div>
+                                </div>
+                            }
+                        </li>
+                    }
+                </ul>
+
+                @if (!string.IsNullOrWhiteSpace(TopicEditError))
+                {
+                    <div class="error mt6">@TopicEditError</div>
+                }
+            }
+                        }
+        </article>
+    </section>
+</section>
+
+@code {
+    // ------------ Subjects state ------------
+    private string SubjectSearch { get; set; } = "";
+    private bool IsAddingSubject { get; set; } = false;
+    private string NewSubjectCode { get; set; } = "";
+    private string NewSubjectName { get; set; } = "";
+    private int? NewSubjectYear { get; set; } = null;
+    private bool NewSubjectActive { get; set; } = true;
+    private string? SubjectAddError { get; set; }
+
+    private long? SelectedSubjectId { get; set; } = 2; // default to BUM281 so you see topics immediately
+
+    // Subject edit
+    private long? EditSubjectId { get; set; } = null;
+    private string EditSubjectCode { get; set; } = "";
+    private string EditSubjectName { get; set; } = "";
+    private int EditSubjectYear { get; set; } = 1;
+    private bool EditSubjectActive { get; set; } = true;
+    private string? SubjectEditError { get; set; } = null;
+
+    private long? ConfirmDeleteSubjectId { get; set; } = null;
+
+    // -------- Dummy subjects --------
+    private class SubjectVM
+    {
+        public SubjectVM(long id, string code, string name, int year, bool active)
+        { SubjectId = id; SubjectCode = code; Name = name; Year = year; IsActive = active; }
+        public long SubjectId { get; set; }
+        public string SubjectCode { get; set; } = "";
+        public string Name { get; set; } = "";
+        public int Year { get; set; }
+        public bool IsActive { get; set; }
+    }
+
+    private List<SubjectVM> Subjects = new()
+  {
+    new SubjectVM(1, "SEN381", "Software Engineering 3", 3, true),
+    new SubjectVM(2, "BUM281", "Business Management 2", 2, true),
+    new SubjectVM(3, "ENT381", "Entrepreneurship 3", 3, true),
+    new SubjectVM(4, "MAT181", "Mathematics 1", 1, true),
+  };
+
+    private IEnumerable<SubjectVM> SubjectsFiltered =>
+      string.IsNullOrWhiteSpace(SubjectSearch)
+        ? Subjects.OrderBy(s => s.SubjectCode)
+        : Subjects.Where(s => ($"{s.SubjectCode} {s.Name}").Contains(SubjectSearch, StringComparison.OrdinalIgnoreCase))
+                  .OrderBy(s => s.SubjectCode);
+
+    private SubjectVM? SelectedSubject =>
+      SelectedSubjectId is null ? null : Subjects.FirstOrDefault(s => s.SubjectId == SelectedSubjectId);
+
+    // ------------ Topics ------------
+    private string TopicSearch { get; set; } = "";
+
+    private class TopicVM
+    {
+        public TopicVM(long id, string title) { TopicId = id; Title = title; }
+        public long TopicId { get; set; }
+        public string Title { get; set; } = "";
+    }
+
+    private Dictionary<long, List<TopicVM>> TopicsBySubject = new()
+    {
+        [1] = new() {
+      new TopicVM(1001,"Project Management"),
+      new TopicVM(1002,"System Arcitechture"),
+      new TopicVM(1003,"API's"),
+      new TopicVM(1004,"Study Tips"),
+      new TopicVM(1005,"Project Tips"),
+    },
+        [2] = new() {
+      new TopicVM(2001,"Leadership"),
+      new TopicVM(2002,"Lead her ship"),
+      new TopicVM(2003,"How to not fail BUM. Trust."),
+    },
+        [3] = new() {
+      new TopicVM(3001,"Technical Feasibility"),
+      new TopicVM(3002,"S.W.O.T."),
+      new TopicVM(3003,"The Life of a Business Gyal"),
+    },
+        [4] = new() {
+      new TopicVM(4001,"Parabolas and the Quadratic function"),
+      new TopicVM(4002,"Where tf the function?"),
+      new TopicVM(4003,"Numbers and stuff like that"),
+    },
+    };
+
+    private List<TopicVM> CurrentTopics =>
+      SelectedSubjectId is null ? new List<TopicVM>()
+      : (TopicsBySubject.TryGetValue(SelectedSubjectId.Value, out var list) ? list : new List<TopicVM>());
+
+    private List<TopicVM> TopicsFiltered =>
+      string.IsNullOrWhiteSpace(TopicSearch)
+        ? CurrentTopics.ToList()
+        : CurrentTopics.Where(t => t.Title.Contains(TopicSearch, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    // ------------ Subjects: actions ------------
+    private void StartAddSubject() { IsAddingSubject = true; SubjectAddError = null; NewSubjectCode = ""; NewSubjectName = ""; NewSubjectYear = null; NewSubjectActive = true; }
+    private void CancelAddSubject() { IsAddingSubject = false; SubjectAddError = null; }
+
+    private void AddSubject()
+    {
+        SubjectAddError = null;
+        var code = (NewSubjectCode ?? "").Trim();
+        var name = (NewSubjectName ?? "").Trim();
+        var year = NewSubjectYear ?? 1;
+
+        if (code.Length == 0 || name.Length == 0) { SubjectAddError = "Code and name are required."; return; }
+        if (year < 1 || year > 5) { SubjectAddError = "Year must be between 1 and 5."; return; }
+        if (Subjects.Any(s => string.Equals(s.SubjectCode, code, StringComparison.OrdinalIgnoreCase)))
+        { SubjectAddError = "Subject code must be unique."; return; }
+
+        var id = NextId();
+        Subjects.Add(new SubjectVM(id, code, name, year, NewSubjectActive));
+        TopicsBySubject[id] = new List<TopicVM>();
+        SelectedSubjectId = id;
+        IsAddingSubject = false;
+    }
+
+    private void SelectSubject(long id)
+    {
+        SelectedSubjectId = id;
+        TopicSearch = "";
+        ClearTopicEditing();
+    }
+
+    private void BeginEditSubject(SubjectVM s)
+    {
+        EditSubjectId = s.SubjectId;
+        EditSubjectCode = s.SubjectCode;
+        EditSubjectName = s.Name;
+        EditSubjectYear = s.Year;
+        EditSubjectActive = s.IsActive;
+        SubjectEditError = null;
+    }
+
+    private void SaveSubjectEdit()
+    {
+        if (EditSubjectId is null) return;
+        var s = Subjects.FirstOrDefault(x => x.SubjectId == EditSubjectId);
+        if (s is null) return;
+
+        var code = (EditSubjectCode ?? "").Trim();
+        var name = (EditSubjectName ?? "").Trim();
+        var year = EditSubjectYear;
+
+        if (code.Length == 0 || name.Length == 0) { SubjectEditError = "Code and name are required."; return; }
+        if (year < 1 || year > 5) { SubjectEditError = "Year must be between 1 and 5."; return; }
+        if (Subjects.Any(x => x.SubjectId != s.SubjectId &&
+                              string.Equals(x.SubjectCode, code, StringComparison.OrdinalIgnoreCase)))
+        { SubjectEditError = "Subject code must be unique."; return; }
+
+        s.SubjectCode = code;
+        s.Name = name;
+        s.Year = year;
+        s.IsActive = EditSubjectActive;
+
+        CancelSubjectEdit();
+    }
+
+    private void CancelSubjectEdit()
+    {
+        EditSubjectId = null;
+        EditSubjectCode = "";
+        EditSubjectName = "";
+        EditSubjectYear = 1;
+        EditSubjectActive = true;
+        SubjectEditError = null;
+    }
+
+    private bool ParseBool(ChangeEventArgs e)
+      => e.Value is bool b ? b
+         : bool.TryParse(e.Value?.ToString(), out var parsed) ? parsed
+         : (e.Value?.ToString()?.Equals("on", StringComparison.OrdinalIgnoreCase) ?? false);
+
+    private void AskDeleteSubject(long id) => ConfirmDeleteSubjectId = id;
+    private void CancelDeleteSubject() => ConfirmDeleteSubjectId = null;
+
+    private void DeleteSubject(long id)
+    {
+        Subjects.RemoveAll(s => s.SubjectId == id);
+        TopicsBySubject.Remove(id);
+        if (SelectedSubjectId == id) SelectedSubjectId = null;
+        ConfirmDeleteSubjectId = null;
+    }
+
+    private void ToggleActive(long id, ChangeEventArgs e)
+    {
+        var s = Subjects.FirstOrDefault(x => x.SubjectId == id);
+        if (s is null) return;
+        s.IsActive = ParseBool(e);
+    }
+
+    // ------------ Topics: actions ------------
+    private long? EditingTopicId { get; set; }
+    private string EditingTitle { get; set; } = "";
+    private string? TopicEditError { get; set; }
+    private ElementReference EditTopicInputRef;
+    private long? ConfirmDeleteTopicId { get; set; }
+    private long? ReorderedTopicId { get; set; } // for slide animation
+
+    private void NewTopic()
+    {
+        if (SelectedSubjectId is null) return;
+        var list = CurrentTopics;
+
+        string baseTitle = "New topic";
+        string title = baseTitle;
+        int i = 2;
+        while (TitleExists(list, title)) title = $"{baseTitle} {i++}";
+
+        var id = NextId();
+        list.Add(new TopicVM(id, title));
+        _ = BeginEditTopic(list.Last());
+    }
+
+    private async Task BeginEditTopic(TopicVM t)
+    {
+        EditingTopicId = t.TopicId;
+        EditingTitle = t.Title;
+        TopicEditError = null;
+
+        await InvokeAsync(StateHasChanged);
+        await Task.Yield();
+        await EditTopicInputRef.FocusAsync();
+    }
+
+    private void SaveTopicEdit()
+    {
+        if (SelectedSubjectId is null || EditingTopicId is null) return;
+        var list = CurrentTopics;
+
+        var t = list.FirstOrDefault(x => x.TopicId == EditingTopicId);
+        if (t is null) return;
+
+        var trimmed = (EditingTitle ?? "").Trim();
+        if (trimmed.Length == 0) { TopicEditError = "Title can’t be empty."; return; }
+        if (TitleExists(list, trimmed, t.TopicId)) { TopicEditError = "Title must be unique in this subject."; return; }
+
+        t.Title = trimmed;
+        ClearTopicEditing();
+    }
+
+    private void CancelTopicEdit() => ClearTopicEditing();
+
+    private void ClearTopicEditing()
+    {
+        EditingTopicId = null;
+        EditingTitle = "";
+        TopicEditError = null;
+    }
+
+    private void OnEditTopicKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") SaveTopicEdit();
+        else if (e.Key == "Escape") CancelTopicEdit();
+    }
+
+    private void AskDeleteTopic(long id) => ConfirmDeleteTopicId = id;
+    private void CancelDeleteTopic() => ConfirmDeleteTopicId = null;
+
+    private void DeleteTopic(long id)
+    {
+        if (SelectedSubjectId is null) return;
+        var list = CurrentTopics;
+        var idx = list.FindIndex(x => x.TopicId == id);
+        if (idx >= 0) list.RemoveAt(idx);
+        ConfirmDeleteTopicId = null;
+    }
+
+    private static bool TitleExists(IEnumerable<TopicVM> list, string title, long? excludeId = null)
+      => list.Any(x => x.TopicId != excludeId &&
+                       string.Equals(x.Title, title, StringComparison.OrdinalIgnoreCase));
+
+    // ----- Ordering helpers -----
+    private int GetOrder(long topicId)
+      => Math.Max(1, CurrentTopics.FindIndex(x => x.TopicId == topicId) + 1);
+
+    private bool CanMoveUp(long topicId)
+      => CurrentTopics.FindIndex(t => t.TopicId == topicId) > 0;
+
+    private bool CanMoveDown(long topicId)
+    {
+        var idx = CurrentTopics.FindIndex(t => t.TopicId == topicId);
+        return idx >= 0 && idx < CurrentTopics.Count - 1;
+    }
+
+    private void Nudge(long topicId, int delta)
+    {
+        if (SelectedSubjectId is null) return;
+        var list = CurrentTopics;
+        var from = list.FindIndex(x => x.TopicId == topicId);
+        if (from < 0) return;
+
+        var to = Math.Clamp(from + delta, 0, list.Count - 1);
+        if (to == from) return;
+
+        var item = list[from];
+        list.RemoveAt(from);
+        list.Insert(to, item);
+        ReorderedTopicFlash(topicId);
+    }
+
+    private void OnOrderChange(long topicId, ChangeEventArgs e)
+    {
+        if (SelectedSubjectId is null) return;
+        var list = CurrentTopics;
+
+        var from = list.FindIndex(x => x.TopicId == topicId);
+        if (from < 0) return;
+
+        // Clamp typed value to 1..N
+        if (!int.TryParse(e.Value?.ToString(), out var requested))
+        {
+            ReorderedTopicFlash(topicId);
+            StateHasChanged();
+            return;
+        }
+
+        var clamped = Math.Clamp(requested, 1, list.Count);
+        var to = clamped - 1;
+        if (to == from) { ReorderedTopicFlash(topicId); StateHasChanged(); return; }
+
+        var item = list[from];
+        list.RemoveAt(from);
+        list.Insert(to, item);
+        ReorderedTopicFlash(topicId);
+    }
+
+    private async void ReorderedTopicFlash(long topicId)
+    {
+        ReorderedTopicId = topicId;
+        await Task.Delay(320);
+        ReorderedTopicId = null;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    // Helpers
+    private static long _next = 9000;
+    private static long NextId() => Interlocked.Increment(ref _next);
+}
+
+<style>
+    /* Shell */
+    .admin-page {
+        --ink: #2D3034;
+        --mist: #DBE4EE;
+        --bg: #fff;
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --radius: 1.25rem;
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+        color: var(--ink);
+        background: var(--bg);
+        width: min(1200px,92vw);
+        margin-inline: auto;
+        padding: clamp(16px,4vw,28px);
+        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif;
+    }
+
+    .title {
+        margin: 0 0 6px;
+        font-weight: 900;
+        letter-spacing: .2px;
+        font-size: clamp(28px,4.2vw,56px)
+    }
+
+    .sub {
+        margin: 0;
+        opacity: .75
+    }
+
+    .head {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap
+    }
+
+    .stack {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem
+    }
+
+    .actions {
+        display: flex;
+        gap: .5rem;
+        align-items: center
+    }
+
+    .btn {
+        background: #2A6FFF;
+        border: none;
+        border-radius: .6rem;
+        padding: .55rem .9rem;
+        color: #fff;
+        cursor: pointer
+    }
+
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid var(--ring);
+            color: var(--ink)
+        }
+
+        .btn.danger {
+            background: #AD1F54
+        }
+
+    /* Layout */
+    .split {
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: clamp(16px,2vw,20px);
+        margin-top: clamp(12px,2vw,16px)
+    }
+
+    @@media (max-width:980px) {
+        .split {
+            grid-template-columns: 1fr
+        }
+    }
+
+    .card {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .7rem
+    }
+
+    .card__head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .6rem;
+        flex-wrap: wrap
+    }
+
+    .card__title {
+        margin: 0;
+        font-size: 1.02rem;
+        font-weight: 900;
+        letter-spacing: .2px
+    }
+
+    .card__sub {
+        margin: .15rem 0 0 0;
+        opacity: .75;
+        font-size: .95rem
+    }
+
+    .search {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: .6rem;
+        padding: .6rem .75rem
+    }
+
+    /* Subjects */
+    .subjects {
+        gap: .9rem
+    }
+
+    .subject-add {
+        background: #f7f9fc;
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        padding: .7rem
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .5rem
+    }
+
+    @@media (max-width:420px) {
+        .grid-2 {
+            grid-template-columns: 1fr
+        }
+    }
+
+    .lbl {
+        font-size: .85rem;
+        opacity: .7;
+        margin-right: .5rem
+    }
+
+    .mt4 {
+        margin-top: .4rem
+    }
+
+    .mt6 {
+        margin-top: .6rem
+    }
+
+    .in {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: .6rem;
+        padding: .45rem .6rem
+    }
+
+        .in.sm {
+            padding: .35rem .5rem;
+            min-width: 100px
+        }
+
+        .in.num {
+            width: 80px;
+            text-align: center
+        }
+
+    .subject-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: .5rem
+    }
+
+    .subject-item {
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        background: #fff
+    }
+
+        .subject-item.selected {
+            outline: 2px solid color-mix(in oklab, var(--ink) 16%, white)
+        }
+
+    .subject-btn {
+        all: unset;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        gap: .9rem;
+        padding: .7rem 1rem;
+        width: 100%;
+        cursor: pointer;
+        border-radius: 12px;
+    }
+
+        .subject-btn:hover {
+            background: #f8fbff
+        }
+
+    .info {
+        display: grid;
+        gap: .2rem;
+        flex: 1 1 auto;
+        min-width: 0
+    }
+
+    .code {
+        font-weight: 900
+    }
+
+    .name {
+        opacity: .9
+    }
+
+    .tools {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-left: auto;
+        white-space: nowrap
+    }
+
+    .icon {
+        border: 1px solid var(--ring);
+        background: #fff;
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+        padding: .35rem;
+        border-radius: .55rem;
+        display: inline-grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+    }
+
+        .icon:hover {
+            background: #f9fafe
+        }
+
+        .icon.ghost {
+            opacity: .9
+        }
+
+        .icon.success {
+            color: #1B998B;
+            font-weight: 900
+        }
+
+        .icon.danger {
+            color: #AD1F54;
+            font-weight: 900
+        }
+
+    /* Switch */
+    .switch {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem
+    }
+
+        .switch input {
+            display: none
+        }
+
+        .switch i {
+            position: relative;
+            width: 42px;
+            height: 24px;
+            background: #dbe4ee;
+            border-radius: 999px;
+            transition: .15s;
+            display: inline-block
+        }
+
+            .switch i:before {
+                content: "";
+                position: absolute;
+                height: 20px;
+                width: 20px;
+                left: 2px;
+                top: 2px;
+                background: #fff;
+                border-radius: 50%;
+                transition: .15s
+            }
+
+        .switch input:checked + i {
+            background: #1B998B
+        }
+
+            .switch input:checked + i:before {
+                transform: translateX(18px)
+            }
+
+    .switch-text {
+        font-size: .9rem;
+        opacity: .75
+    }
+
+    /* Topics */
+    .topic-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 10px
+    }
+
+    .topic-row {
+        display: flex;
+        align-items: center;
+        gap: .7rem;
+        border: 1px solid var(--ring);
+        border-radius: 10px;
+        background: var(--mist);
+        padding: .55rem .7rem;
+        user-select: none;
+        transition: transform .18s ease, background-color .18s ease;
+    }
+
+        .topic-row.slide {
+            transform: translateY(-6px);
+            background-color: #e9f0ff;
+        }
+
+    .order {
+        display: flex;
+        align-items: center;
+        gap: .35rem
+    }
+
+    .order-input {
+        width: 64px;
+        padding: .4rem .5rem;
+        border: 1px solid var(--ring);
+        border-radius: .55rem;
+        background: #fff;
+        text-align: center;
+        font-weight: 800;
+    }
+
+    .nudges {
+        display: flex;
+        flex-direction: column;
+        gap: 4px
+    }
+
+    .nudge {
+        width: 28px;
+        height: 22px;
+        border: 1px solid var(--ring);
+        background: #fff;
+        border-radius: .4rem;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+        .nudge:disabled {
+            opacity: .5;
+            cursor: not-allowed
+        }
+
+    .title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 900;
+        font-size: 1.05rem;
+    }
+
+    .edit {
+        flex: 1;
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: .6rem;
+        padding: .45rem .6rem
+    }
+
+    .spacer {
+        flex: 1
+    }
+
+    .state {
+        padding: 1rem;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow)
+    }
+
+        .state.empty {
+            background: #f1f4f9;
+            border: 1px dashed #d8dee9;
+            color: #6b7280;
+            text-align: center
+        }
+
+    .confirm {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        padding: .6rem .7rem;
+        margin-top: .6rem
+    }
+
+    .confirm__text {
+        font-weight: 800;
+        margin-bottom: .5rem
+    }
+
+    .confirm__actions {
+        display: flex;
+        gap: .5rem
+    }
+
+    .confirm-row {
+        margin-top: .5rem;
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        flex-wrap: wrap
+    }
+
+    .error {
+        color: #AD1F54;
+        font-size: .92rem;
+        margin-top: .25rem
+    }
+</style>

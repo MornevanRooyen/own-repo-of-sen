@@ -1,0 +1,140 @@
+﻿@namespace Frontend.Shared
+@using Microsoft.AspNetCore.Components
+
+<div class="clara @(Small ? "clara--sm" : "clara--lg") panel">
+    <div class="clara-head">
+        <span class="clara-dot"></span>
+        <h2>@(Small ? "CLARA Assistant (preview)" : "CLARA Assistant")</h2>
+    </div>
+
+    <div class="clara-body">
+        <p class="intro"><strong>Hi!</strong> I can help you find topics, tutors, or resources.</p>
+        <ul class="clara-list">
+            <li>“Show BUM 281 resources”</li>
+            <li>“Find a tutor for Thermo 244”</li>
+            <li>“What’s new in my forums?”</li>
+        </ul>
+
+        @if (Small)
+        {
+            <!-- Preview mode: no input, single CTA -->
+            <a href="/login" class="ai-cta" aria-label="Sign in or create an account to use the AI Resources Assistant">
+                Sign in or create an account to use the AI Resources Assistant
+            </a>
+        }
+        else
+        {
+            <!-- Full mode: input enabled -->
+            <label class="input-pill" aria-label="Ask CLARA">
+                <input type="text" placeholder="Ask CLARA…" />
+            </label>
+        }
+    </div>
+</div>
+
+<style>
+    .clara {
+        border: 1px solid var(--panel-ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-1);
+        background: #fff;
+        max-width: 920px;
+        margin-inline: auto;
+    }
+
+    .clara--sm {
+        padding: 12px;
+    }
+
+    .clara--lg {
+        padding: 16px;
+    }
+
+    .clara-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .clara-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+    }
+
+    .clara-body {
+        text-align: center;
+    }
+
+    .intro {
+        margin: 0 0 4px;
+    }
+
+    .clara-list {
+        list-style: none;
+        margin: 0 0 12px 0;
+        padding: 0;
+        color: color-mix(in oklab, var(--ink) 55%, white);
+    }
+
+        .clara-list li {
+            margin: 4px 0;
+        }
+
+    /* Full mode input */
+    .input-pill {
+        display: block;
+        background: #fff;
+        border: 1px solid var(--panel-ring);
+        border-radius: 999px;
+        padding: 8px 12px;
+        max-width: min(680px, 92vw);
+        margin-inline: auto;
+    }
+
+        .input-pill input {
+            width: 100%;
+            border: 0;
+            outline: none;
+            font: inherit;
+            color: var(--ink);
+        }
+
+    /* Preview mode CTA button */
+    .ai-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 12px;
+        padding: 12px 22px;
+        border-radius: 999px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        text-decoration: none;
+        background: linear-gradient(135deg, #7b6cff, #5ad1ff);
+        color: #fff;
+        box-shadow: 0 3px 10px rgba(123,108,255,0.4);
+        transition: all .25s ease-in-out;
+        border: none;
+        cursor: pointer;
+    }
+
+        .ai-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(90,209,255,0.45);
+            background: linear-gradient(135deg, #6c5cff, #48c9ff);
+            text-decoration: none;
+        }
+
+        .ai-cta:active {
+            transform: scale(0.98);
+        }
+</style>
+
+@code {
+    [Parameter] public bool Small { get; set; } = false;
+}

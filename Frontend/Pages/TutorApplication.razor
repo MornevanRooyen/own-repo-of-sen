@@ -1,0 +1,379 @@
+﻿@page "/admin/tutorapplications"
+
+<PageTitle>Admin · Tutor Applications</PageTitle>
+
+<section class="admin-page">
+    <header class="head">
+        <div class="stack">
+            <h1 class="title">Tutor Applications</h1>
+            <p class="sub">Review pending applications. <strong>✓</strong> accepts, <strong>✕</strong> declines.</p>
+        </div>
+
+        <div class="actions">
+            <input class="search" placeholder="Search name, email, student #…"
+                   @bind="Search" @bind:event="oninput" />
+            <select class="filter" @bind="MajorFilter">
+                <option value="">All programmes</option>
+                @foreach (var m in Majors)
+                {
+                    <option value="@m">@m</option>
+                }
+            </select>
+        </div>
+    </header>
+
+    @if (!Filtered.Any())
+    {
+        <div class="state empty">No pending tutor applications match your filters.</div>
+    }
+    else
+    {
+        <div class="grid">
+            @foreach (var app in Filtered)
+            {
+                <article class="card">
+                    <!-- Corner actions (kept off the text by padding on .card) -->
+                    <button class="btn-icon decline" aria-label="Decline" title="Decline"
+                            @onclick="() => Decline(app.UserId)">
+                        ✕
+                    </button>
+                    <button class="btn-icon accept" aria-label="Accept" title="Accept"
+                            @onclick="() => Accept(app.UserId)">
+                        ✓
+                    </button>
+
+                    <header class="card__head">
+                        <img class="avatar" src="@AvatarFor(app)" alt="" />
+                        <div class="meta">
+                            <h3 class="card__title">@($"{app.FirstName} {app.LastName}")</h3>
+                            <p class="card__sub">
+                                @if (!string.IsNullOrWhiteSpace(app.Major))
+                                {
+                                    <span class="pill">@app.Major</span>
+                                    ;
+                                }
+                                @if (app.YearOfStudy.HasValue)
+                                {
+                                    <span class="pill">Year @app.YearOfStudy</span>
+                                    ;
+                                }
+                            </p>
+                            <p class="card__id">ID: @(app.StudentNo ?? app.UserId.ToString())</p>
+                        </div>
+                    </header>
+
+                    <div class="body">
+                        <ul class="kv">
+                            @if (!string.IsNullOrWhiteSpace(app.Email))
+                            {
+                                <li><b>Email:</b> @app.Email</li>
+                                ;
+                            }
+                            @if (!string.IsNullOrWhiteSpace(app.PhoneNum))
+                            {
+                                <li><b>Phone:</b> @app.PhoneNum</li>
+                                ;
+                            }
+                            <li><b>Completed sessions:</b> @app.CompletedSessions</li>
+                            @if (app.MinRequiredGrade.HasValue)
+                            {
+                                <li><b>Min. required grade:</b> @app.MinRequiredGrade%</li>
+                                ;
+                            }
+                        </ul>
+                    </div>
+
+                    <footer class="foot">
+                        <time datetime="@app.CreatedAt.ToString("O")">
+                            Applied @app.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                        </time>
+                    </footer>
+                </article>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private string Search = string.Empty;
+    private string MajorFilter = string.Empty;
+
+    // Demo data (replace with your API later)
+    private List<TutorApplicationVM> Items = new()
+  {
+    new() { UserId=501, FirstName="Sabrina", LastName="Capenter", Email="sabrina@campus.edu",
+            PhoneNum="+27 82 000 0001", StudentNo="BC1234567", Major="BEng (Software)",
+            YearOfStudy=3, CompletedSessions=0, MinRequiredGrade=65, CreatedAt=DateTime.UtcNow.AddHours(-6) },
+    new() { UserId=502, FirstName="Olivia", LastName="Rodrigo", Email="livie@campus.edu",
+            PhoneNum="+27 72 000 0002", StudentNo="BC2233445", Major="BIT",
+            YearOfStudy=2, CompletedSessions=0, MinRequiredGrade=60, CreatedAt=DateTime.UtcNow.AddDays(-1) },
+    new() { UserId=503, FirstName="Yo", LastName="Mama", Email="zooweemama@campus.edu",
+            StudentNo="BC9997777", Major="BEng (Elec)", YearOfStudy=4,
+            CompletedSessions=0, MinRequiredGrade=70, CreatedAt=DateTime.UtcNow.AddHours(-20) }
+  };
+
+    private IEnumerable<string> Majors =>
+      Items.Select(i => i.Major)
+           .Where(m => !string.IsNullOrWhiteSpace(m))
+           .Distinct(StringComparer.OrdinalIgnoreCase)
+           .OrderBy(m => m)!;
+
+    private IEnumerable<TutorApplicationVM> Filtered =>
+      Items.Where(i =>
+        (string.IsNullOrWhiteSpace(Search) ||
+          ($"{i.FirstName} {i.LastName} {i.Email} {i.StudentNo}".Contains(Search, StringComparison.OrdinalIgnoreCase))) &&
+        (string.IsNullOrWhiteSpace(MajorFilter) ||
+          string.Equals(i.Major, MajorFilter, StringComparison.OrdinalIgnoreCase)));
+
+    private Task Accept(long userId)
+    {
+        Items.RemoveAll(x => x.UserId == userId);
+        // TODO: call backend accept
+        return Task.CompletedTask;
+    }
+
+    private Task Decline(long userId)
+    {
+        Items.RemoveAll(x => x.UserId == userId);
+        // TODO: call backend decline
+        return Task.CompletedTask;
+    }
+
+    private static string AvatarFor(TutorApplicationVM x)
+    {
+        if (!string.IsNullOrWhiteSpace(x.ProfilePicturePath)) return x.ProfilePicturePath!;
+        var letter = string.IsNullOrWhiteSpace(x.FirstName) ? "A" : x.FirstName.Substring(0, 1).ToUpperInvariant();
+        var svg = $"<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect width='100%' height='100%' fill='%23DBE4EE'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='22' fill='%232D3034' font-family='Arial, sans-serif'>{letter}</text></svg>";
+        return $"data:image/svg+xml;utf8,{svg}";
+    }
+
+    private class TutorApplicationVM
+    {
+        public long UserId { get; set; }
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string? Email { get; set; }
+        public string? PhoneNum { get; set; }
+        public string? StudentNo { get; set; }
+        public string? Major { get; set; }
+        public int? YearOfStudy { get; set; }
+        public int CompletedSessions { get; set; }
+        public int? MinRequiredGrade { get; set; }
+        public string? ProfilePicturePath { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+}
+
+<style>
+    /* Match dashboard + Reports page styling */
+    .admin-page {
+        --ink: #2D3034;
+        --mist: #DBE4EE;
+        --bg: #fff;
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --radius: 1.25rem;
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+        color: var(--ink);
+        background: var(--bg);
+        width: min(1200px,92vw);
+        margin-inline: auto;
+        padding: clamp(16px,4vw,28px);
+        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif;
+    }
+
+    .title {
+        margin: 0 0 6px;
+        font-weight: 900;
+        letter-spacing: .2px;
+        font-size: clamp(28px,4.2vw,56px)
+    }
+
+    .sub {
+        margin: 0;
+        opacity: .75
+    }
+
+    .head {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap
+    }
+
+    .stack {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem
+    }
+
+    .actions {
+        display: flex;
+        gap: .5rem;
+        align-items: center
+    }
+
+    /* Controls */
+    .search {
+        flex: 0 0 320px;
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: 999px;
+        padding: .65rem 1rem
+    }
+
+    .filter {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: .6rem;
+        padding: .6rem .75rem
+    }
+
+    /* States */
+    .state {
+        padding: 1rem;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow)
+    }
+
+        .state.empty {
+            background: #f1f4f9;
+            border: 1px dashed #d8dee9;
+            color: #6b7280;
+            text-align: center
+        }
+
+    /* Grid & Cards */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(300px,1fr));
+        gap: clamp(16px, 3vw, 28px) clamp(20px, 4vw, 60px);
+        padding-top: clamp(8px, 2vw, 16px)
+    }
+
+    @@media (max-width:760px) {
+        .grid {
+            grid-template-columns: 1fr
+        }
+    }
+
+    /* Keep corner buttons clear of title using extra horizontal padding */
+    .card {
+        position: relative;
+        background: var(--mist);
+        border: 1px solid var(--ring);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 1rem calc(1.25rem + 42px); /* room for 36px corner buttons */
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+    }
+
+    .card__head {
+        display: flex;
+        gap: .75rem;
+        align-items: center
+    }
+
+    .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid var(--ring);
+        background: #fff
+    }
+
+    .meta {
+        min-width: 0
+    }
+
+    .card__title {
+        margin: 0;
+        font-size: 1.02rem;
+        font-weight: 900;
+        letter-spacing: .2px
+    }
+
+    .card__sub {
+        margin: .2rem 0 0 0;
+        opacity: .9
+    }
+
+    .pill {
+        display: inline-block;
+        margin-right: .35rem;
+        padding: .06rem .45rem;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--ring);
+        font-weight: 700;
+        font-size: .8rem
+    }
+
+    .card__id {
+        margin: .2rem 0 0 0;
+        opacity: .78;
+        font-size: .94rem
+    }
+
+    .body {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem
+    }
+
+    .kv {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: .25rem
+    }
+
+        .kv b {
+            margin-right: .25rem
+        }
+
+    .foot {
+        opacity: .75;
+        font-size: .9rem;
+        margin-top: .05rem
+    }
+
+    /* Corner action buttons (same as Reports) */
+    .btn-icon {
+        position: absolute;
+        top: .55rem;
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 50%;
+        font-weight: 900;
+        cursor: pointer;
+        color: #fff;
+        display: grid;
+        place-items: center;
+        line-height: 1;
+        box-shadow: 0 6px 16px rgba(0,0,0,.12)
+    }
+
+        .btn-icon.decline {
+            left: .55rem;
+            background: #AD1F54
+        }
+
+            .btn-icon.decline:hover {
+                filter: brightness(.95)
+            }
+
+        .btn-icon.accept {
+            right: .55rem;
+            background: #1B998B
+        }
+
+            .btn-icon.accept:hover {
+                filter: brightness(.95)
+            }
+</style>

@@ -1,0 +1,1159 @@
+﻿@page "/dashboard"
+@using Microsoft.AspNetCore.Components.Routing
+@using System.Net.Http.Json
+@using System.Globalization
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+<PageTitle>Dashboard | CampusLearn</PageTitle>
+
+<main class="layout container">
+    <!-- Left Column -->
+    <section class="content">
+        <h2 class="greeting">
+            Welcome, <span>@StudentName</span> <small>[ @UserRole ]</small>
+        </h2>
+
+        <!-- Notifications -->
+        <section class="panel">
+            <header class="panel-hd">Notifications</header>
+            <div class="bubble notif-bubble">
+                <ul class="notif-list">
+                    @foreach (var notification in Notifications)
+                    {
+                        <li class="notif-item">
+                            <div class="notif-icon" aria-hidden="true">
+                                <span class="bell"></span>
+                            </div>
+                            <p class="notif-text">
+                                <strong>@notification.SenderName</strong> @notification.Body
+                                <span class="notif-time">@notification.TimeAgo</span>
+                            </p>
+                        </li>
+                    }
+                    @if (Notifications.Count == 0)
+                    {
+                        <li class="notif-empty">You’re all caught up 🎉</li>
+                    }
+                </ul>
+            </div>
+        </section>
+
+        <!-- Upcoming Sessions -->
+        <section class="panel">
+            <header class="panel-hd">@($"{UpcomingSessions.Count} Upcoming Sessions")</header>
+            <div class="bubble sessions-bubble">
+                @if (UpcomingSessions.Count == 0)
+                {
+                    <article class="session-empty">No upcoming sessions yet. Book one from the Tutors page.</article>
+                }
+                else
+                {
+                    @foreach (var session in UpcomingSessions)
+                    {
+                        <article class="session">
+                            <div class="session-meta">in @session.TimeUntil</div>
+                            <div class="session-card">
+                                <div class="session-title">
+                                    @session.SubjectCode session with @session.TutorName on @session.Date
+                                </div>
+                                <div class="session-tags">
+                                    <span>@session.Platform</span>
+                                    <span>@session.Duration</span>
+                                    <span>@session.Time</span>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+
+        <!-- Quick actions -->
+        <section class="panel">
+            <header class="panel-hd">Quick actions</header>
+            <div class="tiles tiles-qa">
+                <NavLink class="tile" href="/peers" match="NavLinkMatch.Prefix">
+                    <h3>Peers</h3>
+                    <p>Find students and tutors to connect with.</p>
+                </NavLink>
+                <NavLink class="tile" href="/subjects" match="NavLinkMatch.Prefix">
+                    <h3>Explore Subjects</h3>
+                    <p>Forums, topics, tutors, and resources.</p>
+                </NavLink>
+                <NavLink class="tile" href="/create-profile" match="NavLinkMatch.Prefix">
+                    <h3>Create/Update Profile</h3>
+                    <p>Edit your programme, year, and subjects.</p>
+                </NavLink>
+            </div>
+        </section>
+    </section>
+
+    <!-- Right Column (CLARA) -->
+    <aside class="sidebar">
+        <div class="clara-box clara-like-landing">
+            <div class="clara-head">
+                <span class="clara-dot"></span>
+                <h2>CLARA Assistant</h2>
+            </div>
+            <div class="clara-body">
+                <p><strong>Hi!</strong> I can help you find topics, tutors, or resources.</p>
+                <ul class="clara-list">
+                    <li>“Show BUM 281 resources”</li>
+                    <li>“Find a tutor for Thermo 244”</li>
+                    <li>“What’s new in my forums?”</li>
+                </ul>
+                <label class="input-pill">
+                    <input type="text" placeholder="Ask CLARA…" />
+                </label>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Full-width Calendar (spans both columns) -->
+    <section class="panel calendar-wide">
+        <header class="panel-hd">Calendar</header>
+
+        <div class="calendar-wrap">
+            <div class="cal-toolbar">
+                <div class="cal-left">
+                    <button class="cal-nav" @onclick="() => ShiftMonth(-1)" aria-label="Previous month">◀</button>
+                </div>
+
+                <div class="cal-mid">
+                    <select class="cal-pick" @bind="PickerMonth" @bind:after="OnPickerChanged">
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+                        }
+                    </select>
+
+                    <select class="cal-pick" @bind="PickerYear" @bind:after="OnPickerChanged">
+                        @foreach (var y in YearPickerOptions)
+                        {
+                            <option value="@y">@y</option>
+                        }
+                    </select>
+
+                    <button class="cal-today" @onclick="GoToday">Today</button>
+                </div>
+
+                <div class="cal-right">
+                    <button class="cal-nav" @onclick="() => ShiftMonth(1)" aria-label="Next month">▶</button>
+                </div>
+            </div>
+
+            <div class="cal-grid @CalAnimClass">
+                @foreach (var d in WeekdayNames)
+                {
+                    <div class="cal-dow">@d</div>
+                }
+
+                @foreach (var cell in CalendarCells)
+                {
+                    var inMonth = cell.InMonth ? "" : "out-month";
+                    var today = cell.Date.Date == DateTime.Today ? "today" : "";
+                    <button type="button"
+                            class="cal-cell @inMonth @today"
+                            @onclick="() => OpenNewEvent(cell.Date)">
+                        <div class="cal-num">@cell.Date.Day</div>
+
+                        @if (cell.Events?.Count > 0)
+                        {
+                            <ul class="cal-events">
+                                @foreach (var ev in cell.Events)
+                                {
+                                    <li class="cal-event" title="@ev.Title">
+                                        <span class="cal-ico" aria-hidden="true"></span>
+                                        <span class="cal-title">@ev.Title</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </button>
+                }
+            </div>
+
+            <div class="cal-footer">
+                <button class="cal-ghost">Full calendar</button>
+                <button class="cal-ghost">Import or export calendars</button>
+            </div>
+        </div>
+    </section>
+</main>
+
+@* ===== New Event Modal (Moodle-style) ===== *@
+@if (ShowNewEvent)
+{
+    <div class="modal-backdrop" @onclick="CloseNewEvent"></div>
+    <div role="dialog" aria-modal="true" class="modal">
+        <header class="modal-head">
+            <h3>New event</h3>
+            <button class="modal-x" @onclick="CloseNewEvent" aria-label="Close">×</button>
+        </header>
+
+        <div class="modal-body">
+            <div class="field-row">
+                <label class="label" for="evt-title">Event title <span class="req">*</span></label>
+                <input id="evt-title"
+                       class="ipt"
+                       placeholder="e.g. Class Test 5 – BUM381"
+                       @bind="NewEventTitle"
+                       @bind:event="oninput" />
+            </div>
+
+            <div class="field-row">
+                <label class="label">Date</label>
+                <div class="date-row">
+                    <select class="sel" @bind="NewDay">
+                        @foreach (var d in Enumerable.Range(1, DateTime.DaysInMonth(NewYear, NewMonth)))
+                        {
+                            <option value="@d">@d</option>
+                        }
+                    </select>
+                    <select class="sel" @bind="NewMonth">
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
+                        }
+                    </select>
+                    <select class="sel" @bind="NewYear">
+                        @foreach (var y in YearOptions)
+                        {
+                            <option value="@y">@y</option>
+                        }
+                    </select>
+                    <select class="sel" @bind="NewHour">
+                        @foreach (var h in HourOptions)
+                        {
+                            <option value="@h">@h.ToString("D2")</option>
+                        }
+                    </select>
+                    <select class="sel" @bind="NewMinute">
+                        @foreach (var m in MinuteOptions)
+                        {
+                            <option value="@m">@m.ToString("D2")</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            @if (ShowRequired)
+            {
+                <div class="req-note"><span aria-hidden="true">!</span> Required</div>
+            }
+        </div>
+
+        <footer class="modal-foot">
+            <button class="btn-plain" @onclick="CloseNewEvent">Cancel</button>
+            <button class="btn-save" @onclick="SaveNewEvent">Save</button>
+        </footer>
+    </div>
+}
+
+<style>
+    /* ===== Design tokens ===== */
+    :root {
+        /* existing tokens */
+        --bg: #FFFFFF;
+        --nav: #DBE4EE;
+        --ink: #2D3034;
+        --teal: #1B998B;
+        --orange: #F17300;
+        --rose: #AD1F54; /* old rose tone */
+        --moodle-maroon: #772953; /* ✅ new Moodle-style maroon */
+        --mist: #DBE4EE;
+        --panel-bg: #FFFFFF;
+        --panel-ring: color-mix(in oklab, var(--ink) 12%, white);
+        --panel-tint: #F4F8FA;
+        --radius: 1.25rem;
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+        --container: min(1200px, 92vw);
+    }
+
+
+    /* base */
+    *, *::before, *::after {
+        box-sizing: border-box
+    }
+
+    html, body {
+        height: 100%
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif;
+        line-height: 1.45;
+    }
+
+    .container {
+        width: var(--container);
+        margin-inline: auto;
+        padding-inline: clamp(12px,3vw,24px)
+    }
+
+    /* main layout */
+    .layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: clamp(16px,3vw,28px);
+        padding-block: clamp(14px,3vw,22px);
+    }
+
+    .content {
+        display: grid;
+        gap: clamp(16px,3vw,22px)
+    }
+
+    /* make calendar span both columns */
+    .calendar-wide {
+        grid-column: 1 / -1;
+    }
+
+    /* greeting */
+    .greeting {
+        margin: 0;
+        font-size: clamp(20px,2.8vw,28px);
+        font-weight: 700
+    }
+
+        .greeting span {
+            font-weight: 800
+        }
+
+        .greeting small {
+            opacity: .7;
+            font-weight: 600
+        }
+
+    /* panels & bubbles */
+    .panel {
+        display: grid;
+        gap: 10px
+    }
+
+    .panel-hd {
+        font-weight: 800;
+        color: color-mix(in oklab, var(--ink) 55%, white)
+    }
+
+    .bubble {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: clamp(12px,2.2vw,18px);
+        display: grid;
+        gap: 12px;
+    }
+
+    .notif-bubble {
+        background: var(--mist);
+        padding: 10px;
+    }
+
+    .sessions-bubble {
+        background: #E8EEF6;
+    }
+
+    /* notifications (unchanged) */
+    .notif-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 10px;
+    }
+
+    .notif-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(180deg, var(--rose) 0%, color-mix(in oklab, var(--rose) 80%, black) 100%);
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 14px;
+    }
+
+    .notif-empty {
+        background: #fff;
+        border: 1px dashed var(--panel-ring);
+        border-radius: 999px;
+        padding: 10px 14px;
+        color: color-mix(in oklab, var(--ink) 60%, white);
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .notif-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: #fff;
+        color: var(--ink);
+        flex-shrink: 0;
+    }
+
+    .bell {
+        width: 12px;
+        height: 12px;
+        display: block;
+        border: 2px solid var(--ink);
+        border-radius: 50%
+    }
+
+    .notif-text {
+        margin: 0;
+        font-weight: 700
+    }
+
+    .notif-time {
+        margin-left: 8px;
+        font-weight: 600;
+        opacity: .9;
+        font-size: .9rem
+    }
+
+    /* CTA button etc. (unchanged) */
+    .input-pill input {
+        width: 100%;
+        border: 0;
+        outline: none;
+        font: inherit;
+        color: var(--ink)
+    }
+
+    .cta-wrap {
+        display: flex;
+        justify-content: flex-end
+    }
+
+    .btn-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 20px;
+        border-radius: 999px;
+        font-weight: 800;
+        letter-spacing: .3px;
+        background: #F17300;
+        color: #fff;
+        border: none;
+        box-shadow: 0 3px 10px rgba(123, 108, 255, 0.4);
+        cursor: pointer;
+        transition: all .25s ease-in-out;
+    }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #6c5cff, #48c9ff);
+            box-shadow: 0 6px 16px rgba(90, 209, 255, 0.45);
+        }
+
+        .btn-cta:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 6px rgba(90, 209, 255, 0.3)
+        }
+
+    @@media (max-width: 980px) {
+        .layout {
+            grid-template-columns: 1fr
+        }
+
+        .cta-wrap {
+            justify-content: center
+        }
+    }
+
+    .tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+        gap: clamp(12px,2.2vw,18px);
+    }
+
+    .tiles-qa .tile {
+        display: block;
+        text-decoration: none;
+        color: var(--ink);
+        background: color-mix(in oklab,var(--teal) 10%,white);
+        border: 1px solid var(--panel-ring);
+        border-radius: calc(var(--radius) - 4px);
+        padding: 16px 18px;
+        box-shadow: var(--shadow);
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+        .tiles-qa .tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0,0,0,.08);
+        }
+
+        .tiles-qa .tile h3 {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .tiles-qa .tile p {
+            margin: 0;
+            color: color-mix(in oklab,var(--ink) 55%, white);
+            font-size: .95rem;
+        }
+
+    /* ===== Calendar ===== */
+    .calendar-wrap {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 10px 10px 16px;
+    }
+
+    .cal-toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 6px 6px;
+        background: var(--mist);
+        border-radius: calc(var(--radius) - 6px);
+        border-bottom: 1px solid var(--panel-ring);
+    }
+
+    .cal-left {
+        justify-self: start
+    }
+
+    .cal-mid {
+        justify-self: center;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .cal-right {
+        justify-self: end
+    }
+
+    .cal-pick, .cal-today {
+        border: 1px solid var(--panel-ring);
+        background: #fff;
+        border-radius: 10px;
+        padding: 6px 10px;
+        font: inherit;
+    }
+
+    .cal-today {
+        font-weight: 800;
+    }
+
+    .cal-month {
+        font-weight: 800;
+        letter-spacing: .3px
+    }
+
+    .cal-nav {
+        border: 1px solid var(--panel-ring);
+        background: #fff;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .cal-grid {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0;
+    }
+
+        .cal-grid.slide-next {
+            animation: slideInLeft .28s ease;
+        }
+
+        .cal-grid.slide-prev {
+            animation: slideInRight .28s ease;
+        }
+
+    @@keyframes slideInLeft {
+        from {
+            opacity: .3;
+            transform: translateX(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    @@keyframes slideInRight {
+        from {
+            opacity: .3;
+            transform: translateX(-12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    .cal-dow {
+        background: #e9edf3;
+        padding: 12px 10px;
+        border: 1px solid var(--panel-ring);
+        font-weight: 800;
+    }
+
+    .cal-cell {
+        min-height: 120px;
+        border: 1px solid var(--panel-ring);
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+        text-align: left;
+        border-radius: 0;
+        cursor: pointer;
+        transition: background .08s ease, transform .08s ease;
+    }
+
+        .cal-cell:hover {
+            background: #fbfcfe;
+            transform: translateY(-1px);
+        }
+
+        .cal-cell.out-month {
+            background: #fff;
+            opacity: .55;
+        }
+
+        .cal-cell.today .cal-num {
+            background: var(--moodle-maroon);
+            color: #fff;
+            border-radius: 8px;
+            padding: 2px 6px;
+            display: inline-block;
+        }
+
+    .cal-num {
+        font-weight: 700;
+        color: var(--moodle-maroon);
+    }
+
+    .cal-events {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 6px;
+    }
+
+    .cal-event {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        background: #fff;
+        border-radius: 8px;
+        font-size: .9rem;
+        box-shadow: 0 1px 0 rgba(0,0,0,.02);
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: transform .08s ease;
+        border: 1px solid color-mix(in oklab, var(--moodle-maroon) 40%, white);
+    }
+
+        .cal-event:hover {
+            transform: translateX(2px);
+        }
+
+        .cal-event .cal-ico {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            background: var(--moodle-maroon);
+        }
+
+    .cal-footer {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+
+    .cal-ghost {
+        border: 1px solid var(--panel-ring);
+        background: #fff;
+        padding: 6px 10px;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-new {
+        background: var(--rose);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .cal-cell {
+        text-align: left;
+    }
+
+        .cal-cell:focus-visible {
+            outline: 3px solid color-mix(in oklab, var(--teal) 60%, white);
+            outline-offset: -1px;
+        }
+
+    /* ===== Modal ===== */
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.35);
+        z-index: 50;
+    }
+
+    .modal {
+        position: fixed;
+        z-index: 60;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        width: min(780px, 92vw);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.22);
+        border: 1px solid var(--panel-ring);
+    }
+
+    .modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--panel-ring);
+        background: #f7f9fc;
+    }
+
+        .modal-head h3 {
+            margin: 0;
+            font-weight: 800;
+        }
+
+    .modal-x {
+        border: none;
+        background: transparent;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        color: #555;
+    }
+
+    .modal-body {
+        padding: 16px;
+        display: grid;
+        gap: 14px;
+    }
+
+    .label {
+        font-weight: 800;
+        margin-bottom: 6px;
+        display: inline-block;
+    }
+
+    .req {
+        color: var(--rose);
+        font-weight: 800;
+        margin-left: 4px;
+    }
+
+    .ipt {
+        width: 100%;
+        border: 1px solid var(--panel-ring);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: inherit;
+    }
+
+    .date-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .sel {
+        border: 1px solid var(--panel-ring);
+        background: #fff;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font: inherit;
+    }
+
+    .field-row {
+        display: grid;
+        gap: 6px;
+    }
+
+    .req-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--rose);
+        font-weight: 700;
+    }
+
+    .modal-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 12px 16px;
+        border-top: 1px solid var(--panel-ring);
+        background: #fafbfe;
+    }
+
+    .btn-plain {
+        background: #fff;
+        border: 1px solid var(--panel-ring);
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .btn-save {
+        background: var(--rose);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    @@media (max-width: 980px) {
+        .layout {
+            grid-template-columns: 1fr
+        }
+
+        .cal-cell {
+            min-height: 88px
+        }
+
+        .cal-event {
+            font-size: .86rem
+        }
+    }
+
+    /* --- restore notifications + sessions look (scoped) --- */
+    .content .bubble.notif-bubble {
+        background: var(--mist);
+        padding: 10px;
+    }
+
+    .content .bubble.sessions-bubble {
+        background: #E8EEF6;
+    }
+
+    .content .session {
+        display: grid;
+        gap: 8px;
+    }
+
+
+    .cal-pick, .cal-today, .cal-ghost, .cal-nav {
+        border: 1px solid color-mix(in oklab, var(--moodle-maroon) 40%, white);
+        background: #fff;
+        color: var(--moodle-maroon);
+        font-weight: 700;
+    }
+
+    .content .session-meta {
+        color: color-mix(in oklab, var(--ink) 50%, white);
+        font-weight: 700;
+    }
+
+    .content .session-card {
+        background: #FFFFFF;
+        border: 1px solid var(--panel-ring);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .content .session-title {
+        font-weight: 700;
+    }
+
+    .content .session-tags {
+        display: flex;
+        gap: 10px;
+        color: color-mix(in oklab, var(--ink) 55%, white);
+        font-weight: 700;
+    }
+
+        .content .session-tags span + span::before {
+            content: "|";
+            margin: 0 8px 0 0;
+            color: color-mix(in oklab, var(--ink) 55%, white);
+        }
+
+    .content .session-empty {
+        background: #fff;
+        border: 1px dashed var(--panel-ring);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        text-align: center;
+        color: color-mix(in oklab, var(--ink) 60%, white);
+        font-weight: 600;
+    }
+
+    .content .notif-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 10px;
+    }
+
+    .content .notif-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(180deg, var(--rose) 0%, color-mix(in oklab, var(--rose) 80%, black) 100%);
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 14px;
+    }
+
+    .content .notif-empty {
+        background: #fff;
+        border: 1px dashed var(--panel-ring);
+        border-radius: 999px;
+        padding: 10px 14px;
+        color: color-mix(in oklab, var(--ink) 60%, white);
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .content .notif-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: #fff;
+        color: var(--ink);
+        flex-shrink: 0;
+    }
+
+    .content .bell {
+        width: 12px;
+        height: 12px;
+        display: block;
+        border: 2px solid var(--ink);
+        border-radius: 50%;
+    }
+
+    .content .notif-text {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .content .notif-time {
+        margin-left: 8px;
+        font-weight: 600;
+        opacity: .9;
+        font-size: .9rem;
+    }
+
+    .cal-pick:hover, .cal-today:hover, .cal-ghost:hover, .cal-nav:hover {
+        background: color-mix(in oklab, var(--moodle-maroon) 10%, white);
+    }
+
+</style>
+
+@code {
+    private string StudentName = "Loading...";
+    private string UserRole = "";
+
+    private List<NotificationItem> Notifications = new()
+    {
+        new NotificationItem { SenderName = "Taylor Swift", Body = "replied to your question.", TimeAgo = "13 minutes ago" }
+    };
+
+    private List<SessionItem> UpcomingSessions = new()
+    {
+        new SessionItem { SubjectCode = "BUM381", TutorName = "Kanye East", Date = "13th September 2025", Platform = "FaceTime", Duration = "1hr", Time = "14:00", TimeUntil = "3 hrs" },
+        new SessionItem { SubjectCode = "BUM381", TutorName = "Kimberly Kardashian", Date = "15th September 2025", Platform = "Teams", Duration = "2hrs", Time = "14:00", TimeUntil = "2 days" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uid = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
+            if (string.IsNullOrEmpty(uid) || !int.TryParse(uid, out int userId))
+            { NavigationManager.NavigateTo("/login"); return; }
+
+            var response = await Http.GetAsync($"https://localhost:7228/api/User/by-id/{userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadFromJsonAsync<Dictionary<string, object>>();
+                if (json != null)
+                {
+                    StudentName = json.ContainsKey("fullName") ? json["fullName"]?.ToString() ?? "User" : "User";
+                    UserRole = json.ContainsKey("role") ? json["role"]?.ToString() ?? "Student" : "Student";
+                }
+            }
+            else { StudentName = "User"; UserRole = "Student"; }
+        }
+        catch { StudentName = "User"; UserRole = "Student"; }
+    }
+
+    public class NotificationItem { public string SenderName { get; set; } = ""; public string Body { get; set; } = ""; public string TimeAgo { get; set; } = ""; }
+    public class SessionItem { public string SubjectCode { get; set; } = ""; public string TutorName { get; set; } = ""; public string Date { get; set; } = ""; public string Platform { get; set; } = ""; public string Duration { get; set; } = ""; public string Time { get; set; } = ""; public string TimeUntil { get; set; } = ""; }
+
+    /* ===== Calendar data ===== */
+    private DateTime CurrentMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    private readonly string[] WeekdayNames = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+    private List<CalCell> CalendarCells = new();
+
+    public class CalEvent { public string Title { get; set; } = ""; public DateTime Date { get; set; } }
+    public class CalCell { public DateTime Date { get; set; } public bool InMonth { get; set; } public List<CalEvent> Events { get; set; } = new(); }
+
+    private List<CalEvent> AllEvents = new()
+    {
+        new CalEvent{ Title="Project Task 2", Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 6) },
+        new CalEvent{ Title="Assignment 5",  Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 2) },
+        new CalEvent{ Title="Class Test 4",  Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 3) },
+        new CalEvent{ Title="Class Test 5",  Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 10) },
+        new CalEvent{ Title="Project Task 4", Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 22) },
+        new CalEvent{ Title="Final Project Submission", Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 24) },
+        new CalEvent{ Title="Project Milestone", Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 31) },
+    };
+
+    /* Picker values + options for jumping across years (past & future) */
+    private int PickerMonth;
+    private int PickerYear;
+    private int[] YearPickerOptions = Enumerable.Range(DateTime.Today.Year - 1, 7).ToArray(); // last year to +5 years
+
+    protected override void OnInitialized()
+    {
+        SyncPickers();
+        BuildCalendar();
+    }
+
+    private void SyncPickers()
+    {
+        PickerMonth = CurrentMonth.Month;
+        PickerYear = CurrentMonth.Year;
+    }
+
+    private int _slideDir = 0; // -1 prev, +1 next
+    private string CalAnimClass => _slideDir == 0 ? "" : (_slideDir > 0 ? "slide-next" : "slide-prev");
+
+    private void ShiftMonth(int delta)
+    {
+        _slideDir = Math.Sign(delta);
+        CurrentMonth = CurrentMonth.AddMonths(delta);
+        SyncPickers();
+        BuildCalendar();
+        // reset direction so animation can retrigger next time
+        _ = Task.Run(async () => { await Task.Delay(300); _slideDir = 0; StateHasChanged(); });
+    }
+
+    private void GoToday()
+    {
+        var target = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        var diff = ((target.Year - CurrentMonth.Year) * 12) + (target.Month - CurrentMonth.Month);
+        _slideDir = Math.Sign(diff);
+        CurrentMonth = target;
+        SyncPickers();
+        BuildCalendar();
+        _ = Task.Run(async () => { await Task.Delay(300); _slideDir = 0; StateHasChanged(); });
+    }
+
+    private void OnPickerChanged()
+    {
+        var target = new DateTime(PickerYear, PickerMonth, 1);
+        var diff = ((target.Year - CurrentMonth.Year) * 12) + (target.Month - CurrentMonth.Month);
+        _slideDir = Math.Sign(diff);
+        CurrentMonth = target;
+        BuildCalendar();
+
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(300);
+            _slideDir = 0;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+
+    private void BuildCalendar()
+    {
+        CalendarCells.Clear();
+        var first = CurrentMonth;
+        int firstDayIndex = ((int)first.DayOfWeek + 6) % 7; // Monday-based week
+        var start = first.AddDays(-firstDayIndex);
+
+        for (int i = 0; i < 42; i++)
+        {
+            var date = start.AddDays(i);
+            var cell = new CalCell { Date = date, InMonth = date.Month == CurrentMonth.Month };
+            cell.Events = AllEvents.Where(e => e.Date.Date == date.Date).ToList();
+            CalendarCells.Add(cell);
+        }
+    }
+
+    /* ===== Modal state & handlers ===== */
+    private bool ShowNewEvent = false;
+    private string NewEventTitle = string.Empty;
+    private int NewDay, NewMonth, NewYear, NewHour, NewMinute;
+    private bool ShowRequired = false;
+
+    private readonly int[] HourOptions = Enumerable.Range(0, 24).ToArray();
+    private readonly int[] MinuteOptions = new[] { 0, 5, 10, 15, 20, 30, 40, 45, 50, 55 };
+    private readonly int[] YearOptions = Enumerable.Range(DateTime.Today.Year - 1, 5).ToArray();
+
+    private void OpenNewEvent(DateTime date)
+    {
+        NewDay = date.Day; NewMonth = date.Month; NewYear = date.Year;
+        NewHour = 12; NewMinute = 0; NewEventTitle = string.Empty; ShowRequired = false;
+        ShowNewEvent = true;
+    }
+    private void CloseNewEvent() => ShowNewEvent = false;
+
+    private void SaveNewEvent()
+    {
+        if (string.IsNullOrWhiteSpace(NewEventTitle)) { ShowRequired = true; return; }
+        var days = DateTime.DaysInMonth(NewYear, NewMonth);
+        var day = Math.Min(NewDay, days);
+        var when = new DateTime(NewYear, NewMonth, day, NewHour, NewMinute, 0);
+
+        AllEvents.Add(new CalEvent { Title = NewEventTitle.Trim(), Date = when });
+        ShowNewEvent = false;
+        // If event is not in the visible month, we still save it (you can navigate to see it)
+        BuildCalendar();
+    }
+}

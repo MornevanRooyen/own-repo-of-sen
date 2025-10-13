@@ -1,0 +1,573 @@
+﻿@page "/studentprofile"
+@page "/studentprofile/{id:int}"
+@using Sen381.Business.Models
+@using Sen381.Business.Services
+@using Sen381.Data_Access
+@inject UserService UserService
+@inject SupaBaseAuthService SupabaseService
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject Frontend.Services.AuthService AuthService
+
+<PageTitle>Profile | CampusLearn</PageTitle>
+
+<!-- ===== Page Header (avatar + title + actions) ===== -->
+<header class="page-hd">
+    <div class="hd-left">
+        <img class="avatar-xl"
+             src="@(currentUser?.ProfilePicturePath ?? "https://placehold.co/160x160/png")"
+             alt="Profile picture of @(currentUser?.FirstName) @(currentUser?.LastName)" />
+
+        <div class="title-block">
+            <h1 class="title">@($"{currentUser?.FirstName} {currentUser?.LastName}")</h1>
+        </div>
+
+        <div class="subtitle">
+            @(currentUser?.RoleString)
+            @if (!string.IsNullOrWhiteSpace(currentUser?.Program))
+            {
+                <span> &middot; @currentUser.Program</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(currentUser?.Year))
+            {
+                <span> &middot; @currentUser.Year Year</span>
+            }
+            @if (currentUser?.Id > 0)
+            {
+                <span class="muted"> &middot; ID: @currentUser.Id</span>
+            }
+        </div>
+    </div>
+
+    <div class="hd-actions">
+        <NavLink class="btn primary" href="/create-profile">Edit profile</NavLink>
+        <NavLink class="btn" href="/messages">Message</NavLink>
+    </div>
+</header>
+
+<!-- ===== Tabs ===== -->
+<nav class="tabs" aria-label="Profile sections">
+    <a class="tab active" href="#details">Profile</a>
+    <a class="tab" href="#activity">Activity</a>
+    <a class="tab" href="#enrolments">Enrolments</a>
+    <a class="tab" href="#preferences">Preferences</a>
+</nav>
+
+<!-- ===== Main two-column layout ===== -->
+<main class="grid">
+    <!-- Left column -->
+    <aside class="col-left">
+        <section id="details" class="card">
+            <h2 class="card-hd">User details</h2>
+            <dl class="props">
+                <div><dt>Full name</dt><dd>@($"{currentUser?.FirstName} {currentUser?.LastName}")</dd></div>
+                <div><dt>Email address</dt><dd><a href="mailto:@currentUser?.Email">@currentUser?.Email</a></dd></div>
+                <div><dt>Phone</dt><dd>@(string.IsNullOrWhiteSpace(currentUser?.PhoneNum) ? "—" : currentUser?.PhoneNum)</dd></div>
+                <div><dt>City</dt><dd>@(string.IsNullOrWhiteSpace(currentUser?.City) ? "—" : currentUser.City)</dd></div>
+                <div><dt>Country</dt><dd>@(string.IsNullOrWhiteSpace(currentUser?.Country) ? "—" : currentUser.Country)</dd></div>
+                <div><dt>Timezone</dt><dd>@(string.IsNullOrWhiteSpace(currentUser?.Timezone) ? "—" : currentUser.Timezone)</dd></div>
+                <div><dt>Program</dt><dd>@(string.IsNullOrWhiteSpace(currentUser?.Program) ? "—" : currentUser.Program)</dd></div>
+                <div><dt>Year</dt><dd>@(string.IsNullOrWhiteSpace(currentUser?.Year) ? "—" : currentUser.Year)</dd></div>
+                <div><dt>Last access</dt><dd>@currentUser?.LastLogin</dd></div>
+                <div><dt>Role</dt><dd>@currentUser?.RoleString</dd></div>
+            </dl>
+        </section>
+
+        <section class="card">
+            <h2 class="card-hd">Interests</h2>
+            <div class="tags">
+                @if (Interests.Count == 0)
+                {
+                    <span class="muted">No interests added</span>
+                }
+                else
+                {
+                    @foreach (var tag in Interests)
+                    {
+                        <span class="tag">@tag</span>
+                    }
+                }
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 class="card-hd">Contact</h2>
+            <ul class="list">
+                <li><strong>Email:</strong> <a href="mailto:@currentUser?.Email">@currentUser?.Email</a></li>
+                <li><strong>Phone:</strong> @(string.IsNullOrWhiteSpace(currentUser?.PhoneNum) ? "—" : currentUser?.PhoneNum)</li>
+                <li><strong>Website:</strong> @(string.IsNullOrWhiteSpace(currentUser?.Website) ? "—" : (MarkupString)$"<a href=\"{currentUser.Website}\" target=\"_blank\" rel=\"noopener\">{currentUser.Website}</a>")</li>
+            </ul>
+        </section>
+    </aside>
+
+    <!-- Right column -->
+    <section class="col-right">
+        <section class="card">
+            <h2 class="card-hd">About</h2>
+            <p class="about">
+                @if (string.IsNullOrWhiteSpace(currentUser?.About))
+                {
+                    <span class="muted">No description provided.</span>
+                }
+                else
+                {
+                    @currentUser.About
+                }
+            </p>
+        </section>
+
+        <section id="preferences" class="card">
+            <h2 class="card-hd">Preferences</h2>
+            <ul class="prefs">
+                <li><a href="/create-profile">Edit profile</a></li>
+                <li><a href="/account/password">Change password</a></li>
+                <li><a href="/notifications">Notification preferences</a></li>
+                <li><a href="/privacy">Privacy and policies</a></li>
+            </ul>
+        </section>
+    </section>
+</main>
+
+<style>
+    /* ===== Tokens ===== */
+    :root {
+        --bg: #f5f7fb;
+        --panel: #fff;
+        --ink: #2D3034;
+        --muted: color-mix(in oklab, var(--ink) 55%, white);
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --primary: #1B998B;
+        --accent: #3a7bdb;
+        --chip: #DBE4EE;
+        --radius: 14px;
+        --shadow: 0 6px 18px rgba(0,0,0,.06);
+        --container: min(1150px,92vw);
+    }
+
+    * {
+        box-sizing: border-box
+    }
+
+    html, body {
+        height: 100%
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: system-ui,-apple-system,"Segoe UI",Inter,Roboto,Arial,sans-serif;
+        line-height: 1.45;
+    }
+
+    a {
+        color: var(--accent);
+        text-decoration: none
+    }
+
+        a:hover {
+            text-decoration: underline
+        }
+
+    /* ===== Header ===== */
+    .page-hd {
+        width: var(--container);
+        margin: 8px auto 10px;
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 14px;
+        display: flex;
+        align-items: center; /* center vertically only on wide screens */
+        justify-content: space-between;
+        gap: 12px;
+        /* prevent overlap by allowing wrapping on narrower widths */
+        flex-wrap: wrap;
+    }
+
+    .hd-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex: 1 1 420px; /* take remaining space, can shrink */
+        min-width: 0; /* allow text to shrink/wrap instead of overflowing */
+    }
+
+    .hd-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        flex: 0 0 auto; /* don't shrink into the title area */
+    }
+
+    .avatar-xl {
+        width: 84px;
+        height: 84px;
+        flex: 0 0 84px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #cfd5da;
+        border: 2px solid var(--ring);
+    }
+
+    .title-block {
+        min-width: 0; /* critical for wrapping long names */
+    }
+
+    .title {
+        margin: 0;
+        font-weight: 800;
+        letter-spacing: .2px;
+        font-size: clamp(20px,3.2vw,28px);
+        overflow-wrap: anywhere; /* wrap long names instead of overlapping */
+        line-height: 1.2;
+    }
+
+    .subtitle {
+        margin-top: 2px;
+        color: var(--muted);
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--ring);
+        background: #eef3f8;
+        color: #122;
+        font-weight: 800;
+        box-shadow: var(--shadow);
+        white-space: nowrap; /* keep buttons tidy */
+    }
+
+        .btn.primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: transparent
+        }
+
+        .btn:hover {
+            filter: brightness(.98);
+            text-decoration: none
+        }
+
+    /* ===== Tabs ===== */
+    .tabs {
+        width: var(--container);
+        margin: 0 auto 10px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 999px;
+        font-weight: 800;
+        background: #e8eef7;
+        color: #1b2b3b;
+        border: 1px solid var(--ring);
+    }
+
+        .tab.active {
+            background: #d9e6ff;
+            color: #14315f;
+            border-color: #c7d7fb
+        }
+
+    /* ===== Main grid ===== */
+    .grid {
+        width: var(--container);
+        margin: 0 auto 24px;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: clamp(14px,3vw,22px);
+    }
+
+    /* ===== Cards ===== */
+    .card {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 14px;
+    }
+
+    .card-hd {
+        margin: 0 0 8px;
+        font-weight: 900;
+        font-size: 1.05rem;
+        letter-spacing: .2px
+    }
+
+    /* Left column details list */
+    .props {
+        display: grid;
+        gap: 10px;
+    }
+
+        .props > div {
+            display: grid;
+            grid-template-columns: 150px minmax(0, 1fr); /* allow right cell to shrink/wrap */
+            gap: 12px;
+            align-items: start;
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        .props dt {
+            font-weight: 800;
+            color: #203040
+        }
+
+        .props dd {
+            margin: 0;
+            color: #1d2329;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+    .tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap
+    }
+
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: var(--chip);
+        border: 1px solid var(--ring);
+        font-weight: 800;
+        color: #203040;
+    }
+
+    .list {
+        margin: 0;
+        padding-left: 1rem
+    }
+
+        .list li + li {
+            margin-top: 6px
+        }
+
+    /* Right column */
+    .about {
+        margin: 0
+    }
+
+    .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(110px,1fr));
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .metric {
+        background: #f2f6fb;
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        padding: 10px;
+        text-align: center;
+    }
+
+        .metric .num {
+            font-size: 1.3rem;
+            font-weight: 900
+        }
+
+        .metric .lbl {
+            color: var(--muted);
+            font-weight: 700
+        }
+
+    .links {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap
+    }
+
+        .links a {
+            font-weight: 800
+        }
+
+    /* Table with safe horizontal scroll to avoid overlap */
+    .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid var(--ring);
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fff;
+        min-width: 520px; /* keep columns readable; wrapper scrolls on narrow screens */
+    }
+
+        .table thead th {
+            text-align: left;
+            background: #eef3f8;
+            padding: 10px;
+            font-weight: 900;
+            border-bottom: 1px solid var(--ring);
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: 10px;
+            border-top: 1px solid var(--ring);
+            vertical-align: top;
+        }
+
+        .table tbody tr:first-child td {
+            border-top: 0
+        }
+
+    .connections {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px
+    }
+
+    .mini-hd {
+        margin: 0 0 6px;
+        font-weight: 900;
+        font-size: 1rem
+    }
+
+    .chips {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap
+    }
+
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: var(--chip);
+        border: 1px solid var(--ring);
+        font-weight: 800;
+        color: #203040;
+    }
+
+    .prefs {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 8px
+    }
+
+        .prefs a {
+            font-weight: 800
+        }
+
+    /* ===== Responsive ===== */
+    /* Stack header content cleanly on smaller screens to prevent overlap */
+    @@media (max-width: 820px) {
+        .page-hd {
+            align-items: flex-start; /* so tall blocks don't force vertical centering */
+        }
+
+        .hd-actions {
+            width: 100%;
+            justify-content: flex-start;
+            margin-top: 6px;
+        }
+    }
+
+    @@media (max-width: 980px) {
+        .grid {
+            grid-template-columns: 1fr
+        }
+
+        .connections {
+            grid-template-columns: 1fr
+        }
+
+        .metrics {
+            grid-template-columns: repeat(2, minmax(110px,1fr));
+        }
+</style>
+
+@code {
+    [Parameter]
+    public int? id { get; set; } // 👈 optional route parameter (used when viewing someone else’s profile)
+
+    private User? currentUser;
+    private bool isLoading = true;
+    private List<string> Interests = new();
+    private bool isOwnProfile = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            isLoading = true;
+
+            // ✅ Ensure Supabase is ready
+            await SupabaseService.InitializeAsync();
+            Console.WriteLine("✅ Supabase client initialized.");
+
+            bool isLoggedIn = await AuthService.IsUserLoggedInAsync();
+            if (!isLoggedIn)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            int? loggedInUserId = await AuthService.GetCurrentUserIdAsync();
+            if (loggedInUserId == null)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            // ✅ Detect whose profile we should load
+            int targetId = id ?? loggedInUserId.Value;
+            isOwnProfile = targetId == loggedInUserId.Value;
+
+            currentUser = await UserService.GetUserByIdAsync(targetId);
+
+            if (!string.IsNullOrWhiteSpace(currentUser?.Interests))
+            {
+                Interests = currentUser.Interests
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(i => i.Trim())
+                    .ToList();
+            }
+
+            Console.WriteLine($"✅ Profile loaded for {currentUser?.FirstName} {currentUser?.LastName} (Own profile: {isOwnProfile})");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Failed to load profile: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

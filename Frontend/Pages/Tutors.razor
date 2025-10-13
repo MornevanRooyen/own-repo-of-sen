@@ -1,0 +1,220 @@
+﻿@page "/topichub/tutors"
+@layout TopicHubLayout
+
+<section class="tutors">
+    <h1 class="title">BUM 281 TUTORS</h1>
+
+    <div class="list">
+        @foreach (var t in tutors)
+        {
+            <details class="row" open="@t.Open">
+                <summary>
+                    <span class="avatar"></span>
+                    <span class="name">@t.Name</span>
+
+                    <span class="spacer"></span>
+
+                    <span class="subs">@t.SubscribersLabel</span>
+
+                    <span class="badge @(t.Subscribed ? "on" : "off")">
+                        @(t.Subscribed ? "Subscribed" : "Not Subscribed")
+                    </span>
+
+                    <span class="chev" aria-hidden="true"></span>
+                </summary>
+
+                <!-- dropdown panel (darker gray block) -->
+                <div class="panel">
+                    <!-- Replace with real tutor info later -->
+                    <p><strong>@t.Name</strong> — placeholder bio / availability / rating goes here.</p>
+                </div>
+            </details>
+        }
+    </div>
+</section>
+
+@code {
+    private record TutorRow(string Name, string SubscribersLabel, bool Subscribed, bool Open);
+
+    // Mock data to match your screenshot
+    private List<TutorRow> tutors = new()
+  {
+    new TutorRow("Kanye East",     "3 Subscribers",   false, false),
+    new TutorRow("Taylor Swift",   "13M Subscribers", true,  false),
+    new TutorRow("Gracie Abrahams","2M Subscribers",  true,  true),  // open to show the grey panel
+  };
+}
+
+<style>
+    /* ===== Tokens ===== */
+    :root {
+        --ink: #2D3034;
+        --mist: #DBE4EE;
+        --badge: #FFFFFF;
+        --teal: #1B998B;
+        --orange: #F17300;
+        --rose: #AD1F54;
+        --radius: 1.25rem;
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box
+    }
+
+    html, body {
+        margin: 0;
+        color: var(--ink);
+        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif
+    }
+
+    /* ===== Layout inside the right panel ===== */
+    .tutors {
+        padding: clamp(10px,3vw,18px)
+    }
+
+    .title {
+        margin: 0 0 10px;
+        font-weight: 800;
+        letter-spacing: .2px;
+        font-size: clamp(22px,3.2vw,32px);
+    }
+
+    /* ===== List ===== */
+    .list {
+        display: grid;
+        gap: 12px
+    }
+
+    /* each row is details/summary so it toggles open */
+    .row {
+        background: var(--mist);
+        border: 1px solid var(--ring);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+        .row summary {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 12px;
+            cursor: pointer;
+        }
+
+            .row summary::-webkit-details-marker {
+                display: none
+            }
+
+    /* left bits */
+    .avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #9aa0a6;
+        flex: 0 0 26px;
+    }
+
+    .name {
+        font-weight: 600
+    }
+
+    /* right bits */
+    .spacer {
+        flex: 1
+    }
+
+    .subs {
+        font-size: .85rem;
+        font-weight: 700;
+        opacity: .8;
+        margin-right: 10px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 8px 12px;
+        background: var(--badge);
+        border-radius: 999px;
+        font-weight: 800;
+        border: 1px solid var(--ring);
+        margin-right: 10px;
+    }
+
+        .badge.on { /* subscribed look (bold + check) */
+        }
+
+        .badge.off {
+            opacity: .85
+        }
+
+    /* chevron */
+    .chev {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        position: relative;
+    }
+
+        .chev::before, .chev::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 2px;
+            background: var(--ink);
+            transition: transform .18s ease;
+        }
+
+        .chev::before {
+            transform: translateX(-2px) rotate(40deg)
+        }
+
+        .chev::after {
+            transform: translateX(2px) rotate(-40deg)
+        }
+
+    /* when open, rotate chevron to point up */
+    .row[open] .chev::before {
+        transform: translateX(-2px) rotate(-40deg)
+    }
+
+    .row[open] .chev::after {
+        transform: translateX(2px) rotate(40deg)
+    }
+
+    /* dropdown panel (darker grey block) */
+    .panel {
+        margin: 0 12px 12px;
+        background: #AEB7C3; /* darker grey as in your mock */
+        color: #1a1b1e;
+        border-radius: 18px;
+        min-height: 120px; /* visible block even without content */
+        padding: 14px 16px;
+    }
+
+        .panel p {
+            margin: 0
+        }
+
+    /* hover niceties */
+    .row summary:hover {
+        filter: brightness(.98)
+    }
+
+    /* Responsive */
+    @@media (max-width: 560px) {
+        .subs {
+            display: none
+        }
+
+        .badge {
+            font-size: .9rem;
+            padding: 6px 10px
+        }
+    }
+</style>

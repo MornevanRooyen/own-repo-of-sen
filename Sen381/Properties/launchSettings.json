@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Sen381": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "SUPABASE_URL": ""
+      }
+    }
+  }
+}

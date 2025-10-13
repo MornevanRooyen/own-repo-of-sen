@@ -1,0 +1,768 @@
+﻿@page "/admin/analytics"
+
+<PageTitle>Admin · Analytics</PageTitle>
+
+<section class="admin-page">
+    <header class="head">
+        <div class="stack">
+            <h1 class="title">Analytics</h1>
+            <p class="sub">A quick look at sessions, students, and tutor supply. Pick a range and filter further by subject.</p>
+        </div>
+
+        <div class="actions">
+            <select class="filter" @bind="Days">
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 90 days</option>
+            </select>
+
+            <select class="filter" @bind="Bucket">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+            </select>
+
+            <!-- bind via string proxy so empty option is safe -->
+            <select class="filter" @bind="SelectedSubjectIdStr">
+                <option value="">All subjects</option>
+                @foreach (var s in Subjects)
+                {
+                    <option value="@s.SubjectId">@s.SubjectCode — @s.Name</option>
+                }
+            </select>
+        </div>
+    </header>
+
+    <!-- KPI tiles -->
+    <section class="tiles">
+        <article class="tile">
+            <div class="tile__label">Sessions</div>
+            <div class="tile__value">@TotalSessions</div>
+            <div class="tile__sub">in selected range</div>
+        </article>
+        <article class="tile">
+            <div class="tile__label">Unique students</div>
+            <div class="tile__value">@UniqueStudents</div>
+            <div class="tile__sub">distinct student accounts</div>
+        </article>
+        <article class="tile">
+            <div class="tile__label">Active tutors</div>
+            <div class="tile__value">@ActiveTutors</div>
+            <div class="tile__sub">tutors with ≥1 session</div>
+        </article>
+        <article class="tile">
+            <div class="tile__label">Repeat students</div>
+            <div class="tile__value">@($"{RepeatStudentsPct:0}%")</div>
+            <div class="tile__sub">had ≥2 sessions with same tutor</div>
+        </article>
+    </section>
+
+    <!-- Charts row -->
+    <section class="charts">
+        <!-- Sessions over time -->
+        <article class="card chart">
+            <header class="card__head">
+                <h3 class="card__title">Sessions over time</h3>
+                <p class="card__sub">@BucketTitle · @RangeTitle</p>
+            </header>
+
+            <div class="chart__area">
+                <svg viewBox="0 0 720 260" class="chart-svg" role="img" aria-label="Sessions over time">
+                    <!-- grid -->
+                    <g class="grid">
+                        @for (int i = 0; i < 5; i++)
+                        {
+                            var y = 220 - (i * 40);
+                            <line x1="50" y1="@y" x2="700" y2="@y" />
+                        }
+                    </g>
+
+                    <!-- y labels (use MarkupString to avoid Razor <text> keyword) -->
+                    <g class="labels y">
+                        @{
+                            var steps = 4;
+                            for (int i = 0; i <= steps; i++)
+                            {
+                                var val = (int)Math.Round(MaxSessions * i / (double)steps);
+                                var y = 220 - (i * 40);
+                                @SvgText(10, y, val.ToString(), "alignment-baseline='middle'")
+                                ;
+                            }
+                        }
+                    </g>
+
+                    <!-- x labels -->
+                    <g class="labels x">
+                        @{
+                            if (Series.Count > 0)
+                            {
+                                var span = Series.Count - 1;
+                                for (int i = 0; i < Series.Count; i += Math.Max(1, span / 6))
+                                {
+                                    var x = 50 + (650.0 * i / Math.Max(1, span));
+                                    var d = Series[i].Date.ToLocalTime().ToString("dd MMM");
+                                    @SvgText(x, 245, d, "text-anchor='middle'")
+                                    ;
+                                }
+                            }
+                        }
+                    </g>
+
+                    <!-- line & dots -->
+                    <polyline class="line" points="@LinePoints" />
+                    <g class="dots">
+                        @for (int i = 0; i < Series.Count; i++)
+                        {
+                            var p = PointAt(i);
+                            <circle cx="@p.x" cy="@p.y" r="2.8"></circle>
+                        }
+                    </g>
+                </svg>
+            </div>
+        </article>
+
+        <!-- Subject share (donut) -->
+        <article class="card chart">
+            <header class="card__head">
+                <h3 class="card__title">Subject share</h3>
+                <p class="card__sub">Sessions by subject</p>
+            </header>
+
+            <div class="donut-wrap">
+                <svg viewBox="0 0 160 120" class="donut">
+                    <g transform="translate(20,0)">
+                        <g transform="rotate(-90 60 60)">
+                            @{
+                                double offset = 0;
+                                for (int i = 0; i < SubjectShare.Count; i++)
+                                {
+                                    var seg = SubjectShare[i];
+                                    var pct = seg.Pct;
+                                    <circle cx="60" cy="60" r="44" fill="transparent"
+                                            pathLength="100"
+                                            style="stroke:@seg.Color;stroke-width:16;stroke-dasharray:@pct 100;stroke-dashoffset:@(-offset)"></circle>
+                                    ;
+                                    offset += pct;
+                                }
+                            }
+                        </g>
+                        <circle cx="60" cy="60" r="30" fill="white" />
+                    </g>
+                </svg>
+
+                <ul class="legend">
+                    @foreach (var seg in SubjectShare)
+                    {
+                        <li><i style="background:@seg.Color"></i>@seg.Label <span class="muted">@($"{seg.Pct:0}%")</span></li>
+                    }
+                </ul>
+            </div>
+        </article>
+    </section>
+
+    <!-- Tutor supply & subject utilization -->
+    <section class="group">
+        <h2 class="group__title">Tutor supply & utilization</h2>
+
+        <div class="grid-2">
+            <!-- Active tutors by subject (bars) -->
+            <article class="card">
+                <header class="card__head">
+                    <h3 class="card__title">Active tutors by subject</h3>
+                    <p class="card__sub">Tutors who taught ≥1 session in range</p>
+                </header>
+
+                <div class="bars">
+                    @foreach (var row in TutorsBySubject)
+                    {
+                        <div class="bar">
+                            <div class="bar__label">@row.Label</div>
+                            <div class="bar__track">
+                                <div class="bar__fill" style="width:@row.Width%"></div>
+                            </div>
+                            <div class="bar__value">@row.Value</div>
+                        </div>
+                    }
+                </div>
+            </article>
+
+            <!-- Utilization table -->
+            <article class="card">
+                <header class="card__head">
+                    <h3 class="card__title">Sessions per active tutor</h3>
+                    <p class="card__sub">Utilization by subject</p>
+                </header>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Sessions</th>
+                            <th>Active tutors</th>
+                            <th>Sessions / tutor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in Utilization)
+                        {
+                            <tr>
+                                <td>@u.Label</td>
+                                <td>@u.Sessions</td>
+                                <td>@u.Tutors</td>
+                                <td>@($"{u.Util:0.0}")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </article>
+        </div>
+    </section>
+</section>
+
+@code {
+    // --------- Filters ---------
+    private int Days { get; set; } = 30;
+    private string Bucket { get; set; } = "daily"; // or "weekly"
+
+    private long? SelectedSubjectId { get; set; } = null;
+    private string SelectedSubjectIdStr
+    {
+        get => SelectedSubjectId?.ToString() ?? "";
+        set => SelectedSubjectId = long.TryParse(value, out var v) ? v : (long?)null;
+    }
+
+    // --------- Sample data ---------
+    private List<SubjectVM> Subjects = new()
+  {
+    new(1, "SEN 381", "Software Engineering"),
+    new(2, "Thermo 244", "Thermodynamics"),
+    new(3, "DB 372", "Databases"),
+    new(4, "ENGM 242", "Engineering Mechanics"),
+    new(5, "Calc 101", "Calculus I")
+  };
+
+    private List<SessionRow> AllSessions = new();
+
+    protected override void OnInitialized()
+    {
+        // Generate deterministic demo data for 30 days
+        var rand = new Random(42);
+
+        var tutorsBySubject = new Dictionary<long, long[]>
+        {
+            [1] = new long[] { 201, 202, 203 },
+            [2] = new long[] { 204, 205 },
+            [3] = new long[] { 201, 203, 205 },
+            [4] = new long[] { 206 },
+            [5] = new long[] { 207 }
+        };
+
+        var students = Enumerable.Range(1001, 42).Select(i => (long)i).ToArray();
+        var subjectWeights = new (long id, int w)[] { (1, 35), (3, 25), (2, 20), (4, 12), (5, 8) };
+        int totalW = subjectWeights.Sum(t => t.w);
+
+        long PickSubject(int r)
+        {
+            int acc = 0;
+            foreach (var t in subjectWeights)
+            {
+                acc += t.w;
+                if (r < acc) return t.id;
+            }
+            return subjectWeights[^1].id;
+        }
+
+        var start = DateTime.UtcNow.Date.AddDays(-29);
+        var dailyCounts = new int[] { 9, 12, 14, 10, 13, 16, 20, 15, 18, 12, 14, 13, 12, 17, 21, 19, 18, 16, 14, 13, 12, 11, 15, 17, 14, 16, 18, 20, 22, 19 };
+
+        var lastTutorForStudent = new Dictionary<long, long>();
+
+        for (int d = 0; d < dailyCounts.Length; d++)
+        {
+            var date = start.AddDays(d).AddHours(rand.Next(8, 20));
+
+            for (int n = 0; n < dailyCounts[d]; n++)
+            {
+                long subjectId = PickSubject(rand.Next(totalW));
+                var student = students[rand.Next(students.Length)];
+
+                // reuse tutors sometimes to create "repeat" behaviour
+                long tutor;
+                if (lastTutorForStudent.TryGetValue(student, out var prev) && rand.NextDouble() < 0.45)
+                    tutor = prev;
+                else
+                {
+                    var pool = tutorsBySubject[subjectId];
+                    tutor = pool[rand.Next(pool.Length)];
+                    lastTutorForStudent[student] = tutor;
+                }
+
+                AllSessions.Add(new SessionRow(date, subjectId, tutor, student));
+            }
+        }
+    }
+
+    // --------- Derived data ---------
+    private IEnumerable<SessionRow> SessionsFiltered =>
+      AllSessions.Where(s =>
+        s.CreatedAt >= DateTime.UtcNow.Date.AddDays(-Days + 1) &&
+        (SelectedSubjectId is null || s.SubjectId == SelectedSubjectId));
+
+    private List<PointItem> Series
+    {
+        get
+        {
+            var groups = Bucket == "weekly"
+              ? SessionsFiltered
+                  .GroupBy(s => StartOfWeek(s.CreatedAt))
+                  .OrderBy(g => g.Key)
+                  .Select(g => new PointItem(g.Key, g.Count()))
+              : SessionsFiltered
+                  .GroupBy(s => s.CreatedAt.Date)
+                  .OrderBy(g => g.Key)
+                  .Select(g => new PointItem(g.Key, g.Count()));
+
+            return groups.ToList();
+        }
+    }
+
+    private int MaxSessions => Math.Max(4, (Series.Count == 0 ? 0 : Series.Max(p => p.Value)));
+    private string RangeTitle => $"Last {Days} days";
+    private string BucketTitle => Bucket == "weekly" ? "Weekly" : "Daily";
+
+    private int TotalSessions => SessionsFiltered.Count();
+    private int UniqueStudents => SessionsFiltered.Select(s => s.StudentId).Distinct().Count();
+    private int ActiveTutors => SessionsFiltered.Select(s => s.TutorId).Distinct().Count();
+
+    private double RepeatStudentsPct
+    {
+        get
+        {
+            var perTutor = SessionsFiltered
+              .GroupBy(s => new { s.TutorId, s.StudentId })
+              .Select(g => new { g.Key.TutorId, g.Key.StudentId, Count = g.Count() });
+
+            var repeatStudents = perTutor.Where(x => x.Count >= 2).Select(x => x.StudentId).Distinct().Count();
+            if (UniqueStudents == 0) return 0;
+            return 100.0 * repeatStudents / UniqueStudents;
+        }
+    }
+
+    // Subject share for donut
+    private List<ShareSeg> SubjectShare
+    {
+        get
+        {
+            var bySubject = SessionsFiltered
+              .GroupBy(s => s.SubjectId)
+              .Select(g => new { SubjectId = g.Key, Count = g.Count() })
+              .OrderByDescending(x => x.Count)
+              .ToList();
+
+            var total = Math.Max(1, bySubject.Sum(x => x.Count));
+            var palette = new[] { "#1B998B", "#2A6FFF", "#AD1F54", "#F2B705", "#4A4E69" };
+
+            var list = new List<ShareSeg>();
+            for (int i = 0; i < bySubject.Count; i++)
+            {
+                var subj = Subjects.First(s => s.SubjectId == bySubject[i].SubjectId);
+                list.Add(new ShareSeg($"{subj.SubjectCode}", Math.Round(100.0 * bySubject[i].Count / total, 1), palette[i % palette.Length]));
+            }
+            return list;
+        }
+    }
+
+    // Bars: active tutors by subject
+    private List<BarRow> TutorsBySubject
+    {
+        get
+        {
+            var data = SessionsFiltered
+              .GroupBy(s => s.SubjectId)
+              .Select(g => new
+              {
+                  SubjectId = g.Key,
+                  Tutors = g.Select(x => x.TutorId).Distinct().Count()
+              })
+              .OrderByDescending(x => x.Tutors)
+              .ToList();
+
+            var max = Math.Max(1, data.Max(x => x.Tutors));
+            return data.Select(x =>
+            {
+                var subj = Subjects.First(s => s.SubjectId == x.SubjectId);
+                return new BarRow($"{subj.SubjectCode}", x.Tutors, 100.0 * x.Tutors / max);
+            }).ToList();
+        }
+    }
+
+    // Utilization table
+    private List<UtilRow> Utilization
+    {
+        get
+        {
+            var sessions = SessionsFiltered
+              .GroupBy(s => s.SubjectId)
+              .Select(g => new { SubjectId = g.Key, Sessions = g.Count(), Tutors = g.Select(x => x.TutorId).Distinct().Count() })
+              .OrderByDescending(x => x.Sessions)
+              .ToList();
+
+            return sessions.Select(x =>
+            {
+                var subj = Subjects.First(s => s.SubjectId == x.SubjectId);
+                var util = x.Tutors == 0 ? 0 : (double)x.Sessions / x.Tutors;
+                return new UtilRow($"{subj.SubjectCode}", x.Sessions, x.Tutors, util);
+            }).ToList();
+        }
+    }
+
+    // --------- SVG helpers (fix for Razor <text>) ---------
+    private MarkupString SvgText(double x, double y, string content, string extraAttrs = "")
+      => new MarkupString($"<text x='{x:F0}' y='{y:F0}' {extraAttrs}>{System.Net.WebUtility.HtmlEncode(content)}</text>");
+
+    private string LinePoints
+    {
+        get
+        {
+            if (Series.Count == 0) return string.Empty;
+            var span = Math.Max(1, Series.Count - 1);
+            var max = Math.Max(1, Series.Max(p => p.Value));
+            var pts = new List<string>();
+            for (int i = 0; i < Series.Count; i++)
+            {
+                var x = 50 + (650.0 * i / span);
+                var y = 220 - (180.0 * Series[i].Value / max);
+                pts.Add($"{x:F1},{y:F1}");
+            }
+            return string.Join(" ", pts);
+        }
+    }
+
+    private (double x, double y) PointAt(int i)
+    {
+        if (Series.Count == 0) return (0, 0);
+        var span = Math.Max(1, Series.Count - 1);
+        var max = Math.Max(1, Series.Max(p => p.Value));
+        var x = 50 + (650.0 * i / span);
+        var y = 220 - (180.0 * Series[i].Value / max);
+        return (x, y);
+    }
+
+    private static DateTime StartOfWeek(DateTime dt)
+    {
+        var d = dt.Date;
+        int diff = (7 + (int)d.DayOfWeek - (int)DayOfWeek.Monday) % 7;
+        return d.AddDays(-diff);
+    }
+
+    // --------- Models ---------
+    private record SubjectVM(long SubjectId, string SubjectCode, string Name);
+    private record SessionRow(DateTime CreatedAt, long SubjectId, long TutorId, long StudentId);
+    private record PointItem(DateTime Date, int Value);
+    private record ShareSeg(string Label, double Pct, string Color);
+    private record BarRow(string Label, int Value, double Width);
+    private record UtilRow(string Label, int Sessions, int Tutors, double Util);
+}
+
+<style>
+    /* Page shell, same family as other admin pages */
+    .admin-page {
+        --ink: #2D3034;
+        --mist: #DBE4EE;
+        --bg: #fff;
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --radius: 1.25rem;
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+        color: var(--ink);
+        background: var(--bg);
+        width: min(1200px,92vw);
+        margin-inline: auto;
+        padding: clamp(16px,4vw,28px);
+        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif;
+    }
+
+    .title {
+        margin: 0 0 6px;
+        font-weight: 900;
+        letter-spacing: .2px;
+        font-size: clamp(28px,4.2vw,56px)
+    }
+
+    .sub {
+        margin: 0;
+        opacity: .75
+    }
+
+    .head {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap
+    }
+
+    .stack {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem
+    }
+
+    .actions {
+        display: flex;
+        gap: .5rem;
+        align-items: center
+    }
+
+    .filter {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: .6rem;
+        padding: .6rem .75rem
+    }
+
+    /* Tiles */
+    .tiles {
+        display: grid;
+        grid-template-columns: repeat(4,minmax(160px,1fr));
+        gap: clamp(12px,2vw,16px);
+        margin-top: 12px
+    }
+
+    @@media (max-width:900px) {
+        .tiles {
+            grid-template-columns: repeat(2,1fr)
+        }
+    }
+
+    @@media (max-width:520px) {
+        .tiles {
+            grid-template-columns: 1fr
+        }
+    }
+
+    .tile {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px
+    }
+
+    .tile__label {
+        font-size: .9rem;
+        opacity: .7
+    }
+
+    .tile__value {
+        font-weight: 900;
+        font-size: clamp(22px,4vw,32px)
+    }
+
+    .tile__sub {
+        opacity: .6;
+        font-size: .9rem
+    }
+
+    /* Cards */
+    .card {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem
+    }
+
+    .card__head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline
+    }
+
+    .card__title {
+        margin: 0;
+        font-size: 1.02rem;
+        font-weight: 900;
+        letter-spacing: .2px
+    }
+
+    .card__sub {
+        margin: .2rem 0 0 0;
+        opacity: .75;
+        font-size: .95rem
+    }
+
+    /* Charts row */
+    .charts {
+        display: grid;
+        grid-template-columns: 1.4fr .9fr;
+        gap: clamp(16px,2vw,20px);
+        margin-top: clamp(12px,2vw,16px)
+    }
+
+    @@media (max-width:950px) {
+        .charts {
+            grid-template-columns: 1fr
+        }
+    }
+
+    /* Line chart */
+    .chart__area {
+        width: 100%;
+        overflow: hidden
+    }
+
+    .chart-svg {
+        width: 100%;
+        height: auto;
+        display: block
+    }
+
+    .grid line {
+        stroke: #e5eaf2;
+        stroke-width: 1
+    }
+
+    .line {
+        fill: none;
+        stroke: #2A6FFF;
+        stroke-width: 2.5px
+    }
+
+    .dots circle {
+        fill: #2A6FFF
+    }
+
+    .labels text {
+        font-size: .8rem;
+        fill: #6b7280
+    }
+
+    /* Donut + legend */
+    .donut-wrap {
+        display: flex;
+        align-items: center;
+        gap: 1rem
+    }
+
+    .donut {
+        width: 220px;
+        height: auto
+    }
+
+    .legend {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: .35rem
+    }
+
+        .legend li {
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .legend i {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            display: inline-block
+        }
+
+        .legend .muted {
+            opacity: .65
+        }
+
+    /* Group header */
+    .group {
+        margin-top: clamp(16px,2vw,20px)
+    }
+
+    .group__title {
+        margin: .1rem 0 .5rem 0;
+        font-size: 1.1rem;
+        font-weight: 900
+    }
+
+    /* Two-column grid section */
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(16px,2vw,20px)
+    }
+
+    @@media (max-width:950px) {
+        .grid-2 {
+            grid-template-columns: 1fr
+        }
+    }
+
+    /* Horizontal bars */
+    .bars {
+        display: grid;
+        gap: .6rem
+    }
+
+    .bar {
+        display: grid;
+        grid-template-columns: minmax(140px,1fr) 1fr auto;
+        align-items: center;
+        gap: .6rem
+    }
+
+    .bar__label {
+        font-weight: 800
+    }
+
+    .bar__track {
+        height: 12px;
+        border: 1px solid var(--ring);
+        border-radius: 999px;
+        background: #f4f7fb;
+        overflow: hidden
+    }
+
+    .bar__fill {
+        height: 100%;
+        background: #1B998B;
+        border-radius: 999px
+    }
+
+    .bar__value {
+        min-width: 2ch;
+        text-align: right;
+        font-weight: 800
+    }
+
+    /* Utilization table */
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px
+    }
+
+        .table th, .table td {
+            padding: 10px 12px;
+            text-align: left
+        }
+
+        .table thead th {
+            font-size: .9rem;
+            opacity: .7
+        }
+
+        .table tbody tr {
+            background: #fff;
+            border: 1px solid var(--ring)
+        }
+
+            .table tbody tr td:first-child {
+                font-weight: 800
+            }
+</style>

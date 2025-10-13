@@ -1,0 +1,484 @@
+﻿@page "/admin/reports"
+
+<PageTitle>Admin · Reports</PageTitle>
+
+<section class="admin-page">
+    <header class="head">
+        <div class="stack">
+            <h1 class="title">Reports</h1>
+            <p class="sub">Review community reports. <strong>✓</strong> keeps content, <strong>✕</strong> removes (soft-hide).</p>
+        </div>
+
+        <div class="actions">
+            <input class="search" placeholder="Search reason, details, reporter…"
+                   @bind="Search" @bind:event="oninput" />
+            <select class="filter" @bind="TypeFilter">
+                <option value="">All types</option>
+                <option value="topic">Topics</option>
+                <option value="reply">Replies</option>
+                <option value="resource">Resources</option>
+                <option value="comment">Comments</option>
+            </select>
+            <label class="chk">
+                <input type="checkbox" @bind="OpenOnly" />
+                <span>Open only</span>
+            </label>
+        </div>
+    </header>
+
+    @if (!AnyVisible)
+    {
+        <div class="state empty">No reports match your filters.</div>
+    }
+    else
+    {
+        @foreach (var kind in KindOrder)
+        {
+            var list = Filtered.Where(r => r.Kind == kind).ToList();
+            if (list.Count == 0) { continue; }
+
+            <section class="group">
+                <h2 class="group__title">@TitleFor(kind) <span class="badge">@list.Count</span></h2>
+
+                <div class="grid">
+                    @foreach (var r in list)
+                    {
+                        <article class="card @(CssFor(r))">
+                            <!-- Corner actions; disabled once resolved -->
+                            <button class="btn-icon decline" aria-label="Remove" title="Remove (soft-hide)"
+                                    disabled="@r.Dismissed"
+                                    @onclick="@(() => Remove(r.ContentReportId))">
+                                ✕
+                            </button>
+                            <button class="btn-icon accept" aria-label="Keep" title="Keep (unflag)"
+                                    disabled="@r.Dismissed"
+                                    @onclick="@(() => Keep(r.ContentReportId))">
+                                ✓
+                            </button>
+
+                            <header class="card__head">
+                                <div class="meta">
+                                    <h3 class="card__title">@r.Context</h3>
+                                    <p class="card__sub">
+                                        <span class="pill">@r.Kind</span>
+                                        <span>· Reported by @r.ReporterName</span>
+                                        <span>· @r.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+
+                                        @if (r.Dismissed)
+                                        {
+                                            <span class="status @(r.Resolution == "remove" ? "remove" : "keep")">
+                                                @(r.Resolution == "remove" ? "Removed" : "Kept")
+                                            </span>
+                                        }
+                                    </p>
+                                </div>
+                            </header>
+
+                            <div class="body">
+                                <ul class="kv">
+                                    <li><b>Reason:</b> @r.Reason</li>
+                                    @if (!string.IsNullOrWhiteSpace(r.Details))
+                                    {
+                                        <li><b>Details:</b> @r.Details</li>
+                                    }
+                                </ul>
+
+                                @if (!string.IsNullOrWhiteSpace(r.Snippet))
+                                {
+                                    <blockquote class="snippet">@r.Snippet</blockquote>
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(r.TargetUrl))
+                            {
+                                <footer class="foot">
+                                    <a class="go" href="@r.TargetUrl">Open location →</a>
+                                </footer>
+                            }
+                        </article>
+                    }
+                </div>
+            </section>
+        }
+    }
+</section>
+
+@code {
+    // ---------- Filters ----------
+    private string Search = string.Empty;
+    private string TypeFilter = string.Empty;
+    private bool OpenOnly = true;
+
+    // ---------- Demo data ----------
+    private List<ReportVM> Items = new()
+  {
+    new ReportVM
+    {
+      ContentReportId = 1, Kind = "topic", ContentId = 101,
+      Reason = "harassment", Details = "Aggressive tone in thread",
+      ReporterName = "Alice M.", CreatedAt = DateTime.UtcNow.AddHours(-3),
+      Dismissed = false, TargetUrl = "/forums/thermo244/topic/101",
+      Context = "Thermo 244 · Midterm thread",
+      Snippet = "“Your answer is ridiculous…”", Resolution = null
+    },
+    new ReportVM
+    {
+      ContentReportId = 2, Kind = "resource", ContentId = 556,
+      Reason = "copyright", Details = "Textbook PDF upload",
+      ReporterName = "Morne V.", CreatedAt = DateTime.UtcNow.AddHours(-6),
+      Dismissed = true, Resolution = "keep", TargetUrl = "/resources/556",
+      Context = "SEN 381 · Uploaded resource",
+      Snippet = "Intro to Microservices (3rd ed.)"
+    },
+    new ReportVM
+    {
+      ContentReportId = 3, Kind = "reply", ContentId = 808,
+      Reason = "spam", Details = "Off-topic link",
+      ReporterName = "Kai R.", CreatedAt = DateTime.UtcNow.AddDays(-1),
+      Dismissed = true, Resolution = "remove", TargetUrl = "/forums/engm242/topic/77#reply-808",
+      Context = "ENGM 242 · Tutorial 6 help",
+      Snippet = "Check out my channel…"
+    }
+  };
+
+    private string[] KindOrder = new[] { "topic", "reply", "resource", "comment" };
+
+    private IEnumerable<ReportVM> Filtered =>
+      Items.Where(r =>
+        (string.IsNullOrWhiteSpace(TypeFilter) || r.Kind == TypeFilter) &&
+        (!OpenOnly || !r.Dismissed) &&
+        (string.IsNullOrWhiteSpace(Search) ||
+          ($"{r.Reason} {r.Details} {r.Snippet} {r.ReporterName} {r.Context}"
+           .Contains(Search, StringComparison.OrdinalIgnoreCase))));
+
+    private bool AnyVisible => Filtered.Any();
+
+    private static string TitleFor(string kind) => kind switch
+    {
+        "topic" => "Topics",
+        "reply" => "Replies",
+        "resource" => "Resources",
+        "comment" => "Comments",
+        _ => kind
+    };
+
+    private static string CssFor(ReportVM r)
+      => r.Dismissed ? (r.Resolution == "remove" ? "state-remove" : "state-keep") : string.Empty;
+
+    // ---------- Actions (optimistic UI) ----------
+    private Task Keep(long id)
+    {
+        var r = Items.FirstOrDefault(x => x.ContentReportId == id);
+        if (r is not null) { r.Dismissed = true; r.Resolution = "keep"; }
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task Remove(long id)
+    {
+        var r = Items.FirstOrDefault(x => x.ContentReportId == id);
+        if (r is not null) { r.Dismissed = true; r.Resolution = "remove"; }
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    // ---------- Model ----------
+    private class ReportVM
+    {
+        public long ContentReportId { get; set; }
+        public string Kind { get; set; } = "";
+        public long ContentId { get; set; }
+        public string Reason { get; set; } = "";
+        public string? Details { get; set; }
+        public string ReporterName { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
+        public bool Dismissed { get; set; }
+        public string? Resolution { get; set; } // "keep" | "remove" | null
+        public string? TargetUrl { get; set; }
+        public string? Context { get; set; }
+        public string? Snippet { get; set; }
+    }
+}
+
+<style>
+    /* Match dashboard typography/feel */
+    .admin-page {
+        --ink: #2D3034;
+        --mist: #DBE4EE;
+        --bg: #fff;
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --radius: 1.25rem;
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+        color: var(--ink);
+        background: var(--bg);
+        width: min(1200px,92vw);
+        margin-inline: auto;
+        padding: clamp(16px,4vw,28px);
+        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif;
+    }
+
+    .title {
+        margin: 0 0 6px;
+        font-weight: 900;
+        letter-spacing: .2px;
+        font-size: clamp(28px,4.2vw,56px)
+    }
+
+    .sub {
+        margin: 0;
+        opacity: .75
+    }
+
+    .head {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        justify-content: space-between;
+        flex-wrap: wrap
+    }
+
+    .stack {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem
+    }
+
+    .actions {
+        display: flex;
+        gap: .5rem;
+        align-items: center
+    }
+
+    /* Controls */
+    .search {
+        flex: 0 0 320px;
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: 999px;
+        padding: .65rem 1rem
+    }
+
+    .filter {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: .6rem;
+        padding: .6rem .75rem
+    }
+
+    .chk {
+        display: flex;
+        align-items: center;
+        gap: .45rem;
+        font-size: .95rem
+    }
+
+    /* States */
+    .state {
+        padding: 1rem;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow)
+    }
+
+        .state.empty {
+            background: #f1f4f9;
+            border: 1px dashed #d8dee9;
+            color: #6b7280;
+            text-align: center
+        }
+
+    /* Group */
+    .group {
+        margin-top: 1.2rem
+    }
+
+    .group__title {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin: .25rem 0 0 0;
+        font-size: 1.1rem;
+        font-weight: 800
+    }
+
+    .badge {
+        display: inline-block;
+        min-width: 1.6rem;
+        text-align: center;
+        font-weight: 800;
+        font-size: .85rem;
+        padding: .1rem .45rem;
+        border-radius: 999px;
+        background: #eef2f7;
+        border: 1px solid var(--ring)
+    }
+
+    /* Grid & Cards */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(300px,1fr));
+        gap: clamp(16px, 3vw, 28px) clamp(20px, 4vw, 60px);
+        padding-top: clamp(8px, 2vw, 16px)
+    }
+
+    @@media (max-width:760px) {
+        .grid {
+            grid-template-columns: 1fr
+        }
+    }
+
+    /* Corner buttons never cover text => extra horizontal padding */
+    .card {
+        position: relative;
+        background: var(--mist);
+        border: 1px solid var(--ring);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 1rem calc(1.25rem + 42px); /* space for 36px corner buttons */
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+    }
+
+    .card__head {
+        display: flex;
+        gap: .75rem;
+        align-items: center
+    }
+
+    .meta {
+        min-width: 0
+    }
+
+    .card__title {
+        margin: 0;
+        font-size: 1.02rem;
+        font-weight: 900;
+        letter-spacing: .2px
+    }
+
+    .card__sub {
+        margin: .2rem 0 0 0;
+        opacity: .85;
+        font-size: .95rem
+    }
+
+    .pill {
+        display: inline-block;
+        margin-right: .35rem;
+        padding: .06rem .45rem;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--ring);
+        font-weight: 700;
+        font-size: .8rem
+    }
+
+    /* Resolved state coloring */
+    .card.state-keep {
+        background: #E8F6F2;
+        border-color: #B9E3DB
+    }
+
+    .card.state-remove {
+        background: #FBE8EE;
+        border-color: #F1B7C7
+    }
+
+    .status {
+        margin-left: .5rem;
+        padding: .06rem .5rem;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: .8rem;
+        border: 1px solid var(--ring)
+    }
+
+        .status.keep {
+            background: #E8F6F2;
+            color: #0f5b51;
+            border-color: #B9E3DB
+        }
+
+        .status.remove {
+            background: #FBE8EE;
+            color: #7D1033;
+            border-color: #F1B7C7
+        }
+
+    .body {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem
+    }
+
+    .kv {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: .25rem
+    }
+
+        .kv b {
+            margin-right: .25rem
+        }
+
+    .snippet {
+        margin: .45rem 0 0 0;
+        padding-left: .75rem;
+        border-left: 3px solid var(--ring);
+        opacity: .95;
+        font-style: italic
+    }
+
+    .foot {
+        margin-top: .05rem
+    }
+
+    .go {
+        font-weight: 800;
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 2px solid rgba(45,48,52,.25);
+        padding-bottom: 1px
+    }
+
+        .go:hover {
+            filter: brightness(.9)
+        }
+
+    /* Corner action buttons */
+    .btn-icon {
+        position: absolute;
+        top: .55rem;
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 50%;
+        font-weight: 900;
+        cursor: pointer;
+        color: #fff;
+        display: grid;
+        place-items: center;
+        line-height: 1;
+        box-shadow: 0 6px 16px rgba(0,0,0,.12)
+    }
+
+        .btn-icon.decline {
+            left: .55rem;
+            background: #AD1F54
+        }
+
+        .btn-icon.accept {
+            right: .55rem;
+            background: #1B998B
+        }
+
+        /* Disabled look when resolved */
+        .btn-icon[disabled] {
+            opacity: .45;
+            filter: grayscale(.1);
+            cursor: default;
+            box-shadow: none
+        }
+</style>
