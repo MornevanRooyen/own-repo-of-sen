@@ -60,16 +60,16 @@ namespace Sen381Backend.Controllers
 
             try
             {
-                // Prevent double-booking within the same hour
-                var hourStart = new DateTime(dto.WhenAt.Year, dto.WhenAt.Month, dto.WhenAt.Day, dto.WhenAt.Hour, 0, 0, DateTimeKind.Unspecified);
-                var hourEnd = hourStart.AddHours(1);
+                // Limit to 5 events per day
+                var dayStart = new DateTime(dto.WhenAt.Year, dto.WhenAt.Month, dto.WhenAt.Day, 0, 0, 0, DateTimeKind.Unspecified);
+                var dayEnd = dayStart.AddDays(1);
                 var allUserEvents = await client
                     .From<UserEvent>()
                     .Where(e => e.UserId == dto.UserId)
                     .Get();
-                var existing = allUserEvents.Models.Where(e => e.WhenAt >= hourStart && e.WhenAt < hourEnd);
-                if (existing.Any())
-                    return BadRequest(new { error = "You already have an event in that hour." });
+                var existing = allUserEvents.Models.Where(e => e.WhenAt >= dayStart && e.WhenAt < dayEnd);
+                if (existing.Count() >= 5)
+                    return BadRequest(new { error = "You can only have up to 5 events per day." });
 
                 var inserted = await client.From<UserEvent>().Insert(model);
                 var saved = inserted.Models.FirstOrDefault() ?? model;
@@ -96,16 +96,16 @@ namespace Sen381Backend.Controllers
             {
                 if (dto.WhenAt.Date < DateTime.Today) return BadRequest(new { error = "Cannot move events to the past." });
 
-                // Same-hour conflict check (exclude current id)
-                var hourStart = new DateTime(dto.WhenAt.Year, dto.WhenAt.Month, dto.WhenAt.Day, dto.WhenAt.Hour, 0, 0, DateTimeKind.Unspecified);
-                var hourEnd = hourStart.AddHours(1);
+                // Limit to 5 events per day (exclude current event being updated)
+                var dayStart = new DateTime(dto.WhenAt.Year, dto.WhenAt.Month, dto.WhenAt.Day, 0, 0, 0, DateTimeKind.Unspecified);
+                var dayEnd = dayStart.AddDays(1);
                 var allUserEvents = await client
                     .From<UserEvent>()
                     .Where(e => e.UserId == dto.UserId)
                     .Get();
-                var clash = allUserEvents.Models.Where(e => e.WhenAt >= hourStart && e.WhenAt < hourEnd && e.Id != id);
-                if (clash.Any())
-                    return BadRequest(new { error = "Another event exists in that hour." });
+                var clash = allUserEvents.Models.Where(e => e.WhenAt >= dayStart && e.WhenAt < dayEnd && e.Id != id);
+                if (clash.Count() >= 5)
+                    return BadRequest(new { error = "You can only have up to 5 events per day." });
 
                 var ev = new UserEvent { Id = id, Title = dto.Title, WhenAt = dto.WhenAt, DurationMinutes = dto.DurationMinutes };
                 var updated = await client.From<UserEvent>().Update(ev);

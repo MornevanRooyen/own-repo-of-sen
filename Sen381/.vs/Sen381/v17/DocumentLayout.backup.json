@@ -59,7 +59,7 @@
               "RelativeDocumentMoniker": "..\\Sen381Backend\\Controllers\\EventsController.cs",
               "ToolTip": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381Backend\\Controllers\\EventsController.cs",
               "RelativeToolTip": "..\\Sen381Backend\\Controllers\\EventsController.cs",
-              "ViewState": "AgIAAFYAAAAAAAAAAAAAwHEAAAANAAAAAAAAAA==",
+              "ViewState": "AgIAAFYAAAAAAAAAAAAAwGAAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-13T16:40:10.655Z",
               "EditorCaption": ""
@@ -74,8 +74,7 @@
               "RelativeToolTip": "..\\Frontend\\Pages\\Dashboard.razor",
               "ViewState": "AgIAADAAAAAAAAAAAAAAACMAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-13T16:36:55.534Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-13T16:36:55.534Z"
             },
             {
               "$type": "Document",
@@ -87,8 +86,7 @@
               "RelativeToolTip": "..\\Sen381Backend\\Controllers\\ProfileController.cs",
               "ViewState": "AgIAAF0AAAAAAAAAAADwv4kAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T16:28:33.685Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-13T16:28:33.685Z"
             },
             {
               "$type": "Document",
@@ -100,8 +98,7 @@
               "RelativeToolTip": "..\\Sen381Backend\\Controllers\\FileController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T15:20:37.065Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-13T15:20:37.065Z"
             },
             {
               "$type": "Document",
@@ -113,8 +110,7 @@
               "RelativeToolTip": "..\\Frontend\\Pages\\CreateProfile.razor",
               "ViewState": "AgIAACMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-13T15:19:47.067Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-13T15:19:47.067Z"
             }
           ]
         }
