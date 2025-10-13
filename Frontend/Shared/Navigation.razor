@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @* Shared/Navigation.razor — used as main layout *@
 
 <nav class="cl-nav">
@@ -40,8 +40,7 @@
         <a @onclick='() => NavigateTo("/subjects")'>Subjects</a>
         <a @onclick='() => NavigateTo("/peers")'>Peers</a>
 
-        @* this is just to have the admin option available for dev*@
-        <a @onclick='() => NavigateTo("/adminprofile")'>Admin</a>
+        @* Admin link is conditionally rendered below based on user role *@
 
 
 
@@ -215,6 +214,7 @@
 
 @code {
     [Inject] private NavigationManager Nav { get; set; }
+    [Inject] private IJSRuntime JS { get; set; }
 
     [Parameter] public bool IsAdmin { get; set; } = false;
     private bool IsMenuOpen;
@@ -225,5 +225,25 @@
     {
         IsMenuOpen = false;
         Nav.NavigateTo(path);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            var role = await JS.InvokeAsync<string>("localStorage.getItem", "role");
+            IsAdmin = string.Equals(role, "admin", StringComparison.OrdinalIgnoreCase);
+            StateHasChanged();
+        }
+        catch
+        {
+            // If we cannot read from localStorage, default to non-admin
+            IsAdmin = false;
+        }
     }
 }
