@@ -8109,23 +8109,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\xavie\\.nuget\\packages\\": {},
+    "C:\\Users\\morne\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381.Tests\\Sen381.Tests.csproj",
+      "projectUniqueName": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381.Tests\\Sen381.Tests.csproj",
       "projectName": "Sen381.Tests",
-      "projectPath": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381.Tests\\Sen381.Tests.csproj",
-      "packagesPath": "C:\\Users\\xavie\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381.Tests\\obj\\",
+      "projectPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381.Tests\\Sen381.Tests.csproj",
+      "packagesPath": "C:\\Users\\morne\\.nuget\\packages\\",
+      "outputPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\xavie\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\morne\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -8140,8 +8140,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Sen381Backend.csproj": {
-              "projectPath": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Sen381Backend.csproj"
+            "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381Backend\\Sen381Backend.csproj": {
+              "projectPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381Backend\\Sen381Backend.csproj"
             }
           }
         }

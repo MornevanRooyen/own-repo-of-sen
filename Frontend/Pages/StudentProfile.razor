@@ -40,7 +40,23 @@
     </div>
 
     <div class="hd-actions">
-        <NavLink class="btn primary" href="/create-profile">Edit profile</NavLink>
+        @if (isOwnProfile)
+        {
+            <NavLink class="btn primary" href="/create-profile">Edit profile</NavLink>
+        }
+        else
+        {
+            <button class="btn @(isFollowing ? "following" : "primary")" @onclick="ToggleFollow" disabled="@isTogglingFollow">
+                @if (isTogglingFollow)
+                {
+                    <span>...</span>
+                }
+                else
+                {
+                    <span>@(isFollowing ? "Unfollow" : "Follow")</span>
+                }
+            </button>
+        }
         <NavLink class="btn" href="/messages">Message</NavLink>
     </div>
 </header>
@@ -92,11 +108,29 @@
 
         <section class="card">
             <h2 class="card-hd">Contact</h2>
-            <ul class="list">
-                <li><strong>Email:</strong> <a href="mailto:@currentUser?.Email">@currentUser?.Email</a></li>
-                <li><strong>Phone:</strong> @(string.IsNullOrWhiteSpace(currentUser?.PhoneNum) ? "—" : currentUser?.PhoneNum)</li>
-                <li><strong>Website:</strong> @(string.IsNullOrWhiteSpace(currentUser?.Website) ? "—" : (MarkupString)$"<a href=\"{currentUser.Website}\" target=\"_blank\" rel=\"noopener\">{currentUser.Website}</a>")</li>
-            </ul>
+            <dl class="contact-list">
+                <div class="contact-item">
+                    <dt>Email:</dt>
+                    <dd><a href="mailto:@currentUser?.Email">@currentUser?.Email</a></dd>
+                </div>
+                <div class="contact-item">
+                    <dt>Phone:</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(currentUser?.PhoneNum) ? "—" : currentUser?.PhoneNum)</dd>
+                </div>
+                <div class="contact-item">
+                    <dt>Website:</dt>
+                    <dd>
+                        @if (string.IsNullOrWhiteSpace(currentUser?.Website))
+                        {
+                            <span>—</span>
+                        }
+                        else
+                        {
+                            <a href="@currentUser.Website" target="_blank" rel="noopener">@currentUser.Website</a>
+                        }
+                    </dd>
+                </div>
+            </dl>
         </section>
     </aside>
 
@@ -116,14 +150,31 @@
             </p>
         </section>
 
-        <section id="preferences" class="card">
-            <h2 class="card-hd">Preferences</h2>
-            <ul class="prefs">
-                <li><a href="/create-profile">Edit profile</a></li>
-                <li><a href="/account/password">Change password</a></li>
-                <li><a href="/notifications">Notification preferences</a></li>
-                <li><a href="/privacy">Privacy and policies</a></li>
-            </ul>
+        @if (isOwnProfile)
+        {
+            <section id="preferences" class="card">
+                <h2 class="card-hd">Preferences</h2>
+                <ul class="prefs">
+                    <li><a href="/create-profile">Edit profile</a></li>
+                    <li><a href="/account/password">Change password</a></li>
+                    <li><a href="/notifications">Notification preferences</a></li>
+                    <li><a href="/privacy">Privacy and policies</a></li>
+                </ul>
+            </section>
+        }
+
+        <section class="card">
+            <h2 class="card-hd">Connections</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-num">@followersCount</div>
+                    <div class="stat-lbl">Followers</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">@followingCount</div>
+                    <div class="stat-lbl">Following</div>
+                </div>
+            </div>
         </section>
     </section>
 </main>
@@ -251,9 +302,20 @@
             border-color: transparent
         }
 
+        .btn.following {
+            background: #6B7280;
+            color: #fff;
+            border-color: transparent
+        }
+
         .btn:hover {
             filter: brightness(.98);
             text-decoration: none
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
     /* ===== Tabs ===== */
@@ -361,6 +423,60 @@
 
         .list li + li {
             margin-top: 6px
+        }
+
+    /* Contact list */
+    .contact-list {
+        margin: 0;
+        display: grid;
+        gap: 8px;
+    }
+
+    .contact-item {
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        gap: 8px;
+        align-items: start;
+    }
+
+        .contact-item dt {
+            font-weight: 800;
+            color: #203040;
+        }
+
+        .contact-item dd {
+            margin: 0;
+            color: #1d2329;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+    /* Stats grid for followers/following */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .stat-box {
+        background: #f2f6fb;
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        padding: 14px;
+        text-align: center;
+    }
+
+        .stat-box .stat-num {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .stat-box .stat-lbl {
+            margin-top: 4px;
+            color: var(--muted);
+            font-weight: 700;
+            font-size: 0.9rem;
         }
 
     /* Right column */
@@ -520,6 +636,10 @@
     private bool isLoading = true;
     private List<string> Interests = new();
     private bool isOwnProfile = false;
+    private bool isFollowing = false;
+    private bool isTogglingFollow = false;
+    private int followersCount = 0;
+    private int followingCount = 0;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -567,6 +687,18 @@
                     .ToList();
             }
 
+            // ✅ Check if current user is following this profile
+            if (!isOwnProfile && currentUser != null)
+            {
+                await CheckFollowStatus(loggedInUserId.Value, currentUser.Id);
+            }
+
+            // ✅ Load follower/following counts
+            if (currentUser != null)
+            {
+                await LoadFollowerCounts(currentUser.Id);
+            }
+
             Console.WriteLine($"✅ Profile loaded for {currentUser?.FirstName} {currentUser?.LastName} (Own profile: {isOwnProfile})");
         }
         catch (Exception ex)
@@ -577,5 +709,109 @@
         {
             isLoading = false;
         }
+    }
+
+    private async Task CheckFollowStatus(int followerId, int followingId)
+    {
+        try
+        {
+            var response = await Http.GetAsync($"api/Follow/check/{followerId}/{followingId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<FollowStatusResponse>();
+                isFollowing = result?.IsFollowing ?? false;
+                Console.WriteLine($"✅ Follow status checked: {isFollowing}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Error checking follow status: {ex.Message}");
+        }
+    }
+
+    private async Task LoadFollowerCounts(int userId)
+    {
+        try
+        {
+            // Fetch followers count
+            var followersResponse = await Http.GetAsync($"api/Follow/followers-count/{userId}");
+            if (followersResponse.IsSuccessStatusCode)
+            {
+                var followersResult = await followersResponse.Content.ReadFromJsonAsync<CountResponse>();
+                followersCount = followersResult?.Count ?? 0;
+            }
+
+            // Fetch following count
+            var followingResponse = await Http.GetAsync($"api/Follow/following-count/{userId}");
+            if (followingResponse.IsSuccessStatusCode)
+            {
+                var followingResult = await followingResponse.Content.ReadFromJsonAsync<CountResponse>();
+                followingCount = followingResult?.Count ?? 0;
+            }
+
+            Console.WriteLine($"✅ Follower counts loaded - Followers: {followersCount}, Following: {followingCount}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Error loading follower counts: {ex.Message}");
+        }
+    }
+
+    private async Task ToggleFollow()
+    {
+        if (currentUser == null || isTogglingFollow) return;
+
+        try
+        {
+            isTogglingFollow = true;
+            int? loggedInUserId = await AuthService.GetCurrentUserIdAsync();
+            if (loggedInUserId == null) return;
+
+            var endpoint = isFollowing ? "api/Follow/unfollow" : "api/Follow/follow";
+            var payload = new
+            {
+                FollowerId = loggedInUserId.Value,
+                FollowingId = currentUser.Id
+            };
+
+            var response = await Http.PostAsJsonAsync(endpoint, payload);
+
+            if (response.IsSuccessStatusCode)
+            {
+                isFollowing = !isFollowing;
+                Console.WriteLine($"✅ {(isFollowing ? "Followed" : "Unfollowed")} user {currentUser.Id}");
+                
+                // Refresh follower counts
+                await LoadFollowerCounts(currentUser.Id);
+                
+                // Optional: Show a success message to the user
+                await JS.InvokeVoidAsync("alert", isFollowing ? "You are now following this user!" : "You have unfollowed this user.");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"⚠️ Failed to toggle follow: {error}");
+                await JS.InvokeVoidAsync("alert", "Failed to update follow status. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Error toggling follow: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", "An error occurred. Please try again.");
+        }
+        finally
+        {
+            isTogglingFollow = false;
+        }
+    }
+
+    private class FollowStatusResponse
+    {
+        public bool IsFollowing { get; set; }
+    }
+
+    private class CountResponse
+    {
+        public int Count { get; set; }
     }
 }

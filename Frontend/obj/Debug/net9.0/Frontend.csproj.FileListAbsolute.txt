@@ -2967,10 +2967,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\cs\Microsoft.TestPlatform.CoreUtilities.resources.2z8e12b2eo.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dz0bp9s7po.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\blazor.boot.json
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.pbg2993dg1.pdb
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.yr2mqbrzis.wasm
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.pbg2993dg1.pdb.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.yr2mqbrzis.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\blazor.boot.json.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\Frontend.staticwebassets.runtime.json
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\Frontend.staticwebassets.endpoints.json
@@ -3594,7 +3590,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\blazor.
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\blazor.boot.json
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\3ranqx5z3g-khy4lop6wu.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\nc4k800ojr-8rbvw3on5j.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\6n8q7nco3q-z65br7citq.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\qgerszyb1m-t1cqhe9u97.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\sjjt76o3xv-c2jlpeoesf.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\t0zwmc1f3q-sejl45xvog.gz
@@ -3641,7 +3636,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compres
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\uozhmon6js-0j3bgjxly4.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\6l803hsylq-iag0ou56lh.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\e3lu7f1opv-tswichycbp.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\fe1mgtc0ab-h6mhp3eela.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\rp0mcxkfg1-md9yvkcqlf.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\i31q9hscey-z6jo10m0rd.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\aev7e57ak8-65wbz7t8mt.gz
@@ -3777,8 +3771,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compres
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\iw0ae27wof-tjcz0u77k5.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\285b9jwisc-tptq2av103.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\gigkqu8b6v-lfu7j35m59.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\kltuif5gvt-yr2mqbrzis.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\3xre9mjkz3-pbg2993dg1.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\jlteakxexk-tofjs4wrvy.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\staticwebassets.build.json
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\staticwebassets.build.json.cache
@@ -4297,13 +4289,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compres
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\4a76gf3ksv-xd6mv31d55.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\e1pdjk1d8o-kaml52uspo.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\sm1k7dzsek-uqnhzdwypx.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.x9cnsb7l3i.pdb
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.9pzw3c02ey.wasm
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.x9cnsb7l3i.pdb.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.9pzw3c02ey.wasm.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-9pzw3c02ey.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-x9cnsb7l3i.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-zb3ap700a2.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Microsoft.CSharp.j3zkownjjr.wasm
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Microsoft.VisualBasic.Core.qljjwgjnrn.wasm
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Microsoft.VisualBasic.ocn5mkr2m2.wasm
@@ -6435,3 +6420,19 @@ C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Frontend\obj\Debug\net9.0\compressed
 C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-eq7xbgkonj.gz
 C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-bdzld693nu.gz
 C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-0sqmq3b8ir.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\6n8q7nco3q-h9o0enghgw.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\fe1mgtc0ab-2a9nn4ag4b.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\gagwzvzvfg-rgdsi5dv36.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.auedtpk3e1.pdb
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.y8o3c5eccs.wasm
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.auedtpk3e1.pdb.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.y8o3c5eccs.wasm.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\kltuif5gvt-y8o3c5eccs.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\3xre9mjkz3-auedtpk3e1.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.qwtj9ab2vy.pdb
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.iyoupex2kk.wasm
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.qwtj9ab2vy.pdb.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.iyoupex2kk.wasm.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-iyoupex2kk.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-qwtj9ab2vy.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-jeclhtyab6.gz

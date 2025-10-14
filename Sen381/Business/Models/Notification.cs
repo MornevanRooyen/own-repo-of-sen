@@ -7,8 +7,8 @@ namespace Sen381.Business.Models
     [Table("notifications")]
     public class Notification : BaseModel
     {
-        [PrimaryKey("notification_id", false)]
-        [Column("notification_id")]
+        [PrimaryKey("notification_id", true)]
+        [Column("notification_id", ignoreOnInsert: true)]
         public int NotificationId { get; set; }
 
         [Column("user_id")]

@@ -71,11 +71,19 @@ html, body {
 .title {
     font-weight: 800;
     font-size: 1.1rem;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--ring);
+    padding: 0.75rem 1rem 0.5rem;
     background: var(--panel);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.subtitle {
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0 1rem 0.75rem;
+    border-bottom: 1px solid var(--ring);
+    background: var(--panel);
+    color: var(--muted);
 }
 
 .threads {
@@ -103,6 +111,26 @@ html, body {
     .item.active {
         background: rgba(0,0,0,0.08);
     }
+
+/* Avatar image */
+.avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid var(--ring);
+}
+
+.conv-head .avatar {
+    width: 38px;
+    height: 38px;
+}
+
+.user-info {
+    flex: 1;
+    min-width: 0;
+}
 
 /* Profile picture with animated gradient */
 .dot {
@@ -235,19 +263,28 @@ html, body {
 
 .row {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
     .row.incoming {
-        justify-content: flex-start;
+        align-items: flex-start;
     }
 
     .row.outgoing {
-        justify-content: flex-end;
+        align-items: flex-end;
     }
 
         .row.outgoing .bubble {
             background: linear-gradient(135deg, #e8e8e8, #ffffff);
         }
+
+.time {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 4px;
+    padding: 0 8px;
+}
 
 /* Input bar */
 .inputbar {

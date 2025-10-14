@@ -164,13 +164,13 @@ namespace Sen381Backend.Controllers
         [HttpPost("mark-read/{userId}")]
         public async Task<IActionResult> MarkNotificationsAsRead(int userId)
         {
-            var unreadResp = await _client
+            var allResp = await _client
                 .From<Notification>()
                 .Filter("user_id", Supabase.Postgrest.Constants.Operator.Equals, userId)
-                .Filter("is_read", Supabase.Postgrest.Constants.Operator.Equals, false)
                 .Get();
 
-            var unread = unreadResp.Models;
+            // Filter unread notifications client-side
+            var unread = allResp.Models.Where(n => !n.IsRead).ToList();
             if (unread.Count == 0)
                 return Ok(new { message = "No unread notifications found." });
 

@@ -1,4 +1,5 @@
 ﻿@page "/dashboard"
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Routing
 @using System.Net.Http.Json
 @using System.Globalization
@@ -18,16 +19,28 @@
         <!-- Notifications -->
         <section class="panel">
             <header class="panel-hd">Notifications</header>
+            <div class="notif-header-actions">
+                @if (Notifications.Count > 0)
+                {
+                    <button class="btn-mark-read" @onclick="MarkAllAsRead" disabled="@isMarkingRead">
+                        @(isMarkingRead ? "Marking..." : "Mark all as read")
+                    </button>
+                }
+            </div>
             <div class="bubble notif-bubble">
                 <ul class="notif-list">
                     @foreach (var notification in Notifications)
                     {
-                        <li class="notif-item">
+                        <li class="notif-item clickable" @onclick="() => HandleNotificationClick(notification)">
                             <div class="notif-icon" aria-hidden="true">
                                 <span class="bell"></span>
+                                @if (notification.Count > 1)
+                                {
+                                    <span class="notif-badge">@notification.Count</span>
+                                }
                             </div>
                             <p class="notif-text">
-                                <strong>@notification.SenderName</strong> @notification.Body
+                                @((MarkupString)notification.Body)
                                 <span class="notif-time">@notification.TimeAgo</span>
                             </p>
                         </li>
@@ -382,6 +395,37 @@
     .panel-hd {
         font-weight: 800;
         color: color-mix(in oklab, var(--ink) 55%, white)
+    }
+
+    .notif-header-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 4px;
+    }
+
+    .btn-mark-read {
+        background: #fff;
+        border: 1px solid var(--panel-ring);
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--ink);
+    }
+
+    .btn-mark-read:hover:not(:disabled) {
+        background: color-mix(in oklab, var(--rose) 10%, white);
+        border-color: var(--rose);
+        color: var(--rose);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-mark-read:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 
     .bubble {
@@ -988,6 +1032,20 @@
         padding: 10px 14px;
     }
 
+    .content .notif-item.clickable {
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .content .notif-item.clickable:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .content .notif-item.clickable:active {
+        transform: translateY(0);
+    }
+
     .content .notif-empty {
         background: #fff;
         border: 1px dashed var(--panel-ring);
@@ -1007,6 +1065,23 @@
         background: #fff;
         color: var(--ink);
         flex-shrink: 0;
+        position: relative;
+    }
+
+    .notif-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: #FF4444;
+        color: #fff;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: grid;
+        place-items: center;
+        font-size: 0.7rem;
+        font-weight: 900;
+        border: 2px solid var(--rose);
     }
 
     .content .bell {
@@ -1038,11 +1113,10 @@
 @code {
     private string StudentName = "Loading...";
     private string UserRole = "";
+    private int CurrentUserId;
+    private bool isMarkingRead = false;
 
-    private List<NotificationItem> Notifications = new()
-    {
-        new NotificationItem { SenderName = "Taylor Swift", Body = "replied to your question.", TimeAgo = "13 minutes ago" }
-    };
+    private List<NotificationItem> Notifications = new();
 
     // UpcomingSessions is computed from AllEvents in ComputeUpcoming()
 
@@ -1053,6 +1127,8 @@
             var uid = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
             if (string.IsNullOrEmpty(uid) || !int.TryParse(uid, out int userId))
             { NavigationManager.NavigateTo("/login"); return; }
+
+            CurrentUserId = userId; // Store for later use
 
             var response = await Http.GetAsync($"https://localhost:7228/api/User/by-id/{userId}");
             if (response.IsSuccessStatusCode)
@@ -1068,11 +1144,165 @@
 
             // Load events for this user
             await LoadEvents(userId);
+            
+            // Load notifications
+            await LoadNotifications(userId);
         }
         catch { StudentName = "User"; UserRole = "Student"; }
     }
 
-    public class NotificationItem { public string SenderName { get; set; } = ""; public string Body { get; set; } = ""; public string TimeAgo { get; set; } = ""; }
+    private async Task LoadNotifications(int userId)
+    {
+        try
+        {
+            var response = await Http.GetAsync($"https://localhost:7228/api/Notifications/user/{userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var notificationDtos = await response.Content.ReadFromJsonAsync<List<NotificationDto>>();
+                if (notificationDtos != null)
+                {
+                    // Only show unread notifications on dashboard
+                    var unreadNotifications = notificationDtos
+                        .Where(n => !n.IsRead)
+                        .OrderByDescending(n => n.SentAt)
+                        .ToList();
+
+                    // Group notifications by type and sender name
+                    var grouped = unreadNotifications
+                        .GroupBy(n => new { n.Type, SenderName = ExtractSenderName(n.Body) })
+                        .Select(g => new NotificationItem
+                        {
+                            NotificationId = g.First().NotificationId, // Use the latest notification ID
+                            SenderName = g.Key.SenderName,
+                            Body = g.Count() > 1 
+                                ? $"<strong>{g.Key.SenderName}</strong> sent you {g.Count()} messages" 
+                                : g.First().Body,
+                            TimeAgo = FormatTimeAgo(g.First().SentAt),
+                            IsRead = false,
+                            Type = g.Key.Type,
+                            Count = g.Count(),
+                            NotificationIds = g.Select(n => n.NotificationId).ToList() // Store all IDs for marking as read
+                        })
+                        .Take(5)
+                        .ToList();
+
+                    Notifications = grouped;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Error loading notifications: {ex.Message}");
+        }
+    }
+
+    private static string ExtractSenderName(string body)
+    {
+        // Extract name from "<strong>FirstName LastName</strong> sent you a message" format
+        if (body.Contains("sent you a message"))
+        {
+            var parts = body.Split(" sent you a message");
+            var nameWithTags = parts[0];
+            // Remove HTML tags
+            return nameWithTags.Replace("<strong>", "").Replace("</strong>", "").Trim();
+        }
+        return "";
+    }
+
+    private static string FormatTimeAgo(DateTime sentAt)
+    {
+        // Treat the incoming DateTime as UTC (Supabase stores timestamps as UTC but doesn't set the Kind property)
+        var utcSentAt = DateTime.SpecifyKind(sentAt, DateTimeKind.Utc);
+        var span = DateTime.UtcNow - utcSentAt;
+        
+        // Debug logging
+        Console.WriteLine($"[DEBUG] Original SentAt: {sentAt}, Kind: {sentAt.Kind}");
+        Console.WriteLine($"[DEBUG] UTC SentAt: {utcSentAt}, UTC Now: {DateTime.UtcNow}, Span: {span.TotalMinutes} minutes");
+        
+        if (span.TotalMinutes < 1) return "just now";
+        if (span.TotalMinutes < 60) return $"{Math.Floor(span.TotalMinutes)} minute{(Math.Floor(span.TotalMinutes) == 1 ? "" : "s")} ago";
+        if (span.TotalHours < 24) return $"{Math.Floor(span.TotalHours)} hour{(Math.Floor(span.TotalHours) == 1 ? "" : "s")} ago";
+        if (span.TotalDays < 7) return $"{Math.Floor(span.TotalDays)} day{(Math.Floor(span.TotalDays) == 1 ? "" : "s")} ago";
+        return utcSentAt.ToLocalTime().ToString("MMM dd");
+    }
+
+    private void HandleNotificationClick(NotificationItem notification)
+    {
+        // Navigate based on notification type
+        switch (notification.Type)
+        {
+            case "direct_message":
+                NavigationManager.NavigateTo("/messages");
+                break;
+            case "chat_message":
+                NavigationManager.NavigateTo("/messages");
+                break;
+            default:
+                // For other notification types, could navigate to specific pages
+                Console.WriteLine($"Notification clicked: {notification.Type}");
+                break;
+        }
+    }
+
+    private async Task MarkAllAsRead()
+    {
+        if (isMarkingRead || CurrentUserId == 0) return;
+
+        try
+        {
+            isMarkingRead = true;
+            Console.WriteLine($"[Dashboard] Marking all notifications as read for user {CurrentUserId}");
+
+            var response = await Http.PutAsync($"https://localhost:7228/api/Notifications/mark-all-read/{CurrentUserId}", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("✅ All notifications marked as read");
+                
+                // Clear the notifications list
+                Notifications.Clear();
+                StateHasChanged();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"⚠️ Error marking notifications as read: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Exception marking notifications as read: {ex.Message}");
+        }
+        finally
+        {
+            isMarkingRead = false;
+        }
+    }
+
+    public class NotificationItem 
+    { 
+        public int NotificationId { get; set; }
+        public string SenderName { get; set; } = ""; 
+        public string Body { get; set; } = ""; 
+        public string TimeAgo { get; set; } = "";
+        public bool IsRead { get; set; }
+        public string Type { get; set; } = "";
+        public int Count { get; set; } = 1;
+        public List<int> NotificationIds { get; set; } = new();
+    }
+
+    public class NotificationDto
+    {
+        public int NotificationId { get; set; }
+        public int UserId { get; set; }
+        public string Type { get; set; }
+        public int? SubjectId { get; set; }
+        public string Title { get; set; }
+        public string Body { get; set; }
+        public DateTime SentAt { get; set; }
+        public string Priority { get; set; }
+        public bool IsRead { get; set; }
+    }
     public class SessionItem { public string Title { get; set; } = ""; public DateTime When { get; set; } public string Duration { get; set; } = "1 hr"; public string TimeUntil { get; set; } = ""; }
 
     /* ===== Calendar data ===== */
