@@ -1,69 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
 
 namespace Sen381.Business.Models
 {
-    // Placeholder enum for ChatStatus (replace with your real one)
-    public enum ChatStatus
+    [Table("chat_sessions")]
+    public class ChatSession : BaseModel
     {
-        Open,
-        Escalated,
-        Resolved
-    }
+        [PrimaryKey("chat_session_id", false)]
+        [Column("chat_session_id")]
+        public int ChatSessionId { get; set; }
 
-    public class ChatSession
-    {
-        // ---------- Fields ----------
-        private int id;
-        private int studentId;
-        private int subjectId;
-        private ChatStatus chatStatus;
-        private int escalationId;
+        [Column("student_id")]
+        public int StudentId { get; set; }
 
-        // ---------- Properties ----------
-        public int Id
-        {
-            get => id;
-            set => id = value;
-        }
+        [Column("tutor_id")]
+        public int TutorId { get; set; }
 
-        public int StudentId
-        {
-            get => studentId;
-            set => studentId = value;
-        }
+        [Column("subject_id")]
+        public int? SubjectId { get; set; }
 
-        public int SubjectId
-        {
-            get => subjectId;
-            set => subjectId = value;
-        }
+        [Column("status")]
+        public string Status { get; set; } = "open";
 
-        public ChatStatus ChatStatus
-        {
-            get => chatStatus;
-            set => chatStatus = value;
-        }
+        [Column("escalation_id")]
+        public int? EscalationId { get; set; }
 
-        public int EscalationId
-        {
-            get => escalationId;
-            set => escalationId = value;
-        }
-
-        // ---------- Methods ----------
-        public void MarkEscalated(int escalationId)
-        {
-            this.escalationId = escalationId;
-            chatStatus = ChatStatus.Escalated;
-        }
-
-        public void Resolve()
-        {
-            chatStatus = ChatStatus.Resolved;
-        }
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -1,109 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
 
 namespace Sen381.Business.Models
 {
-    public enum NotificationType
+    [Table("notifications")]
+    public class Notification : BaseModel
     {
-        General,
-        Assignment,
-        Reminder,
-        Alert
-    }
+        [PrimaryKey("notification_id", false)]
+        [Column("notification_id")]
+        public int NotificationId { get; set; }
 
-    public enum Priority
-    {
-        Low,
-        Medium,
-        High,
-        Critical
-    }
+        [Column("user_id")]
+        public int UserId { get; set; }
 
-    public class Notification
-    {
-        // ---------- Fields ----------
-        private int id;
-        private int userId;
-        private NotificationType type;
-        private int subjectCode;
-        private string title;
-        private string body;
-        private DateTime sentAt;
-        private Priority priority;
+        [Column("type")]
+        public string Type { get; set; }
 
-        private bool isRead;
-        private bool isDismissed;
+        [Column("subject_id")]
+        public int? SubjectId { get; set; }
 
-        // ---------- Properties ----------
-        public int Id
-        {
-            get => id;
-            set => id = value;
-        }
+        [Column("title")]
+        public string Title { get; set; }
 
-        public int UserId
-        {
-            get => userId;
-            set => userId = value;
-        }
+        [Column("body")]
+        public string Body { get; set; }
 
-        public NotificationType Type
-        {
-            get => type;
-            set => type = value;
-        }
+        [Column("sent_at")]
+        public DateTime SentAt { get; set; } = DateTime.UtcNow;
 
-        public int SubjectCode
-        {
-            get => subjectCode;
-            set => subjectCode = value;
-        }
+        [Column("priority")]
+        public string Priority { get; set; } = "normal";
 
-        public string Title
-        {
-            get => title;
-            set => title = value;
-        }
-
-        public string Body
-        {
-            get => body;
-            set => body = value;
-        }
-
-        public DateTime SentAt
-        {
-            get => sentAt;
-            set => sentAt = value;
-        }
-
-        public Priority Priority
-        {
-            get => priority;
-            set => priority = value;
-        }
-
-        // Extra helpers
-        public bool IsRead => isRead;
-        public bool IsDismissed => isDismissed;
-
-        // ---------- Methods ----------
-        public void MarkRead()
-        {
-            isRead = true;
-        }
-
-        public void MarkUnread()
-        {
-            isRead = false;
-        }
-
-        public void Dismiss()
-        {
-            isDismissed = true;
-        }
+        [Column("is_read")]
+        public bool IsRead { get; set; } = false;
     }
 }

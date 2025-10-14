@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Chat": {
+    "/api/Chat/send": {
       "post": {
         "tags": [
           "Chat"
@@ -14,21 +14,121 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserInput"
+                "$ref": "#/components/schemas/ChatMessage"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserInput"
+                "$ref": "#/components/schemas/ChatMessage"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserInput"
+                "$ref": "#/components/schemas/ChatMessage"
               }
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Chat/history/{sessionId}": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Chat/sessions/{userId}": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Chat/create-session": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatSession"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatSession"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatSession"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Chat/mark-read/{userId}": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -298,7 +398,7 @@
         }
       }
     },
-    "/api/Profile/by-id/{id}": {
+    "/api/Profile/{id}": {
       "get": {
         "tags": [
           "Profile"
@@ -319,9 +419,7 @@
             "description": "OK"
           }
         }
-      }
-    },
-    "/api/Profile/{id}": {
+      },
       "put": {
         "tags": [
           "Profile"
@@ -356,6 +454,29 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Profile/by-id/{id}": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -432,6 +553,133 @@
   },
   "components": {
     "schemas": {
+      "ChatMessage": {
+        "type": "object",
+        "properties": {
+          "baseUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "requestClientOptions": {
+            "$ref": "#/components/schemas/ClientOptions"
+          },
+          "tableName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "primaryKey": {
+            "type": "object",
+            "additionalProperties": { },
+            "nullable": true,
+            "readOnly": true
+          },
+          "chatMessageId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sessionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "senderUserId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "imageFileId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatSession": {
+        "type": "object",
+        "properties": {
+          "baseUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "requestClientOptions": {
+            "$ref": "#/components/schemas/ClientOptions"
+          },
+          "tableName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "primaryKey": {
+            "type": "object",
+            "additionalProperties": { },
+            "nullable": true,
+            "readOnly": true
+          },
+          "chatSessionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "studentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tutorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subjectId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "escalationId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ClientOptions": {
+        "type": "object",
+        "properties": {
+          "schema": {
+            "type": "string",
+            "nullable": true
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "queryParams": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateEventDto": {
         "type": "object",
         "properties": {
@@ -532,28 +780,6 @@
             "nullable": true
           },
           "profilePicturePath": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserInput": {
-        "type": "object",
-        "properties": {
-          "senderId": {
-            "type": "string",
-            "nullable": true
-          },
-          "reveriverId": {
-            "type": "string",
-            "nullable": true
-          },
-          "messageText": {
-            "type": "string",
-            "nullable": true
-          },
-          "fileUrl": {
             "type": "string",
             "nullable": true
           }

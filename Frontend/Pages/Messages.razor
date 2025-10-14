@@ -1,87 +1,180 @@
 ﻿@page "/messages"
+@using System.Net.Http.Json
+@using Sen381.Business.Models
 @inject HttpClient Http
+@inject IJSRuntime JS
 
-<h3>Upload a File</h3>
+<link rel="stylesheet" href="css/messages.css" />
 
-@if (isUploading)
-{
-    <p>Uploading file... Please wait.</p>
-}
-else
-{
-    <EditForm Model="@fileModel" OnValidSubmit="@UploadFile">
-        <InputFile OnChange="@OnFileSelected" />
-        <br /><br />
-        <button class="btn btn-primary" type="submit" disabled="@(!fileSelected)">
-            Upload
-        </button>
-    </EditForm>
-}
-
-@if (!string.IsNullOrEmpty(uploadedUrl))
-{
-    <div class="mt-3">
-        <h5>File uploaded successfully!</h5>
-        <p><b>Signed URL:</b></p>
-        <a href="@uploadedUrl" target="_blank">@uploadedUrl</a>
-    </div>
-}
-
-@code {
-    private FileInputModel fileModel = new();
-    private bool fileSelected = false;
-    private bool isUploading = false;
-    private string uploadedUrl = string.Empty;
-
-    private async Task OnFileSelected(InputFileChangeEventArgs e)
-    {
-        fileModel.File = e.File;
-        fileSelected = true;
-    }
-
-    private async Task UploadFile()
-    {
-        if (fileModel.File is null)
-            return;
-
-        try
-        {
-            isUploading = true;
-
-            using var content = new MultipartFormDataContent();
-            using var stream = fileModel.File.OpenReadStream(maxAllowedSize: 10_000_000); // 10MB max
-            var fileContent = new StreamContent(stream);
-            content.Add(fileContent, "File", fileModel.File.Name);
-
-            var response = await Http.PostAsync("api/file/uploadfile", content);
-
-            if (response.IsSuccessStatusCode)
+<div class="dm">
+    <!-- ===== Sidebar list of chat sessions ===== -->
+    <div class="list" data-collapsed="False">
+        <div class="title">Chats</div>
+        <ul class="threads">
+            @if (ChatSessions == null)
             {
-                var json = await response.Content.ReadFromJsonAsync<UploadResponse>();
-                uploadedUrl = json?.SignedUrl ?? "No URL returned.";
+                <li>Loading sessions...</li>
+            }
+            else if (!ChatSessions.Any())
+            {
+                <li>No chats found.</li>
             }
             else
             {
-                uploadedUrl = $"Error: {response.ReasonPhrase}";
+                @foreach (var s in ChatSessions)
+                {
+                    var active = (s.ChatSessionId == SelectedSession?.ChatSessionId) ? "item active" : "item";
+                    <li class="@active" @onclick="() => LoadChat(s.ChatSessionId)" data-role="Tutor">
+                        <div class="dot"></div>
+                        <div>
+                            <div class="name">
+                                @(s.StudentId == CurrentUserId ? $"Tutor #{s.TutorId}" : $"Student #{s.StudentId}")
+                            </div>
+                            <div class="meta">@($"{s.Status}")</div>
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+
+    <!-- ===== Conversation window ===== -->
+    <div class="conversation">
+        @if (SelectedSession == null)
+        {
+            <div class="chat" style="display:flex;align-items:center;justify-content:center;color:var(--muted);">
+                Select a conversation to start messaging.
+            </div>
+        }
+        else
+        {
+            <div class="conv-head">
+                <div class="dot"></div>
+                <div>
+                    <div class="name">
+                        @(SelectedSession.StudentId == CurrentUserId
+                                            ? $"Tutor #{SelectedSession.TutorId}"
+                                            : $"Student #{SelectedSession.StudentId}")
+                </div>
+                <div class="meta">Subject ID: @(SelectedSession.SubjectId ?? 0)</div>
+            </div>
+        </div>
+
+            <div class="chat" @ref="ChatContainer">
+            @if (ChatMessages == null)
+                {
+                    <p style="color:var(--muted)">Loading messages...</p>
+                }
+                else if (!ChatMessages.Any())
+                {
+                    <p style="color:var(--muted)">No messages yet. Start the conversation!</p>
+                }
+                else
+                {
+                    @foreach (var m in ChatMessages)
+                    {
+                        var rowClass = (m.SenderUserId == CurrentUserId) ? "row outgoing" : "row incoming";
+                        <div class="@rowClass">
+                            <div class="bubble">@m.Text</div>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div class="inputbar">
+                <input @bind="NewMessageText" @bind:event="oninput" class="input"
+                       placeholder="Type your message..." @onkeydown="HandleEnter" />
+                <button class="send" @onclick="SendMessage">
+                    <i class="bi bi-send"></i>
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<ChatSession>? ChatSessions;
+    private List<ChatMessage>? ChatMessages;
+    private ChatSession? SelectedSession;
+    private string NewMessageText = string.Empty;
+    private ElementReference ChatContainer;
+
+    // TODO: replace with real user ID from auth context
+    private int CurrentUserId = 91; // Example student ID
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSessions();
+    }
+
+    private async Task LoadSessions()
+    {
+        try
+        {
+            ChatSessions = await Http.GetFromJsonAsync<List<ChatSession>>($"api/chat/sessions/{CurrentUserId}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERROR] LoadSessions: {ex.Message}");
+        }
+    }
+
+    private async Task LoadChat(int sessionId)
+    {
+        try
+        {
+            SelectedSession = ChatSessions?.FirstOrDefault(s => s.ChatSessionId == sessionId);
+            ChatMessages = await Http.GetFromJsonAsync<List<ChatMessage>>($"api/chat/history/{sessionId}");
+            await ScrollToBottom();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERROR] LoadChat: {ex.Message}");
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(NewMessageText) || SelectedSession == null)
+            return;
+
+        var msg = new ChatMessage
+        {
+            SessionId = SelectedSession.ChatSessionId,
+            SenderUserId = CurrentUserId,
+            Text = NewMessageText,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        try
+        {
+            var res = await Http.PostAsJsonAsync("api/chat/send", msg);
+            if (res.IsSuccessStatusCode)
+            {
+                ChatMessages ??= new List<ChatMessage>();
+                ChatMessages.Add(msg);
+                NewMessageText = string.Empty;
+                await ScrollToBottom();
             }
         }
         catch (Exception ex)
         {
-            uploadedUrl = $"Exception: {ex.Message}";
+            Console.WriteLine($"[ERROR] SendMessage: {ex.Message}");
         }
-        finally
+    }
+
+    private async Task HandleEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await SendMessage();
+    }
+
+    private async Task ScrollToBottom()
+    {
+        try
         {
-            isUploading = false;
+            await JS.InvokeVoidAsync("scrollToBottom", ChatContainer);
         }
-    }
-
-    public class FileInputModel
-    {
-        public IBrowserFile? File { get; set; }
-    }
-
-    public class UploadResponse
-    {
-        public string? SignedUrl { get; set; }
+        catch { }
     }
 }

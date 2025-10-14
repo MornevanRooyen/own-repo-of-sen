@@ -1,51 +1,29 @@
-﻿using Sen381.Business.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
 
 namespace Sen381.Business.Models
 {
-    
-    public class ChatMessage
+    [Table("chat_messages")]
+    public class ChatMessage : BaseModel
     {
-        // ---------- Fields ----------
-        private int id;
-        private int sessionId;
-        private string text;
+        [PrimaryKey("chat_message_id", false)]
+        [Column("chat_message_id")]
+        public int ChatMessageId { get; set; }
 
-        private List<SourceRef> sourceRefs = new List<SourceRef>();
+        [Column("session_id")]
+        public int SessionId { get; set; }
 
-        // ---------- Properties ----------
-        public int Id
-        {
-            get => id;
-            set => id = value;
-        }
+        [Column("sender_user_id")]
+        public int SenderUserId { get; set; }
 
-        public int SessionId
-        {
-            get => sessionId;
-            set => sessionId = value;
-        }
+        [Column("text")]
+        public string Text { get; set; }
 
-        public string Text
-        {
-            get => text;
-            set => text = value;
-        }
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public List<SourceRef> SourceRefs
-        {
-            get => sourceRefs;
-            set => sourceRefs = value ?? new List<SourceRef>();
-        }
-
-        // ---------- Methods ----------
-        public void Edit(string newText)
-        {
-            Text = newText;
-        }
+        [Column("image_file_id")]
+        public int? ImageFileId { get; set; }
     }
 }

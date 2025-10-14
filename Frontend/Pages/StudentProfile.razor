@@ -3,11 +3,11 @@
 @using Sen381.Business.Models
 @using Sen381.Business.Services
 @using Sen381.Data_Access
-@inject UserService UserService
 @inject SupaBaseAuthService SupabaseService
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 @inject Frontend.Services.AuthService AuthService
+@inject HttpClient Http
 
 <PageTitle>Profile | CampusLearn</PageTitle>
 
@@ -514,7 +514,7 @@
 
 @code {
     [Parameter]
-    public int? id { get; set; } // 👈 optional route parameter (used when viewing someone else’s profile)
+    public int? id { get; set; }
 
     private User? currentUser;
     private bool isLoading = true;
@@ -549,9 +549,17 @@
             int targetId = id ?? loggedInUserId.Value;
             isOwnProfile = targetId == loggedInUserId.Value;
 
-            currentUser = await UserService.GetUserByIdAsync(targetId);
+            // ✅ Fetch user data from backend API instead of using UserService directly
+            var response = await Http.GetAsync($"api/Profile/{targetId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"⚠️ Failed to load profile data. Status: {response.StatusCode}");
+                return;
+            }
 
-            if (!string.IsNullOrWhiteSpace(currentUser?.Interests))
+            currentUser = await response.Content.ReadFromJsonAsync<User>();
+
+            if (currentUser != null && !string.IsNullOrWhiteSpace(currentUser.Interests))
             {
                 Interests = currentUser.Interests
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)

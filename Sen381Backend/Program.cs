@@ -1,6 +1,8 @@
-﻿using Sen381.Data_Access;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Sen381.Data_Access;
 using Sen381.Business.Services;
-using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,44 +10,31 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Supabase service as a singleton (parameterless ctor reads appsettings.json)
 builder.Services.AddSingleton<SupaBaseAuthService>();
-builder.Services.AddScoped<SupaBaseAuthService>();
+
+// Your other backend services
+builder.Services.AddSingleton<SupaBaseAuthService>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserService, UserService>();   // ✅ FIX
+builder.Services.AddScoped<NotificationService>();
+;
 
-
-// ✅ Add Supabase service
-builder.Services.AddScoped<SupaBaseAuthService>();
-
-// Register Supabase.Client for storage/database access used by FileController
-var supabaseUrl = builder.Configuration["Supabase:Url"];
-var supabaseKey = builder.Configuration["Supabase:Key"];
-if (!string.IsNullOrWhiteSpace(supabaseUrl) && !string.IsNullOrWhiteSpace(supabaseKey))
-{
-    var options = new SupabaseOptions
-    {
-        AutoRefreshToken = true,
-        AutoConnectRealtime = true
-    };
-    builder.Services.AddSingleton(new Client(supabaseUrl, supabaseKey, options));
-}
-
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
+// CORS for your WASM app (adjust ports if needed)
+const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-        policy =>
-        {
-            policy.WithOrigins("https://localhost:7097") 
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy(MyAllowSpecificOrigins, policy =>
+    {
+        policy.WithOrigins("https://localhost:7097", "http://localhost:5097")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
-
 var app = builder.Build();
-// Configure the HTTP request pipeline
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -56,5 +45,4 @@ app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();

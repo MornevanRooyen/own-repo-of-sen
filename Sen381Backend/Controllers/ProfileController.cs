@@ -20,7 +20,17 @@ namespace Sen381Backend.Controllers
         }
 
         // =============================
-        // GET profile by user ID
+        // GET profile by user ID (alias route for /api/Profile/{id})
+        // =============================
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetByIdAlias(int id)
+        {
+            // ✅ Just delegate to the main handler below
+            return await GetById(id);
+        }
+
+        // =============================
+        // GET profile by user ID (main route)
         // =============================
         [HttpGet("by-id/{id:int}")]
         public async Task<IActionResult> GetById(int id)
@@ -121,7 +131,7 @@ namespace Sen381Backend.Controllers
 
                     // Preserved fields
                     PasswordHash = existingUser.PasswordHash,
-                    IsEmailVerified = existingUser.IsEmailVerified,  // 👈 critical
+                    IsEmailVerified = existingUser.IsEmailVerified,
                     CreatedAt = existingUser.CreatedAt,
                     LastLogin = existingUser.LastLogin,
                     RoleString = existingUser.RoleString
@@ -144,11 +154,10 @@ namespace Sen381Backend.Controllers
         }
     }
 
-
-        // =============================
-        // DTO for profile updates
-        // =============================
-        public class ProfileUpdateDto
+    // =============================
+    // DTO for profile updates
+    // =============================
+    public class ProfileUpdateDto
     {
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";

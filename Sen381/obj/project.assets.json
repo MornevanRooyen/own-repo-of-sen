@@ -2950,23 +2950,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\morne\\.nuget\\packages\\": {},
+    "C:\\Users\\xavie\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\Sen381.csproj",
+      "projectUniqueName": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381\\Sen381.csproj",
       "projectName": "Sen381",
-      "projectPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\Sen381.csproj",
-      "packagesPath": "C:\\Users\\morne\\.nuget\\packages\\",
-      "outputPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\obj\\",
+      "projectPath": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381\\Sen381.csproj",
+      "packagesPath": "C:\\Users\\xavie\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\morne\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\xavie\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

@@ -1,39 +1,66 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Supabase;
+using Sen381.Business.Models;
+using Sen381.Data_Access;
 
 namespace Sen381.Business.Services
 {
     public class NotificationService
     {
-        // Notify when a new topic is created
-        public void NotifyNewTopic(int topicId)
+        private readonly SupaBaseAuthService _supabase;
+
+        public NotificationService(SupaBaseAuthService supabase)
         {
-            // TODO: look up followers/subscribers of the topic/forum and send notifications
-            Console.WriteLine($"[NotificationService] New topic created. TopicId={topicId}");
+            _supabase = supabase;
         }
 
-        // Notify when an existing topic is updated (new reply, edit, etc.)
-        public void NotifyTopicUpdate(int topicId)
+        /// <summary>
+        /// Creates a new notification record in the database.
+        /// </summary>
+        public async Task CreateNotificationAsync(Notification notification)
         {
-            // TODO: notify followers/subscribers of this topic
-            Console.WriteLine($"[NotificationService] Topic updated. TopicId={topicId}");
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
+            await _supabase.InitializeAsync();
+            var client = _supabase.Client;
+
+            notification.SentAt = DateTime.UtcNow;
+            notification.IsRead = false;
+
+            await client.From<Notification>().Insert(notification);
         }
 
-        // Notify when a tutor responds
-        public void NotifyTutorResponse(int tutorId)
+        /// <summary>
+        /// Gets all notifications for a user.
+        /// </summary>
+        public async Task<IQueryable<Notification>> GetNotificationsAsync(int userId)
         {
-            // TODO: notify the relevant student(s) subscribed to/engaged with this tutor
-            Console.WriteLine($"[NotificationService] Tutor responded. TutorId={tutorId}");
+            await _supabase.InitializeAsync();
+            var client = _supabase.Client;
+
+            var response = await client.From<Notification>().Get();
+            return response.Models.AsQueryable().Where(n => n.UserId == userId);
         }
 
-        // Notify when an FAQ is promoted or highlighted
-        public void NotifyFAQPromotion(int faqId)
+        /// <summary>
+        /// Marks a notification as read.
+        /// </summary>
+        public async Task MarkAsReadAsync(int notificationId)
         {
-            // TODO: broadcast to interested users (module subscribers, etc.)
-            Console.WriteLine($"[NotificationService] FAQ promoted. FaqId={faqId}");
+            await _supabase.InitializeAsync();
+            var client = _supabase.Client;
+
+            var response = await client.From<Notification>().Get();
+            var notification = response.Models.FirstOrDefault(n => n.NotificationId == notificationId);
+
+            if (notification != null)
+            {
+                notification.IsRead = true;
+                await client.From<Notification>().Update(notification);
+            }
         }
     }
 }

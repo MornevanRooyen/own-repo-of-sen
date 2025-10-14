@@ -1,27 +1,26 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Sen381.Data_Access;
-using Sen381.Business.Services;
 using Frontend;
+using Sen381.Data_Access;
+using System;
+using System.Net.Http;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+// ✅ Load config from wwwroot/appsettings.json
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// 🔐 Read Supabase config
-var supabaseUrl = builder.Configuration["Supabase:Url"];
-var supabaseKey = builder.Configuration["Supabase:AnonKey"];
-
-
-// 🧠 Register your services
-builder.Services.AddSingleton(new SupaBaseAuthService(supabaseUrl, supabaseKey));
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<Frontend.Services.AuthService>();
-
-// ✅ Register ONE HttpClient — pointing to your backend API
+// ✅ Backend API base URL
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7097/") // backend API base
+    BaseAddress = new Uri("https://localhost:7228/")
 });
+
+// ✅ Register services
+builder.Services.AddScoped<SupaBaseAuthService>();
+builder.Services.AddScoped<Frontend.Services.AuthService>();
 
 await builder.Build().RunAsync();
