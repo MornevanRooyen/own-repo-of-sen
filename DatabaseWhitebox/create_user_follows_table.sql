@@ -20,3 +20,4 @@ CREATE INDEX IF NOT EXISTS idx_user_follows_following ON user_follows(following_
 -- GRANT SELECT, INSERT, DELETE ON user_follows TO your_app_user;
 -- GRANT USAGE, SELECT ON SEQUENCE user_follows_id_seq TO your_app_user;
 
+

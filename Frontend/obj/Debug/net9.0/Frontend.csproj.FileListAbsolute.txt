@@ -2500,7 +2500,6 @@ C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\blazor.build.
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\blazor.boot.json
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\3ranqx5z3g-khy4lop6wu.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\nc4k800ojr-8rbvw3on5j.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\6n8q7nco3q-z65br7citq.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\qgerszyb1m-t1cqhe9u97.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\sjjt76o3xv-c2jlpeoesf.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\t0zwmc1f3q-sejl45xvog.gz
@@ -2547,7 +2546,6 @@ C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\ez
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\uozhmon6js-0j3bgjxly4.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\6l803hsylq-iag0ou56lh.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\e3lu7f1opv-tswichycbp.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\fe1mgtc0ab-h6mhp3eela.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\rp0mcxkfg1-md9yvkcqlf.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\i31q9hscey-z6jo10m0rd.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\aev7e57ak8-65wbz7t8mt.gz
@@ -4296,8 +4294,6 @@ C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_fram
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Microsoft.Win32.Registry.nbxzikm6ra.wasm
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\mscorlib.xd6mv31d55.wasm
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\netstandard.kaml52uspo.wasm
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.pbg2993dg1.pdb
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.yr2mqbrzis.wasm
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.AppContext.s2mli7k045.wasm
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Buffers.d8ayacj23s.wasm
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Collections.Concurrent.feo024siyp.wasm
@@ -4478,7 +4474,6 @@ C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_fram
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Diagnostics.DiagnosticSource.onf7a771xa.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Xml.Serialization.ue0pg3pj3d.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Runtime.Loader.ny7ii14wer.wasm.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.pbg2993dg1.pdb.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Core.i2gfsit2dg.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\mscorlib.xd6mv31d55.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Security.Principal.Windows.q6gj72jx8c.wasm.gz
@@ -4550,7 +4545,6 @@ C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_fram
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Diagnostics.TextWriterTraceListener.7lhrolq8ha.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.ServiceProcess.86z5319u6p.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Runtime.hexcao080t.wasm.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.yr2mqbrzis.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Diagnostics.FileVersionInfo.3u9sednzu3.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Data.DataSetExtensions.rwrekrq7sx.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Security.Cryptography.Algorithms.974cvdn89t.wasm.gz
@@ -4631,10 +4625,6 @@ C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_fram
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Text.Encoding.CodePages.z9scq0q12p.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Globalization.Extensions.vj2hxw2cxd.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Xml.XmlDocument.ni8e11ip1r.wasm.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.qq6dr7ik6c.pdb
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.2curwg4hhh.wasm
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.qq6dr7ik6c.pdb.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.2curwg4hhh.wasm.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\aru0kno3qg-j3zkownjjr.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\i4tf0mqa6l-qljjwgjnrn.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\bmid7dc5vw-ocn5mkr2m2.gz
@@ -4804,11 +4794,6 @@ C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\u6
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\4a76gf3ksv-xd6mv31d55.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\e1pdjk1d8o-kaml52uspo.gz
 C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\sm1k7dzsek-uqnhzdwypx.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\kltuif5gvt-yr2mqbrzis.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\3xre9mjkz3-pbg2993dg1.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-2curwg4hhh.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-qq6dr7ik6c.gz
-C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-dx9vxgmetw.gz
 C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Frontend\bin\Debug\net9.0\wwwroot\_framework\blazor.webassembly.js
 C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Frontend\bin\Debug\net9.0\wwwroot\_framework\dotnet.js
 C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Frontend\bin\Debug\net9.0\wwwroot\_framework\dotnet.js.map
@@ -6423,16 +6408,34 @@ C:\Users\xavie\OneDrive\Desktop\Sen381 Repo\Frontend\obj\Debug\net9.0\compressed
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\6n8q7nco3q-h9o0enghgw.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\fe1mgtc0ab-2a9nn4ag4b.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\gagwzvzvfg-rgdsi5dv36.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.auedtpk3e1.pdb
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.y8o3c5eccs.wasm
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.auedtpk3e1.pdb.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.y8o3c5eccs.wasm.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\kltuif5gvt-y8o3c5eccs.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\3xre9mjkz3-auedtpk3e1.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.qwtj9ab2vy.pdb
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.iyoupex2kk.wasm
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.qwtj9ab2vy.pdb.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.iyoupex2kk.wasm.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-iyoupex2kk.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-qwtj9ab2vy.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-jeclhtyab6.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.ucqjuezw0n.pdb
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.e4ogcy9rxl.wasm
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.e0mh8zwlnz.pdb
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.o0zsdsnmnj.wasm
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.e0mh8zwlnz.pdb.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.ucqjuezw0n.pdb.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.e4ogcy9rxl.wasm.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.o0zsdsnmnj.wasm.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\gagwzvzvfg-rgdsi5dv36.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\6n8q7nco3q-h9o0enghgw.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\fe1mgtc0ab-2a9nn4ag4b.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\kltuif5gvt-o0zsdsnmnj.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\3xre9mjkz3-e0mh8zwlnz.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-e4ogcy9rxl.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-ucqjuezw0n.gz
+C:\Sen381 github repo\SEN381-CampusLearn\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-tqmbdb5pam.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.e0mh8zwlnz.pdb
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.o0zsdsnmnj.wasm
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.e0mh8zwlnz.pdb.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.o0zsdsnmnj.wasm.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.0uxlog8hi7.pdb
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.4ao38ztpm7.wasm
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.0uxlog8hi7.pdb.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.4ao38ztpm7.wasm.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\g1hjx21r9s-qhwzjpm6hj.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\2anxjmpgpz-x1y3lo4dpu.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\kltuif5gvt-o0zsdsnmnj.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\3xre9mjkz3-e0mh8zwlnz.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-4ao38ztpm7.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-0uxlog8hi7.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-l8e4s7j5ez.gz

@@ -21,3 +21,4 @@ CREATE INDEX IF NOT EXISTS idx_direct_messages_sent_at ON direct_messages(sent_a
 -- GRANT SELECT, INSERT, UPDATE ON direct_messages TO your_app_user;
 -- GRANT USAGE, SELECT ON SEQUENCE direct_messages_id_seq TO your_app_user;
 
+
