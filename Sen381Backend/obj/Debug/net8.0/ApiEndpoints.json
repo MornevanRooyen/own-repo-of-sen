@@ -562,6 +562,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Sen381Backend.Controllers.UserController",
+    "Method": "GetFollowing",
+    "RelativePath": "api/User/following",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Sen381Backend.Controllers.VerifyController",
     "Method": "VerifyEmail",
     "RelativePath": "api/Verify/verify-email",

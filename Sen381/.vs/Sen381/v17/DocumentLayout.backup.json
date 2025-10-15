@@ -1,9 +1,18 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\",
+  "WorkspaceRootPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Sen381\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F71772DD-08CB-4B67-878D-2A90E4D77AEF}|..\\Frontend\\Frontend.csproj|c:\\sen381 github repo\\own repo\\own-repo-of-sen\\frontend\\pages\\messages.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\Pages\\Messages.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\FileController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\UserController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\wwwroot\\css\\messages.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -13,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Bookmark",
@@ -41,16 +50,50 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "FileController.cs",
+              "DocumentMoniker": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\FileController.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\FileController.cs",
+              "ToolTip": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\FileController.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\FileController.cs",
+              "ViewState": "AgIAACQAAAAAAAAAAADwv1UAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T22:22:32.137Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UserController.cs",
+              "DocumentMoniker": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\UserController.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\UserController.cs",
+              "ToolTip": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\UserController.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Sen381Backend\\Controllers\\UserController.cs",
+              "ViewState": "AgIAAE8AAAAAAAAAAADwv4AAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T22:16:00.383Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "messages.css",
+              "DocumentMoniker": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\wwwroot\\css\\messages.css",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\wwwroot\\css\\messages.css",
+              "ToolTip": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\wwwroot\\css\\messages.css",
+              "RelativeToolTip": "..\\..\\..\\..\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\wwwroot\\css\\messages.css",
+              "ViewState": "AgIAACcCAAAAAAAAAAAIwFQCAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-10-15T22:13:10.578Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Messages.razor",
-              "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\Pages\\Messages.razor",
-              "RelativeDocumentMoniker": "..\\Frontend\\Pages\\Messages.razor",
-              "ToolTip": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\Pages\\Messages.razor",
-              "RelativeToolTip": "..\\Frontend\\Pages\\Messages.razor",
-              "ViewState": "AgIAAMEAAAAAAAAAAAAAwMwAAAArAAAAAAAAAA==",
+              "DocumentMoniker": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\Pages\\Messages.razor",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\Pages\\Messages.razor",
+              "ToolTip": "C:\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\Pages\\Messages.razor",
+              "RelativeToolTip": "..\\..\\..\\..\\Users\\xavie\\OneDrive\\Desktop\\Sen381 Repo\\Frontend\\Pages\\Messages.razor",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-14T18:11:19.093Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-15T22:02:44.373Z"
             }
           ]
         }

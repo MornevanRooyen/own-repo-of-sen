@@ -902,6 +902,18 @@
         }
       }
     },
+    "/api/User/following": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Verify/verify-email": {
       "get": {
         "tags": [

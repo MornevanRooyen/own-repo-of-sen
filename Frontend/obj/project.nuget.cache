@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ybnG2werRuw=",
+  "dgSpecHash": "lQ4Go6iFtrs=",
   "success": true,
-  "projectFilePath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\Frontend.csproj",
+  "projectFilePath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\Frontend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\morne\\.nuget\\packages\\microsoft.aspnetcore.authorization\\9.0.9\\microsoft.aspnetcore.authorization.9.0.9.nupkg.sha512",
     "C:\\Users\\morne\\.nuget\\packages\\microsoft.aspnetcore.components\\9.0.9\\microsoft.aspnetcore.components.9.0.9.nupkg.sha512",

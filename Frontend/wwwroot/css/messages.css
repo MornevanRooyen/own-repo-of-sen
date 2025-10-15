@@ -528,3 +528,69 @@
 .messages-area::-webkit-scrollbar-thumb:hover {
     background: #adb5bd;
 }
+
+.chat-image {
+    max-width: 260px;
+    border-radius: 12px;
+    display: block;
+}
+
+.chat-video {
+    width: 300px;
+    max-width: 100%;
+    border-radius: 12px;
+    display: block;
+}
+
+.selected-file {
+    font-size: 12px;
+    margin-bottom: 6px;
+    opacity: .85
+}
+
+.clear-file {
+    margin-left: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer
+}
+
+.chat-image {
+    max-width: 250px;
+    border-radius: 10px;
+    display: block;
+    margin-top: 5px;
+}
+
+.chat-video {
+    max-width: 250px;
+    border-radius: 10px;
+    display: block;
+    margin-top: 5px;
+}
+
+.file-download-link {
+    color: #9cf;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+    .file-download-link:hover {
+        text-decoration: underline;
+    }
+
+.selected-file {
+    font-size: 12px;
+    margin-bottom: 6px;
+    opacity: 0.85;
+}
+
+.clear-file {
+    margin-left: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #bbb;
+}

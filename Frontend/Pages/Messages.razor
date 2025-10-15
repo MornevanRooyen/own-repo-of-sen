@@ -1,7 +1,9 @@
 ﻿@page "/messages"
+@using System.Net.Http
 @using System.Net.Http.Json
 @using Sen381.Business.Models
 @using Frontend.Services
+@using Microsoft.AspNetCore.Components.Forms
 @inject HttpClient Http
 @inject IJSRuntime JS
 @inject AuthService AuthService
@@ -14,56 +16,34 @@
     <div class="people-sidebar">
         <div class="people-header">
             <h3 class="people-title">People</h3>
-            <button class="collapse-btn" @onclick="ToggleSidebar">
+            <button class="toggle-sidebar" @onclick="ToggleSidebar">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15,18 9,12 15,6"></polyline>
+                    <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
         </div>
-        
-        <div class="people-list">
+
+        <div class="people-list @(isSidebarCollapsed ? "collapsed" : "")">
             @if (FollowedUsers == null)
             {
-                <div class="loading-state">Loading...</div>
+                <div class="people-loading">Loading...</div>
             }
             else if (!FollowedUsers.Any())
             {
-                <div class="empty-state">
-                    You're not following anyone yet.<br/>
-                    Follow users to start messaging them!
-                </div>
+                <div class="people-empty">No people found. Follow someone to chat.</div>
             }
             else
             {
                 @foreach (var user in FollowedUsers)
                 {
-                    var isActive = (user.Id == SelectedUser?.Id);
-                    <div class="person-item @(isActive ? "active" : "")" @onclick="() => LoadConversation(user)">
-                        <div class="person-avatar @(isActive ? "active-border" : "")">
-                            @if (!string.IsNullOrEmpty(user.ProfilePicturePath))
-                            {
-                                <img src="@user.ProfilePicturePath" alt="@user.FirstName" class="avatar-image" />
-                            }
-                            else
-                            {
-                                <div class="avatar-placeholder">@user.FirstName[0]</div>
-                            }
+                    var isActive = (SelectedUser?.Id == user.Id);
+                    <div class="person @(isActive ? "active" : "")" @onclick="() => LoadConversation(user)">
+                        <div class="person-avatar">
+                            <img src="@(user.ProfilePicturePath ?? "https://placehold.co/64x64/png")" alt="avatar" />
                         </div>
                         <div class="person-info">
                             <div class="person-name">@($"{user.FirstName} {user.LastName}")</div>
-                        </div>
-                        <div class="person-status @(isActive ? "active-status" : "inactive-status")">
-                            @if (isActive)
-                            {
-                                <div class="status-dot"></div>
-                            }
-                            else
-                            {
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                            }
+                            <div class="person-role">@user.RoleString</div>
                         </div>
                     </div>
                 }
@@ -71,34 +51,26 @@
         </div>
     </div>
 
-    <!-- ===== Right Section - Chat Area ===== -->
+    <!-- ===== Main Chat Area ===== -->
     <div class="chat-area">
         @if (SelectedUser == null)
         {
-            <div class="no-chat-selected">
-                <div class="no-chat-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <div class="chat-empty-state">
+                <div class="empty-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
                 </div>
                 <h3>Select a person to start messaging</h3>
-                <p>Choose someone from the People list to begin your conversation</p>
             </div>
         }
         else
         {
             <!-- Chat Header -->
             <div class="chat-header">
-                <div class="chat-user-info">
-                    <div class="chat-user-avatar @(SelectedUser.Id == SelectedUser?.Id ? "active-border" : "")">
-                        @if (!string.IsNullOrEmpty(SelectedUser.ProfilePicturePath))
-                        {
-                            <img src="@SelectedUser.ProfilePicturePath" alt="@SelectedUser.FirstName" class="avatar-image" />
-                        }
-                        else
-                        {
-                            <div class="avatar-placeholder">@SelectedUser.FirstName[0]</div>
-                        }
+                <div class="chat-user">
+                    <div class="chat-user-avatar">
+                        <img src="@(SelectedUser.ProfilePicturePath ?? "https://placehold.co/64x64/png")" alt="avatar" />
                     </div>
                     <div class="chat-user-details">
                         <div class="chat-user-name">@($"{SelectedUser.FirstName} {SelectedUser.LastName}")</div>
@@ -129,9 +101,50 @@
                     @foreach (var msg in ConversationMessages)
                     {
                         var isOutgoing = (msg.SenderId == CurrentUserId);
+                        bool isAttachment = msg.MessageText != null && msg.MessageText.StartsWith("ATTACH|");
+
+                        string? attachType = null;
+                        string? attachUrl = null;
+                        string? attachName = null;
+
+                        if (isAttachment)
+                        {
+                            try
+                            {
+                                var parts = msg.MessageText.Split('|', 4);
+                                attachType = parts.Length > 1 ? parts[1] : null;
+                                attachUrl = parts.Length > 2 ? parts[2] : null;
+                                attachName = parts.Length > 3 ? parts[3] : null;
+                            }
+                            catch { }
+                        }
+
                         <div class="message-row @(isOutgoing ? "outgoing" : "incoming")">
                             <div class="message-bubble @(isOutgoing ? "outgoing-bubble" : "incoming-bubble")">
-                                @msg.MessageText
+                                @if (isAttachment && !string.IsNullOrEmpty(attachUrl))
+                                {
+                                    if (attachType == "image")
+                                    {
+                                        <img src="@attachUrl" alt="@attachName" class="chat-image" />
+                                    }
+                                    else if (attachType == "video")
+                                    {
+                                        <video controls class="chat-video">
+                                            <source src="@attachUrl" />
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    }
+                                    else
+                                    {
+                                        <a href="@attachUrl" target="_blank" class="file-download-link">
+                                            📎 @(!string.IsNullOrEmpty(attachName) ? attachName : "Download file")
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    @msg.MessageText
+                                }
                             </div>
                             <div class="message-time">@msg.SentAt?.ToString("HH:mm")</div>
                         </div>
@@ -142,14 +155,26 @@
             <!-- Message Input -->
             <div class="message-input-area">
                 <div class="input-container">
-                    <button class="attachment-btn">
+                    @if (selectedFileName != null)
+                    {
+                        <div class="selected-file">
+                            📎 @selectedFileName
+                            <button type="button" class="clear-file" @onclick="ClearSelectedFile">✕</button>
+                        </div>
+                    }
+                    <button class="attachment-btn" @onclick="OpenFilePicker">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.64 16.2a2 2 0 0 1-2.83-2.83l8.49-8.49"></path>
                         </svg>
                     </button>
+
+                    <InputFile id="filePicker" style="display:none" OnChange="HandleFileSelected"
+                               accept="image/*,video/*,.pdf,.doc,.docx,.zip,.txt" />
+
                     <input @bind="NewMessageText" @bind:event="oninput" class="message-input"
                            placeholder="Type a private message..." @onkeydown="HandleEnter" />
-                    <button class="send-btn" @onclick="SendMessage" disabled="@(isSending || string.IsNullOrWhiteSpace(NewMessageText))">
+
+                    <button class="send-btn" @onclick="SendMessage" disabled="@(isSending || (string.IsNullOrWhiteSpace(NewMessageText) && selectedFile == null))">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
                             <polygon points="22,2 15,22 11,13 2,9"></polygon>
@@ -171,9 +196,12 @@
     private int CurrentUserId;
     private bool isSidebarCollapsed = false;
 
+    private IBrowserFile selectedFile;
+    private string selectedFileName;
+    private string selectedFileType;
+
     protected override async Task OnInitializedAsync()
     {
-        // Get current user ID from auth service
         bool isLoggedIn = await AuthService.IsUserLoggedInAsync();
         if (!isLoggedIn)
         {
@@ -181,14 +209,7 @@
             return;
         }
 
-        int? userId = await AuthService.GetCurrentUserIdAsync();
-        if (userId == null)
-        {
-            NavigationManager.NavigateTo("/login");
-            return;
-        }
-
-        CurrentUserId = userId.Value;
+        CurrentUserId = (await AuthService.GetCurrentUserIdAsync()) ?? 0;
         await LoadFollowedUsers();
     }
 
@@ -196,9 +217,7 @@
     {
         try
         {
-            Console.WriteLine($"[Messages] Loading followed users for user {CurrentUserId}");
-            FollowedUsers = await Http.GetFromJsonAsync<List<User>>($"api/Follow/following-list/{CurrentUserId}");
-            Console.WriteLine($"[Messages] Loaded {FollowedUsers?.Count ?? 0} followed users");
+            FollowedUsers = await Http.GetFromJsonAsync<List<User>>("api/User/following");
         }
         catch (Exception ex)
         {
@@ -216,9 +235,7 @@
             ConversationMessages = await Http.GetFromJsonAsync<List<DirectMessage>>($"api/Messaging/conversation/{CurrentUserId}/{user.Id}");
             Console.WriteLine($"[Messages] Loaded {ConversationMessages?.Count ?? 0} messages");
 
-            // Mark messages as read
             await Http.PutAsync($"api/Messaging/mark-read/{user.Id}/{CurrentUserId}", null);
-
             await ScrollToBottom();
         }
         catch (Exception ex)
@@ -227,39 +244,74 @@
         }
     }
 
+    private async Task HandleEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await SendMessage();
+    }
+
     private async Task SendMessage()
     {
-        if (string.IsNullOrWhiteSpace(NewMessageText) || SelectedUser == null || isSending)
+        if ((string.IsNullOrWhiteSpace(NewMessageText) && selectedFile == null) || SelectedUser == null || isSending)
             return;
 
         try
         {
             isSending = true;
+            string textToSend = NewMessageText;
+
+            if (selectedFile != null)
+            {
+                using var content = new MultipartFormDataContent();
+                var stream = selectedFile.OpenReadStream(20_000_000);
+                var fileContent = new StreamContent(stream);
+                content.Add(fileContent, "File", selectedFile.Name);
+                content.Add(new StringContent(selectedFile.Name), "Name");
+
+                var uploadResp = await Http.PostAsync("api/File/uploadfile", content);
+                if (!uploadResp.IsSuccessStatusCode)
+                {
+                    var err = await uploadResp.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[Messages] File upload failed: {err}");
+                    await JS.InvokeVoidAsync("alert", "File upload failed.");
+                    return;
+                }
+
+                var uploadJson = await uploadResp.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                // 🔥 read lowercase key
+                var url = uploadJson != null && uploadJson.ContainsKey("signedUrl") ? uploadJson["signedUrl"] : null;
+
+                var kind = (selectedFile.ContentType?.StartsWith("image") == true) ? "image" :
+                           (selectedFile.ContentType?.StartsWith("video") == true) ? "video" : "file";
+                textToSend = $"ATTACH|{kind}|{url}|{selectedFile.Name}";
+            }
 
             var request = new
             {
                 SenderId = CurrentUserId,
                 ReceiverId = SelectedUser.Id,
-                MessageText = NewMessageText
+                MessageText = textToSend
             };
 
-            Console.WriteLine($"[Messages] Sending message to user {SelectedUser.Id}");
             var response = await Http.PostAsJsonAsync("api/Messaging/send", request);
 
             if (response.IsSuccessStatusCode)
             {
-                // Add message to local list immediately for better UX
                 ConversationMessages ??= new List<DirectMessage>();
                 ConversationMessages.Add(new DirectMessage
                 {
                     SenderId = CurrentUserId,
                     ReceiverId = SelectedUser.Id,
-                    MessageText = NewMessageText,
+                    MessageText = textToSend,
                     SentAt = DateTime.Now,
                     IsRead = false
                 });
 
                 NewMessageText = string.Empty;
+                selectedFile = null;
+                selectedFileName = null;
+                selectedFileType = null;
+
                 await ScrollToBottom();
                 Console.WriteLine("✅ [Messages] Message sent successfully");
             }
@@ -281,22 +333,41 @@
         }
     }
 
-    private async Task HandleEnter(KeyboardEventArgs e)
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        if (e.Key == "Enter" && !e.ShiftKey)
-            await SendMessage();
+        selectedFile = e.File;
+        selectedFileName = selectedFile?.Name;
+        selectedFileType = selectedFile?.ContentType;
+    }
+
+    private void ClearSelectedFile()
+    {
+        selectedFile = null;
+        selectedFileName = null;
+        selectedFileType = null;
     }
 
     private async Task ScrollToBottom()
     {
         try
         {
-            await Task.Delay(100); // Small delay to ensure DOM is updated
             await JS.InvokeVoidAsync("scrollToBottom", ChatContainer);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"⚠️ [ERROR] ScrollToBottom: {ex.Message}");
+        }
+    }
+
+    private async Task OpenFilePicker()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("eval", "document.getElementById('filePicker').click()");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Messages] OpenFilePicker error: {ex.Message}");
         }
     }
 
