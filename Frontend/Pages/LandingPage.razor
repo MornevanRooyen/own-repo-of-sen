@@ -61,6 +61,45 @@
         --shadow-1: 0 6px 18px rgba(0,0,0,.06);
         --shadow-2: 0 12px 28px rgba(0,0,0,.08);
         --container: min(1200px, 92vw);
+        
+        /* Add smooth transitions for all elements */
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Dark mode overrides */
+    .dark-mode {
+        --bg: #1a1a1a;
+        --nav: #2d2d2d;
+        --ink: #ffffff;
+        --panel-bg: #2d2d2d;
+        --panel-ring: #404040;
+        --muted: #b3b3b3;
+        --shadow-1: 0 6px 18px rgba(0,0,0,.3);
+        --shadow-2: 0 12px 28px rgba(0,0,0,.4);
+    }
+
+    /* Dark mode specific styles */
+    .dark-mode .tile {
+        background: color-mix(in oklab, var(--accent) 20%, var(--panel-bg));
+        border-color: var(--panel-ring);
+        color: var(--ink);
+    }
+
+    .dark-mode .tile:hover {
+        box-shadow: var(--shadow-2);
+    }
+
+    .dark-mode .tile p {
+        color: var(--muted);
+    }
+
+    .dark-mode .hero.full-bleed {
+        background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 15%, var(--panel-bg)) 0%, var(--panel-bg) 30%);
+    }
+
+    .dark-mode .hero .accent {
+        color: var(--ink);
+        text-shadow: none;
     }
 
     @@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap');
@@ -79,6 +118,7 @@
         color: var(--ink);
         font-family: "Lexend", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
         line-height: 1.45;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h1, h2, h3 {
@@ -125,6 +165,7 @@
         border-radius: var(--radius);
         box-shadow: var(--shadow-1);
         padding: clamp(16px, 2.8vw, 28px);
+        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     /* ---------- FULL-BLEED BANDS ---------- */
@@ -194,7 +235,7 @@
         border-radius: calc(var(--radius) - 4px);
         padding: 16px 18px;
         box-shadow: var(--shadow-1);
-        transition: transform .15s ease, box-shadow .15s ease;
+        transition: transform .15s ease, box-shadow .15s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
         .tile:hover {
@@ -267,7 +308,8 @@
     /* FOOTER */
     .foot {
         border-top: 1px solid var(--panel-ring);
-        background: var(--bg)
+        background: var(--bg);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
         .foot .container {

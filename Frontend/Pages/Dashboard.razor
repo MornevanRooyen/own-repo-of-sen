@@ -31,9 +31,8 @@
                 <ul class="notif-list">
                     @foreach (var notification in Notifications)
                     {
-                        <li class="notif-item clickable" @onclick="() => HandleNotificationClick(notification)">
-                            <div class="notif-icon" aria-hidden="true">
-                                <span class="bell"></span>
+                        <li class="notif-item clickable" @onclick="() => HandleNotificationClick(notification)" data-role="@notification.RoleString">
+                            <div class="notif-dot" aria-hidden="true">
                                 @if (notification.Count > 1)
                                 {
                                     <span class="notif-badge">@notification.Count</span>
@@ -326,12 +325,189 @@
         --radius: 1.25rem;
         --shadow: 0 8px 22px rgba(0,0,0,.06);
         --container: min(1200px, 92vw);
+        
+        /* Add smooth transitions for all elements */
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Dark mode overrides */
+    .dark-mode {
+        --bg: #1a1a1a;
+        --nav: #2d2d2d;
+        --ink: #ffffff;
+        --mist: #2d2d2d;
+        --panel-bg: #2d2d2d;
+        --panel-ring: #404040;
+        --panel-tint: #333333;
+        --shadow: 0 8px 22px rgba(0,0,0,.3);
+    }
+
+    /* Dark mode specific styles */
+    .dark-mode .tiles-qa .tile {
+        background: color-mix(in oklab, var(--teal) 20%, #2d2d2d);
+        color: var(--ink);
+    }
+
+    .dark-mode .tiles-qa .tile:hover {
+        box-shadow: 0 12px 28px rgba(0,0,0,.4);
+    }
+
+    .dark-mode .notif-bubble {
+        background: var(--mist);
+    }
+
+    .dark-mode .panel-hd {
+        color: var(--ink);
+    }
+
+    /* Dark mode for Upcoming Sessions */
+    .dark-mode .session-card {
+        background: var(--panel-bg);
+        border-color: var(--panel-ring);
+        color: var(--ink);
+    }
+
+    .dark-mode .session-title {
+        color: var(--ink);
+    }
+
+    .dark-mode .session-tags {
+        color: var(--ink);
+    }
+
+    .dark-mode .session-meta {
+        color: var(--ink);
+    }
+
+    .dark-mode .session-empty {
+        color: var(--ink);
+    }
+
+    /* Dark mode for Calendar */
+    .dark-mode .cal-toolbar {
+        background: var(--mist);
+        border-color: var(--panel-ring);
+    }
+
+    .dark-mode .cal-pick, .dark-mode .cal-today {
+        background: var(--panel-bg);
+        border-color: var(--panel-ring);
+        color: var(--ink);
+    }
+
+    .dark-mode .cal-month {
+        color: var(--ink);
+    }
+
+    .dark-mode .cal-dow {
+        color: var(--ink);
+    }
+
+    .dark-mode .cal-cell {
+        background: var(--panel-bg);
+        border-color: var(--panel-ring);
+        color: var(--ink);
+    }
+
+    .dark-mode .cal-cell:hover {
+        background: var(--panel-tint);
+    }
+
+    .dark-mode .cal-cell.out-month {
+        background: var(--panel-bg);
+        color: var(--text-secondary);
+    }
+
+    .dark-mode .cal-num {
+        color: var(--ink);
+    }
+
+    .dark-mode .cal-event {
+        background: var(--rose);
+        color: #fff;
+    }
+
+    .dark-mode .cal-footer {
+        color: var(--ink);
+    }
+
+    /* Dark mode for Mark all as read button */
+    .dark-mode .btn-mark-read {
+        background: var(--panel-bg);
+        border-color: var(--panel-ring);
+        color: var(--ink);
+    }
+
+    .dark-mode .btn-mark-read:hover:not(:disabled) {
+        background: color-mix(in oklab, var(--rose) 20%, var(--panel-bg));
+        border-color: var(--rose);
+        color: var(--rose);
+    }
+
+    /* Dark mode for Upcoming Sessions bubble */
+    .dark-mode .sessions-bubble {
+        background: var(--mist);
+    }
+
+    /* Dark mode for content sessions bubble (overrides the hardcoded #E8EEF6) */
+    .dark-mode .content .bubble.sessions-bubble {
+        background: var(--mist);
+    }
+
+    /* Dark mode for session card (overrides the hardcoded #FFFFFF) */
+    .dark-mode .content .session-card {
+        background: var(--panel-bg);
+        border-color: var(--panel-ring);
+        color: var(--ink);
+    }
+
+    /* Dark mode for Calendar day header (Mon, Tue, Wed, etc.) */
+    .dark-mode .cal-dow {
+        background: var(--panel-tint);
+        border-color: var(--panel-ring);
+        color: var(--ink);
+    }
+
+    /* Dark mode for CLARA Sidebar */
+    .dark-mode .sidebar {
+        background: var(--panel-bg);
+        border-color: var(--panel-ring);
+    }
+
+    .dark-mode .clara-head h2 {
+        color: var(--ink);
+    }
+
+    .dark-mode .clara-body p {
+        color: var(--ink);
+    }
+
+    .dark-mode .clara-body strong {
+        color: var(--ink);
+    }
+
+    .dark-mode .clara-list li {
+        color: var(--ink);
+    }
+
+    .dark-mode .input-pill {
+        background: var(--mist);
+        border-color: var(--panel-ring);
+    }
+
+    .dark-mode .input-pill input {
+        color: var(--ink);
+    }
+
+    .dark-mode .input-pill input::placeholder {
+        color: var(--text-secondary);
     }
 
 
     /* base */
     *, *::before, *::after {
-        box-sizing: border-box
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     html, body {
@@ -344,6 +520,7 @@
         color: var(--ink);
         font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif;
         line-height: 1.45;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .container {
@@ -411,7 +588,7 @@
         font-weight: 700;
         font-size: 0.85rem;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.2s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
         color: var(--ink);
     }
 
@@ -436,6 +613,7 @@
         padding: clamp(12px,2.2vw,18px);
         display: grid;
         gap: 12px;
+        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
     }
 
     .notif-bubble {
@@ -453,67 +631,151 @@
         margin: 0;
         padding: 0;
         display: grid;
-        gap: 10px;
+        gap: 1rem;
     }
 
     .notif-item {
+        color: #fff;
+        padding: 1rem 1.2rem;
+        border-radius: var(--radius);
         display: flex;
         align-items: center;
-        gap: 10px;
-        background: linear-gradient(180deg, var(--rose) 0%, color-mix(in oklab, var(--rose) 80%, black) 100%);
-        color: #fff;
-        border-radius: 999px;
-        padding: 10px 14px;
+        gap: 1rem;
+        transition: transform .14s ease, filter .14s ease;
+        cursor: pointer;
     }
+
+    /* heavier on the dark colour, diagonal gradient */
+    .notif-item[data-role="Tutor"]   { background: linear-gradient(135deg, var(--rose) 0% 72%, color-mix(in oklab, var(--rose) 60%, white) 100%); }
+    .notif-item[data-role="Student"] { background: linear-gradient(135deg, var(--rose) 0% 72%, color-mix(in oklab, var(--rose) 60%, white) 100%); }
+    .notif-item[data-role="Clara"]   { background: linear-gradient(135deg, var(--rose) 0% 72%, color-mix(in oklab, var(--rose) 60%, white) 100%); }
+    
+    /* Default notification style */
+    .notif-item:not([data-role]) { background: linear-gradient(135deg, var(--rose) 0% 72%, color-mix(in oklab, var(--rose) 60%, white) 100%); }
+
+    .notif-item:hover { transform: scale(1.012); filter: brightness(1.25); }
 
     .notif-empty {
         background: #fff;
         border: 1px dashed var(--panel-ring);
-        border-radius: 999px;
-        padding: 10px 14px;
-        color: color-mix(in oklab, var(--ink) 60%, white);
+        border-radius: var(--radius);
+        padding: .9rem 1.1rem;
+        color: #64707c;
         font-weight: 600;
         text-align: center;
     }
 
-    .notif-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        display: grid;
-        place-items: center;
-        background: #fff;
-        color: var(--ink);
-        flex-shrink: 0;
+    .notif-dot { 
+        width: 1.5rem; 
+        height: 1.5rem; 
+        background: #fff; 
+        border-radius: 50%; 
     }
 
-    .bell {
-        width: 12px;
-        height: 12px;
-        display: block;
-        border: 2px solid var(--ink);
-        border-radius: 50%
+    .notif-text { 
+        margin: 0; 
+        font-size: 1rem; 
     }
 
-    .notif-text {
-        margin: 0;
-        font-weight: 700
-    }
-
-    .notif-time {
-        margin-left: 8px;
-        font-weight: 600;
-        opacity: .9;
-        font-size: .9rem
+    .notif-time { 
+        font-size: 0.85rem; 
+        opacity: .95; 
+        margin-left: .4rem; 
     }
 
     /* CTA button etc. (unchanged) */
+    /* CLARA Sidebar Styles */
+    .sidebar {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .clara-box {
+        background: transparent;
+    }
+
+    .clara-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .clara-dot {
+        width: 12px;
+        height: 12px;
+        background: var(--rose);
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .clara-head h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--ink);
+        transition: color 0.3s ease;
+    }
+
+    .clara-body {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .clara-body p {
+        margin: 0;
+        color: var(--ink);
+        line-height: 1.5;
+        transition: color 0.3s ease;
+    }
+
+    .clara-body strong {
+        color: var(--ink);
+        font-weight: 700;
+    }
+
+    .clara-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .clara-list li {
+        color: var(--ink);
+        font-size: 0.9rem;
+        line-height: 1.4;
+        transition: color 0.3s ease;
+    }
+
+    .input-pill {
+        background: var(--mist);
+        border: 1px solid var(--panel-ring);
+        border-radius: 12px;
+        padding: 12px 16px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
     .input-pill input {
         width: 100%;
         border: 0;
         outline: none;
         font: inherit;
-        color: var(--ink)
+        color: var(--ink);
+        background: transparent;
+        transition: color 0.3s ease;
+    }
+
+    .input-pill input::placeholder {
+        color: color-mix(in oklab, var(--ink) 60%, transparent);
+        transition: color 0.3s ease;
     }
 
     .cta-wrap {
@@ -573,7 +835,7 @@
         border-radius: calc(var(--radius) - 4px);
         padding: 16px 18px;
         box-shadow: var(--shadow);
-        transition: transform .15s ease, box-shadow .15s ease;
+        transition: transform .15s ease, box-shadow .15s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
         .tiles-qa .tile:hover {
@@ -610,6 +872,7 @@
         background: var(--mist);
         border-radius: calc(var(--radius) - 6px);
         border-bottom: 1px solid var(--panel-ring);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .cal-left {
@@ -698,6 +961,7 @@
         padding: 12px 10px;
         border: 1px solid var(--panel-ring);
         font-weight: 800;
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
     .cal-cell {
@@ -711,7 +975,7 @@
         text-align: left;
         border-radius: 0;
         cursor: pointer;
-        transition: background .08s ease, transform .08s ease;
+        transition: background .08s ease, transform .08s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
         .cal-cell:hover {
@@ -955,6 +1219,7 @@
 
     .content .bubble.sessions-bubble {
         background: #E8EEF6;
+        transition: background-color 0.3s ease;
     }
 
     .content .session {
@@ -985,6 +1250,7 @@
         align-items: center;
         gap: 12px;
         flex-wrap: wrap;
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
     .content .session-title {
@@ -1289,6 +1555,7 @@
         public string Type { get; set; } = "";
         public int Count { get; set; } = 1;
         public List<int> NotificationIds { get; set; } = new();
+        public string RoleString { get; set; } = "Student"; // Default to Student role
     }
 
     public class NotificationDto

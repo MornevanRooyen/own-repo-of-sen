@@ -9,86 +9,153 @@
 
 <link rel="stylesheet" href="css/messages.css" />
 
-<div class="dm">
-    <!-- ===== Sidebar list of followed users ===== -->
-    <div class="list" data-collapsed="False">
-        <div class="title">Messages</div>
-        <div class="subtitle">People you follow</div>
-        <ul class="threads">
+<div class="messages-container">
+    <!-- ===== Left Sidebar - People List ===== -->
+    <div class="people-sidebar">
+        <div class="people-header">
+            <h3 class="people-title">People</h3>
+            <button class="collapse-btn" @onclick="ToggleSidebar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15,18 9,12 15,6"></polyline>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="people-list">
             @if (FollowedUsers == null)
             {
-                <li>Loading...</li>
+                <div class="loading-state">Loading...</div>
             }
             else if (!FollowedUsers.Any())
             {
-                <li style="padding: 20px; color: var(--muted); text-align: center;">
+                <div class="empty-state">
                     You're not following anyone yet.<br/>
                     Follow users to start messaging them!
-                </li>
+                </div>
             }
             else
             {
                 @foreach (var user in FollowedUsers)
                 {
-                    var active = (user.Id == SelectedUser?.Id) ? "item active" : "item";
-                    <li class="@active" @onclick="() => LoadConversation(user)">
-                        <img class="avatar" src="@(user.ProfilePicturePath ?? "https://placehold.co/40x40/png")" alt="@user.FirstName" />
-                        <div class="user-info">
-                            <div class="name">@($"{user.FirstName} {user.LastName}")</div>
-                            <div class="meta">@user.RoleString</div>
+                    var isActive = (user.Id == SelectedUser?.Id);
+                    <div class="person-item @(isActive ? "active" : "")" @onclick="() => LoadConversation(user)">
+                        <div class="person-avatar @(isActive ? "active-border" : "")">
+                            @if (!string.IsNullOrEmpty(user.ProfilePicturePath))
+                            {
+                                <img src="@user.ProfilePicturePath" alt="@user.FirstName" class="avatar-image" />
+                            }
+                            else
+                            {
+                                <div class="avatar-placeholder">@user.FirstName[0]</div>
+                            }
                         </div>
-                    </li>
+                        <div class="person-info">
+                            <div class="person-name">@($"{user.FirstName} {user.LastName}")</div>
+                        </div>
+                        <div class="person-status @(isActive ? "active-status" : "inactive-status")">
+                            @if (isActive)
+                            {
+                                <div class="status-dot"></div>
+                            }
+                            else
+                            {
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            }
+                        </div>
+                    </div>
                 }
             }
-        </ul>
+        </div>
     </div>
 
-    <!-- ===== Conversation window ===== -->
-    <div class="conversation">
+    <!-- ===== Right Section - Chat Area ===== -->
+    <div class="chat-area">
         @if (SelectedUser == null)
         {
-            <div class="chat" style="display:flex;align-items:center;justify-content:center;color:var(--muted);">
-                Select a person to start messaging.
+            <div class="no-chat-selected">
+                <div class="no-chat-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <h3>Select a person to start messaging</h3>
+                <p>Choose someone from the People list to begin your conversation</p>
             </div>
         }
         else
         {
-            <div class="conv-head">
-                <img class="avatar" src="@(SelectedUser.ProfilePicturePath ?? "https://placehold.co/40x40/png")" alt="@SelectedUser.FirstName" />
-                <div>
-                    <div class="name">@($"{SelectedUser.FirstName} {SelectedUser.LastName}")</div>
-                    <div class="meta">@SelectedUser.Email</div>
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-user-info">
+                    <div class="chat-user-avatar @(SelectedUser.Id == SelectedUser?.Id ? "active-border" : "")">
+                        @if (!string.IsNullOrEmpty(SelectedUser.ProfilePicturePath))
+                        {
+                            <img src="@SelectedUser.ProfilePicturePath" alt="@SelectedUser.FirstName" class="avatar-image" />
+                        }
+                        else
+                        {
+                            <div class="avatar-placeholder">@SelectedUser.FirstName[0]</div>
+                        }
+                    </div>
+                    <div class="chat-user-details">
+                        <div class="chat-user-name">@($"{SelectedUser.FirstName} {SelectedUser.LastName}")</div>
+                        <div class="chat-user-role">@SelectedUser.RoleString</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="chat" @ref="ChatContainer">
+            <!-- Messages Area -->
+            <div class="messages-area" @ref="ChatContainer">
                 @if (ConversationMessages == null)
                 {
-                    <p style="color:var(--muted)">Loading messages...</p>
+                    <div class="loading-messages">Loading messages...</div>
                 }
                 else if (!ConversationMessages.Any())
                 {
-                    <p style="color:var(--muted)">No messages yet. Start the conversation!</p>
+                    <div class="empty-messages">
+                        <div class="empty-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <p>No messages yet. Start the conversation!</p>
+                    </div>
                 }
                 else
                 {
                     @foreach (var msg in ConversationMessages)
                     {
-                        var rowClass = (msg.SenderId == CurrentUserId) ? "row outgoing" : "row incoming";
-                        <div class="@rowClass">
-                            <div class="bubble">@msg.MessageText</div>
-                            <div class="time">@msg.SentAt?.ToString("HH:mm")</div>
+                        var isOutgoing = (msg.SenderId == CurrentUserId);
+                        <div class="message-row @(isOutgoing ? "outgoing" : "incoming")">
+                            <div class="message-bubble @(isOutgoing ? "outgoing-bubble" : "incoming-bubble")">
+                                @msg.MessageText
+                            </div>
+                            <div class="message-time">@msg.SentAt?.ToString("HH:mm")</div>
                         </div>
                     }
                 }
             </div>
 
-            <div class="inputbar">
-                <input @bind="NewMessageText" @bind:event="oninput" class="input"
-                       placeholder="Type your message..." @onkeydown="HandleEnter" />
-                <button class="send" @onclick="SendMessage" disabled="@isSending">
-                    <i class="bi bi-send"></i>
-                </button>
+            <!-- Message Input -->
+            <div class="message-input-area">
+                <div class="input-container">
+                    <button class="attachment-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.64 16.2a2 2 0 0 1-2.83-2.83l8.49-8.49"></path>
+                        </svg>
+                    </button>
+                    <input @bind="NewMessageText" @bind:event="oninput" class="message-input"
+                           placeholder="Type a private message..." @onkeydown="HandleEnter" />
+                    <button class="send-btn" @onclick="SendMessage" disabled="@(isSending || string.IsNullOrWhiteSpace(NewMessageText))">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                        </svg>
+                    </button>
+                </div>
             </div>
         }
     </div>
@@ -102,6 +169,7 @@
     private ElementReference ChatContainer;
     private bool isSending = false;
     private int CurrentUserId;
+    private bool isSidebarCollapsed = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -230,5 +298,11 @@
         {
             Console.WriteLine($"⚠️ [ERROR] ScrollToBottom: {ex.Message}");
         }
+    }
+
+    private void ToggleSidebar()
+    {
+        isSidebarCollapsed = !isSidebarCollapsed;
+        StateHasChanged();
     }
 }

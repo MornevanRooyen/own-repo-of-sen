@@ -2,26 +2,37 @@
 @* Shared/Navigation.razor — used as main layout *@
 
 <nav class="cl-nav">
-    <div class="container nav-row">
+    <div class="nav-row">
         <a class="brand" href="/Landing">
-            <span class="logo" aria-hidden="true">
-                <svg viewBox="0 0 64 64" width="34" height="34" role="img" focusable="false">
-                    <g stroke="currentColor" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M42 14c-4-4-9-6-14-6C15 8 8 15 8 26s7 18 20 18c5 0 10-2 14-6" />
-                        <path d="M56 12v32H34" />
-                    </g>
-                </svg>
-            </span>
             <span class="brand-text">CampusLearn</span>
         </a>
 
-        <button class="hamburger @(IsMenuOpen ? "active" : "")"
-                aria-label="Menu"
-                aria-expanded="@IsMenuOpen.ToString().ToLowerInvariant()"
-                type="button"
-                @onclick="ToggleMenu">
-            <span></span><span></span><span></span>
-        </button>
+        <div class="nav-actions">
+            <button class="theme-toggle" @onclick="ToggleDarkMode" title="Toggle Dark Mode">
+                <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+
+            <button class="hamburger @(IsMenuOpen ? "active" : "")"
+                    aria-label="Menu"
+                    aria-expanded="@IsMenuOpen.ToString().ToLowerInvariant()"
+                    type="button"
+                    @onclick="ToggleMenu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
     </div>
 </nav>
 
@@ -61,6 +72,40 @@
         --ring: color-mix(in oklab, var(--ink) 12%, white);
         --shadow: 0 12px 28px rgba(0,0,0,.08);
         --container: min(1200px,92vw);
+        
+        /* Light mode colors */
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --text-primary: #2c3e50;
+        --text-secondary: #6c757d;
+        --border-color: #e9ecef;
+        --shadow-dark: rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode {
+        /* Dark mode colors */
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --text-primary: #ffffff;
+        --text-secondary: #b3b3b3;
+        --border-color: #404040;
+        --shadow-dark: rgba(0, 0, 0, 0.3);
+        
+        /* Override specific colors for dark mode */
+        --nav: #2d2d2d;
+        --ink: #ffffff;
+        --ring: #404040;
+        --bg: #1a1a1a;
+    }
+
+    /* Apply dark mode to body and main content */
+    .dark-mode body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+    }
+
+    .dark-mode main {
+        background-color: var(--bg-primary);
     }
 
     /* base */
@@ -79,16 +124,116 @@
         position: sticky;
         top: 0;
         z-index: 50;
-        background: var(--nav);
-        border-bottom: 1px solid var(--ring)
+        background: #4A5568; /* Dark gray background */
+        border-bottom: 1px solid var(--ring);
+        width: 100%;
     }
+
+    /* Override text colors for navigation bar only */
+    .cl-nav .brand {
+        color: #FFFFFF !important; /* White text for brand */
+    }
+
+    .cl-nav .brand-text {
+        color: #FFFFFF !important; /* White text for brand text */
+        text-decoration: underline;
+        text-decoration-color: #007bff;
+        text-underline-offset: 4px;
+    }
+
+    .cl-nav .hamburger span {
+        background: #FFFFFF !important; /* White hamburger lines */
+    }
+
+    /* ========== Navigation Actions ========== */
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* ========== Theme Toggle Button ========== */
+    .theme-toggle {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+
+    .theme-toggle:active {
+        transform: scale(0.95);
+    }
+
+    .theme-toggle svg {
+        position: absolute;
+        transition: all 0.3s ease;
+        color: #FFFFFF;
+    }
+
+    .sun-icon {
+        opacity: 1;
+        transform: rotate(0deg);
+    }
+
+    .moon-icon {
+        opacity: 0;
+        transform: rotate(180deg);
+    }
+
+    .dark-mode .sun-icon {
+        opacity: 0;
+        transform: rotate(180deg);
+    }
+
+    .dark-mode .moon-icon {
+        opacity: 1;
+        transform: rotate(0deg);
+    }
+
+    /* Dark mode for hamburger menu */
+    .dark-mode .hamburger span {
+        background: var(--ink);
+        transition: background-color 0.3s ease, transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    /* Dark mode for drawer menu */
+    .dark-mode .drawer {
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+        box-shadow: var(--shadow-dark);
+    }
+
+    .dark-mode .drawer-nav a {
+        color: var(--text-primary);
+    }
+
+    .dark-mode .drawer-nav a:hover {
+        background: var(--bg-secondary);
+    }
+
 
     .nav-row {
         height: 64px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px
+        padding: 0 24px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .brand {
@@ -101,12 +246,13 @@
 
     .brand-text {
         font-weight: 800;
-        font-size: clamp(18px,2.1vw,24px)
+        font-size: clamp(18px,2.1vw,24px);
     }
 
     .logo {
         color: var(--ink)
     }
+
 
     /* hamburger */
     .hamburger {
@@ -125,7 +271,7 @@
             height: 3px;
             background: var(--ink);
             border-radius: 8px;
-            transition: transform .25s ease,opacity .25s ease
+            transition: transform .25s ease, opacity .25s ease, background-color 0.3s ease;
         }
 
             .hamburger span + span {
@@ -169,7 +315,7 @@
         inset: 0 0 0 auto;
         width: min(78vw,360px);
         translate: 100% 0;
-        transition: translate .24s ease;
+        transition: translate .24s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         background: #fff;
         border-left: 1px solid var(--ring);
         box-shadow: var(--shadow);
@@ -193,7 +339,8 @@
             border-radius: 12px;
             font-weight: 800;
             text-decoration: none;
-            color: var(--ink)
+            color: var(--ink);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
             .drawer-nav a:hover {
@@ -213,11 +360,48 @@
 @code {
     [Inject] private NavigationManager Nav { get; set; }
     [Inject] private Frontend.Services.AuthService Auth { get; set; }
+    [Inject] private IJSRuntime JS { get; set; }
 
     [Parameter] public bool IsAdmin { get; set; } = false;
     private bool IsMenuOpen;
+    private bool IsDarkMode = false;
 
     private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
+
+    private async Task ToggleDarkMode()
+    {
+        IsDarkMode = !IsDarkMode;
+        await ApplyTheme();
+        
+        // Save preference to localStorage
+        try
+        {
+            await JS.InvokeVoidAsync("localStorage.setItem", "darkMode", IsDarkMode.ToString().ToLowerInvariant());
+        }
+        catch
+        {
+            // localStorage might not be available in some contexts
+        }
+    }
+
+    private async Task ApplyTheme()
+    {
+        try
+        {
+            if (IsDarkMode)
+            {
+                await JS.InvokeVoidAsync("document.documentElement.classList.add", "dark-mode");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("document.documentElement.classList.remove", "dark-mode");
+            }
+        }
+        catch
+        {
+            // JS interop might fail in some contexts
+        }
+    }
 
     private void NavigateTo(string path)
     {
@@ -225,10 +409,23 @@
         Nav.NavigateTo(path);
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Nav.LocationChanged += HandleLocationChanged;
         _ = RefreshRoleAsync();
+        
+        // Load dark mode preference from localStorage
+        try
+        {
+            var darkModePreference = await JS.InvokeAsync<string>("localStorage.getItem", "darkMode");
+            IsDarkMode = darkModePreference == "true";
+            await ApplyTheme();
+        }
+        catch
+        {
+            // If localStorage is not available, default to light mode
+            IsDarkMode = false;
+        }
     }
 
     private async Task RefreshRoleAsync()

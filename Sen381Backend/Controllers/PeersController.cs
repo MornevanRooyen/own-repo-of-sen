@@ -35,7 +35,11 @@ namespace Sen381Backend.Controllers
                         UserId = u.Id,
                         u.FirstName,
                         u.LastName,
-                        Role = u.RoleString?.ToLower() ?? "student"
+                        Role = u.RoleString?.ToLower() ?? "student",
+                        u.ProfilePicturePath,
+                        u.Program,
+                        u.Year,
+                        Subjects = u.Interests // Map Interests to Subjects for frontend compatibility
                     });
 
                     return Ok(allPeers);
@@ -47,13 +51,17 @@ namespace Sen381Backend.Controllers
                     u.LastName.Contains(query, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
-                // ✅ Map only what’s needed for the peers page
+                // ✅ Map only what's needed for the peers page
                 var peers = users.Select(u => new
                 {
                     UserId = u.Id,
                     u.FirstName,
                     u.LastName,
-                    Role = u.RoleString?.ToLower() ?? "student"
+                    Role = u.RoleString?.ToLower() ?? "student",
+                    u.ProfilePicturePath,
+                    u.Program,
+                    u.Year,
+                    Subjects = u.Interests // Map Interests to Subjects for frontend compatibility
                 });
 
                 return Ok(peers);

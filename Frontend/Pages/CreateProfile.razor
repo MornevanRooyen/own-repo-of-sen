@@ -205,6 +205,22 @@
         --radius: 14px;
         --shadow: 0 6px 18px rgba(0,0,0,.06);
         --container: min(1150px,92vw);
+        
+        /* Add smooth transitions for all elements */
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Dark mode overrides */
+    .dark-mode {
+        --bg: #1a1a1a;
+        --panel: #2d2d2d;
+        --ink: #ffffff;
+        --muted: #b3b3b3;
+        --ring: #404040;
+        --primary: #1B998B;
+        --accent: #3a7bdb;
+        --chip: #404040;
+        --shadow: 0 6px 18px rgba(0,0,0,.3);
     }
 
     * {
@@ -221,6 +237,7 @@
         color: var(--ink);
         font-family: system-ui,-apple-system,"Segoe UI",Inter,Roboto,Arial,sans-serif;
         line-height: 1.45;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     a {
@@ -354,13 +371,15 @@
         font-weight: 800;
         background: #e8eef7;
         color: #1b2b3b;
-        border: 1px solid var(--ring)
+        border: 1px solid var(--ring);
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
 
         .tab.active {
             background: #d9e6ff;
             color: #14315f;
-            border-color: #c7d7fb
+            border-color: #c7d7fb;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         .tab[aria-disabled="true"] {
@@ -414,6 +433,7 @@
         box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
         font: inherit;
         color: var(--ink);
+        transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     }
 
         .input:focus {
@@ -488,7 +508,59 @@
         color: #333
     }
 
-    =
+    /* ========== Dark Mode Styles ========== */
+    .dark-mode .page-hd {
+        background: var(--panel);
+        border-color: var(--ring);
+        color: var(--ink);
+    }
+
+    .dark-mode .tab {
+        background: var(--mist);
+        color: var(--ink);
+        border-color: var(--ring);
+    }
+
+    .dark-mode .tab.active {
+        background: color-mix(in oklab, var(--accent) 20%, var(--panel));
+        color: var(--ink);
+        border-color: var(--accent);
+    }
+
+    .dark-mode .input {
+        background: var(--panel);
+        color: var(--ink);
+        box-shadow: inset 0 0 0 1px var(--ring);
+    }
+
+    .dark-mode .input:focus {
+        box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 2px color-mix(in oklab, var(--accent) 20%, transparent);
+    }
+
+    .dark-mode .textarea {
+        background: var(--panel);
+        color: var(--ink);
+        border-color: var(--ring);
+    }
+
+    .dark-mode .btn {
+        background: var(--mist);
+        color: var(--ink);
+        border-color: var(--ring);
+    }
+
+    .dark-mode .btn.primary {
+        background: var(--primary);
+        color: #fff;
+    }
+
+    .dark-mode .field label {
+        color: var(--ink);
+    }
+
+    .dark-mode .muted {
+        color: var(--muted);
+    }
 </style>
 
 @code {

@@ -1,6 +1,7 @@
 ﻿@page "/peers"
 @inject HttpClient Http
 @inject NavigationManager NavManager
+@inject Frontend.Services.AuthService AuthService
 <PageTitle>Peers | CampusLearn</PageTitle>
 
 <main class="layout">
@@ -18,56 +19,77 @@
             </div>
         </div>
 
-        <!-- Students Section -->
-        <section class="peer-section">
-            <h2 class="section-title">Students</h2>
-            <div class="peer-grid">
-                @if (FilteredStudents != null && FilteredStudents.Any())
-                {
-                    @foreach (var student in FilteredStudents)
-                    {
-                        <div class="peer-card student-card" @onclick="() => NavigateToProfile(student.UserId, false)">
-                            <div class="card-header">
-                                <div class="avatar-circle">
-                                    <svg class="avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="12" cy="7" r="4"></circle>
-                                    </svg>
-                                </div>
-                                <div class="message-icon">
-                                    <svg viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <span class="peer-name">@student.FirstName @student.LastName</span>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <p>No students found.</p>
-                }
+        <!-- Filter Buttons -->
+        <div class="filter-section">
+            <div class="filter-buttons">
+                <button class="filter-btn @(CurrentFilter == "all" ? "active" : "")" @onclick="SetFilterAll">
+                    All
+                </button>
+                <button class="filter-btn @(CurrentFilter == "students" ? "active" : "")" @onclick="SetFilterStudents">
+                    Students
+                </button>
+                <button class="filter-btn @(CurrentFilter == "tutors" ? "active" : "")" @onclick="SetFilterTutors">
+                    Tutors
+                </button>
+                <button class="filter-btn @(CurrentFilter == "subscribed-students" ? "active" : "")" @onclick="SetFilterSubscribedStudents">
+                    Subscribed Students
+                </button>
+                <button class="filter-btn @(CurrentFilter == "subscribed-tutors" ? "active" : "")" @onclick="SetFilterSubscribedTutors">
+                    Subscribed Tutors
+                </button>
             </div>
-        </section>
+        </div>
 
-        <!-- Tutors Section -->
+        <!-- Peers Section -->
         <section class="peer-section">
-            <h2 class="section-title">Tutors</h2>
+            @if (CurrentFilter == "all")
+            {
+                <h2 class="section-title">All Peers</h2>
+            }
+            else if (CurrentFilter == "students")
+            {
+                <h2 class="section-title">Students</h2>
+            }
+            else if (CurrentFilter == "tutors")
+            {
+                <h2 class="section-title">Tutors</h2>
+            }
+            else if (CurrentFilter == "subscribed-students")
+            {
+                <h2 class="section-title">Subscribed Students</h2>
+            }
+            else if (CurrentFilter == "subscribed-tutors")
+            {
+                <h2 class="section-title">Subscribed Tutors</h2>
+            }
+            
             <div class="peer-grid">
-                @if (FilteredTutors != null && FilteredTutors.Any())
+                @if (FilteredPeers != null && FilteredPeers.Any())
                 {
-                    @foreach (var tutor in FilteredTutors)
+                    @foreach (var peer in FilteredPeers)
                     {
-                        <div class="peer-card tutor-card" @onclick="() => NavigateToProfile(tutor.UserId, true)">
+                        <div class="peer-card @(peer.Role.ToLower() == "tutor" ? "tutor-card" : "student-card")" @onclick="@(() => NavigateToPeerProfile(peer))">
                             <div class="card-header">
                                 <div class="avatar-circle">
-                                    <svg class="avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="12" cy="7" r="4"></circle>
-                                    </svg>
+                                    @if (!string.IsNullOrEmpty(peer.ProfilePicturePath))
+                                    {
+                                        <img src="@peer.ProfilePicturePath" 
+                                             alt="@peer.FirstName's profile picture" 
+                                             class="avatar-image"
+                                             onerror="console.log('Image failed to load:', '@peer.ProfilePicturePath'); this.style.display='none'; this.nextElementSibling.style.display='block';" 
+                                             onload="console.log('Image loaded successfully:', '@peer.ProfilePicturePath');" />
+                                        <svg class="avatar-icon fallback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: none;">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    }
+                                    else
+                                    {
+                                        <svg class="avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    }
                                 </div>
                                 <div class="message-icon">
                                     <svg viewBox="0 0 24 24" fill="currentColor">
@@ -76,14 +98,14 @@
                                 </div>
                             </div>
                             <div class="card-footer">
-                                <span class="peer-name">@tutor.FirstName @tutor.LastName</span>
+                                <span class="peer-name">@peer.FirstName @peer.LastName</span>
                             </div>
                         </div>
                     }
                 }
                 else
                 {
-                    <p>No tutors found.</p>
+                    <p>No peers found.</p>
                 }
             </div>
         </section>
@@ -106,6 +128,25 @@
         --search-bg: #e8e8e8;
         --radius: 1.25rem;
         --shadow: 0 4px 14px rgba(0,0,0,0.08);
+        
+        /* Add smooth transitions for all elements */
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Dark mode overrides */
+    .dark-mode {
+        --bg: #1a1a1a;
+        --nav: #2d2d2d;
+        --text: #ffffff;
+        --text-dim: #b3b3b3;
+        --accent: #a4103b;
+        --accent-soft: #c21c55;
+        --student-orange: #f28a1e;
+        --tutor-maroon: #a4103b;
+        --panel-bg: #2d2d2d;
+        --panel-ring: #404040;
+        --search-bg: #404040;
+        --shadow: 0 4px 14px rgba(0,0,0,0.3);
     }
 
     /* ========== Base ========== */
@@ -123,6 +164,7 @@
         color: var(--text);
         font-family: "Lexend", sans-serif;
         font-weight: 300;
+        transition: background-color 0.3s ease, color 0.3s ease;
         line-height: 1.4;
     }
 
@@ -145,6 +187,45 @@
         align-items: center;
         gap: 2rem;
         flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .filter-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+        background: #f8f9fa;
+        padding: 0.25rem;
+        border-radius: 0.75rem;
+        width: fit-content;
+        flex-wrap: wrap;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        background: transparent;
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .filter-btn:hover {
+        background: rgba(255, 255, 255, 0.5);
+        color: #495057;
+    }
+
+    .filter-btn.active {
+        background: #fff;
+        color: #007bff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .peers-title {
@@ -165,6 +246,7 @@
         min-width: 20rem;
         flex: 1;
         max-width: 30rem;
+        transition: background-color 0.3s ease;
     }
 
     .search-icon,
@@ -217,7 +299,7 @@
         border-radius: var(--radius);
         overflow: hidden;
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
         box-shadow: var(--shadow);
         min-width: 9rem;
     }
@@ -252,9 +334,24 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden; /* Ensure images don't overflow the circle */
     }
 
     .avatar-icon {
+        width: 2rem;
+        height: 2rem;
+        stroke-width: 2;
+        color: var(--text);
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Maintain aspect ratio and fill the circle */
+        border-radius: 50%;
+    }
+
+    .fallback-icon {
         width: 2rem;
         height: 2rem;
         stroke-width: 2;
@@ -278,10 +375,11 @@
 
     /* ========== Card Footer ========== */
     .card-footer {
-        background: white;
+        background: var(--panel-bg);
         padding: 0.8rem;
         text-align: center;
         border-top: 2px solid;
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
     .student-card .card-footer {
@@ -316,29 +414,135 @@
             grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
         }
     }
+
+    /* ========== Dark Mode Styles ========== */
+    .dark-mode .search-box {
+        background: var(--search-bg);
+    }
+
+    .dark-mode .filter-buttons {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-ring);
+    }
+
+    .dark-mode .filter-btn {
+        color: var(--text);
+    }
+
+    .dark-mode .filter-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+    }
+
+    .dark-mode .filter-btn.active {
+        background: var(--accent);
+        color: #fff;
+    }
+
+    .dark-mode .card-footer {
+        background: var(--panel-bg);
+        color: var(--text);
+    }
+
+    .dark-mode .peer-name {
+        color: var(--text);
+    }
+
+    .dark-mode .peer-role {
+        color: var(--text-dim);
+    }
 </style>
 
 @code {
     private string SearchQuery { get; set; } = "";
+    private string CurrentFilter { get; set; } = "all"; // "all", "students", "tutors", "subscribed-students", "subscribed-tutors"
 
-    private List<PeerUser> Students { get; set; } = new();
-    private List<PeerUser> Tutors { get; set; } = new();
+    private List<PeerUser> AllPeers { get; set; } = new();
+    private List<long> SubscribedUserIds { get; set; } = new();
 
-    private IEnumerable<PeerUser> FilteredStudents =>
-        Students.Where(s =>
-            string.IsNullOrWhiteSpace(SearchQuery) ||
-            s.FirstName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-            s.LastName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase));
+    private IEnumerable<PeerUser> FilteredPeers
+    {
+        get
+        {
+            var filtered = AllPeers.AsEnumerable();
 
-    private IEnumerable<PeerUser> FilteredTutors =>
-        Tutors.Where(t =>
-            string.IsNullOrWhiteSpace(SearchQuery) ||
-            t.FirstName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-            t.LastName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase));
+            // Apply role filter
+            if (CurrentFilter == "students")
+            {
+                filtered = filtered.Where(p => p.Role.ToLower() == "student");
+            }
+            else if (CurrentFilter == "tutors")
+            {
+                filtered = filtered.Where(p => p.Role.ToLower() == "tutor");
+            }
+            else if (CurrentFilter == "subscribed-students")
+            {
+                Console.WriteLine($"🔍 Filtering subscribed students: SubscribedUserIds = [{string.Join(", ", SubscribedUserIds)}]");
+                Console.WriteLine($"🔍 AllPeers count: {AllPeers.Count}");
+                var students = filtered.Where(p => p.Role.ToLower() == "student").ToList();
+                Console.WriteLine($"🔍 Students count: {students.Count}");
+                filtered = filtered.Where(p => p.Role.ToLower() == "student" && SubscribedUserIds.Contains(p.UserId));
+                Console.WriteLine($"🔍 Filtered subscribed students count: {filtered.Count()}");
+            }
+            else if (CurrentFilter == "subscribed-tutors")
+            {
+                Console.WriteLine($"🔍 Filtering subscribed tutors: SubscribedUserIds = [{string.Join(", ", SubscribedUserIds)}]");
+                Console.WriteLine($"🔍 AllPeers count: {AllPeers.Count}");
+                var tutors = filtered.Where(p => p.Role.ToLower() == "tutor").ToList();
+                Console.WriteLine($"🔍 Tutors count: {tutors.Count}");
+                filtered = filtered.Where(p => p.Role.ToLower() == "tutor" && SubscribedUserIds.Contains(p.UserId));
+                Console.WriteLine($"🔍 Filtered subscribed tutors count: {filtered.Count()}");
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                filtered = filtered.Where(p =>
+                    p.FirstName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    p.LastName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    p.Program?.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) == true ||
+                    p.Subjects?.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) == true);
+            }
+
+            return filtered;
+        }
+    }
+
+    private void SetFilter(string filter)
+    {
+        CurrentFilter = filter;
+        StateHasChanged();
+    }
+
+    private void SetFilterAll()
+    {
+        SetFilter("all");
+    }
+
+    private void SetFilterStudents()
+    {
+        SetFilter("students");
+    }
+
+    private void SetFilterTutors()
+    {
+        SetFilter("tutors");
+    }
+
+    private void SetFilterSubscribedStudents()
+    {
+        SetFilter("subscribed-students");
+    }
+
+    private void SetFilterSubscribedTutors()
+    {
+        SetFilter("subscribed-tutors");
+    }
 
     protected override async Task OnInitializedAsync()
     {
         await LoadPeersAsync();
+        await LoadSubscribedUsersAsync();
     }
 
     private async Task LoadPeersAsync()
@@ -353,13 +557,44 @@
 
             if (result != null)
             {
-                Students = result.Where(u => u.Role == "student").ToList();
-                Tutors = result.Where(u => u.Role == "tutor").ToList();
+                AllPeers = result;
+                Console.WriteLine($"🔍 LoadPeersAsync: Loaded {AllPeers.Count} peers");
+                foreach (var peer in AllPeers.Take(3)) // Show first 3 peers for debugging
+                {
+                    Console.WriteLine($"🔍 Peer: {peer.FirstName} {peer.LastName} - ProfilePicturePath: '{peer.ProfilePicturePath}'");
+                }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Failed to load peers: {ex.Message}");
+        }
+    }
+
+    private async Task LoadSubscribedUsersAsync()
+    {
+        try
+        {
+            // Get current user ID from auth service
+            var currentUserId = await AuthService.GetCurrentUserIdAsync();
+            if (currentUserId.HasValue)
+            {
+                // Get following list from backend
+                var result = await Http.GetFromJsonAsync<List<FollowedUser>>($"api/follow/following-list/{currentUserId.Value}");
+                Console.WriteLine($"🔍 LoadSubscribedUsersAsync: Got {result?.Count ?? 0} followed users");
+                SubscribedUserIds = result?.Select(u => (long)u.Id).ToList() ?? new List<long>();
+                Console.WriteLine($"🔍 LoadSubscribedUsersAsync: SubscribedUserIds = [{string.Join(", ", SubscribedUserIds)}]");
+            }
+            else
+            {
+                Console.WriteLine("🔍 LoadSubscribedUsersAsync: No current user ID");
+                SubscribedUserIds = new List<long>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Failed to load subscribed users: {ex.Message}");
+            SubscribedUserIds = new List<long>();
         }
     }
 
@@ -370,11 +605,40 @@
         NavManager.NavigateTo($"/{profileType}/{userId}");
     }
 
+    private void NavigateToPeerProfile(PeerUser peer)
+    {
+        bool isTutor = peer.Role.ToLower() == "tutor";
+        NavigateToProfile(peer.UserId, isTutor);
+    }
+
     public class PeerUser
     {
         public long UserId { get; set; }
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         public string Role { get; set; } = ""; // "student" or "tutor"
+        public string? Program { get; set; }
+        public string? Year { get; set; }
+        public string? Subjects { get; set; } // This will map to Interests from backend
+        public string? ProfilePicturePath { get; set; }
+    }
+
+    public class FollowedUser
+    {
+        public int Id { get; set; }  // Changed from UserId to Id to match backend
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string RoleString { get; set; } = "";  // Changed from Role to RoleString to match backend
+        public string? Email { get; set; }
+        public string? PhoneNum { get; set; }
+        public string? ProfilePicturePath { get; set; }
+        public string? City { get; set; }
+        public string? Country { get; set; }
+        public string? Timezone { get; set; }
+        public string? Website { get; set; }
+        public string? Program { get; set; }
+        public string? Year { get; set; }
+        public string? About { get; set; }
+        public string? Interests { get; set; }
     }
 }
