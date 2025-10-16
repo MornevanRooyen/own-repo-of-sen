@@ -19,7 +19,8 @@ builder.Services.AddSingleton<SupaBaseAuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IUserService, UserService>();   // ✅ FIX
 builder.Services.AddScoped<NotificationService>();
-;
+builder.Services.AddScoped<SubjectService>();
+builder.Services.AddScoped<TopicService>();
 
 // CORS for your WASM app (adjust ports if needed)
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";

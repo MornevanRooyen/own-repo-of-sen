@@ -1,4 +1,9 @@
 ﻿@page "/admin/tutorapplications"
+@using Frontend.Services
+@inject TutorApplicationService TutorAppService
+@inject AuthService AuthService
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
 
 <PageTitle>Admin · Tutor Applications</PageTitle>
 
@@ -22,7 +27,15 @@
         </div>
     </header>
 
-    @if (!Filtered.Any())
+    @if (IsLoading)
+    {
+        <div class="state loading">Loading applications...</div>
+    }
+    else if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="state error">@ErrorMessage</div>
+    }
+    else if (!Filtered.Any())
     {
         <div class="state empty">No pending tutor applications match your filters.</div>
     }
@@ -34,11 +47,11 @@
                 <article class="card">
                     <!-- Corner actions (kept off the text by padding on .card) -->
                     <button class="btn-icon decline" aria-label="Decline" title="Decline"
-                            @onclick="() => Decline(app.UserId)">
+                            @onclick="() => Decline(app.ApplicationId)">
                         ✕
                     </button>
                     <button class="btn-icon accept" aria-label="Accept" title="Accept"
-                            @onclick="() => Accept(app.UserId)">
+                            @onclick="() => Accept(app.ApplicationId)">
                         ✓
                     </button>
 
@@ -80,6 +93,16 @@
                                 <li><b>Min. required grade:</b> @app.MinRequiredGrade%</li>
                                 ;
                             }
+                            @if (!string.IsNullOrWhiteSpace(app.TranscriptPath))
+                            {
+                                <li>
+                                    <b>Transcript:</b> 
+                                    <a href="#" @onclick="() => ViewTranscript(app.TranscriptPath)" @onclick:preventDefault="true" class="transcript-link">
+                                        View PDF Transcript
+                                    </a>
+                                </li>
+                                ;
+                            }
                         </ul>
                     </div>
 
@@ -97,20 +120,50 @@
 @code {
     private string Search = string.Empty;
     private string MajorFilter = string.Empty;
+    private List<TutorApplicationVM> Items = new();
+    private bool IsLoading = true;
+    private string? ErrorMessage = null;
 
-    // Demo data (replace with your API later)
-    private List<TutorApplicationVM> Items = new()
-  {
-    new() { UserId=501, FirstName="Sabrina", LastName="Capenter", Email="sabrina@campus.edu",
-            PhoneNum="+27 82 000 0001", StudentNo="BC1234567", Major="BEng (Software)",
-            YearOfStudy=3, CompletedSessions=0, MinRequiredGrade=65, CreatedAt=DateTime.UtcNow.AddHours(-6) },
-    new() { UserId=502, FirstName="Olivia", LastName="Rodrigo", Email="livie@campus.edu",
-            PhoneNum="+27 72 000 0002", StudentNo="BC2233445", Major="BIT",
-            YearOfStudy=2, CompletedSessions=0, MinRequiredGrade=60, CreatedAt=DateTime.UtcNow.AddDays(-1) },
-    new() { UserId=503, FirstName="Yo", LastName="Mama", Email="zooweemama@campus.edu",
-            StudentNo="BC9997777", Major="BEng (Elec)", YearOfStudy=4,
-            CompletedSessions=0, MinRequiredGrade=70, CreatedAt=DateTime.UtcNow.AddHours(-20) }
-  };
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadApplications();
+    }
+
+    private async Task LoadApplications()
+    {
+        try
+        {
+            IsLoading = true;
+            var applications = await TutorAppService.GetPendingApplicationsAsync();
+            Items = applications.Select(app => new TutorApplicationVM
+            {
+                ApplicationId = app.ApplicationId,
+                UserId = app.UserId,
+                FirstName = app.FirstName,
+                LastName = app.LastName,
+                Email = app.Email,
+                PhoneNum = app.PhoneNum,
+                StudentNo = app.StudentNo,
+                Major = app.Major,
+                YearOfStudy = app.YearOfStudy,
+                CompletedSessions = app.CompletedSessions,
+                MinRequiredGrade = app.MinRequiredGrade,
+                ProfilePicturePath = app.ProfilePicturePath,
+                TranscriptPath = app.TranscriptPath,
+                CreatedAt = app.CreatedAt ?? DateTime.UtcNow
+            }).ToList();
+            ErrorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error loading applications: {ex.Message}";
+            Items = new List<TutorApplicationVM>();
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
 
     private IEnumerable<string> Majors =>
       Items.Select(i => i.Major)
@@ -125,18 +178,62 @@
         (string.IsNullOrWhiteSpace(MajorFilter) ||
           string.Equals(i.Major, MajorFilter, StringComparison.OrdinalIgnoreCase)));
 
-    private Task Accept(long userId)
+    private async Task Accept(int applicationId)
     {
-        Items.RemoveAll(x => x.UserId == userId);
-        // TODO: call backend accept
-        return Task.CompletedTask;
+        try
+        {
+            var currentUser = await AuthService.GetCurrentUserAsync();
+            if (currentUser == null)
+            {
+                ErrorMessage = "Admin user not found";
+                return;
+            }
+
+            var success = await TutorAppService.ApproveApplicationAsync(applicationId, currentUser.UserId);
+            if (success)
+            {
+                // Remove from local list
+                Items.RemoveAll(x => x.ApplicationId == applicationId);
+                StateHasChanged();
+            }
+            else
+            {
+                ErrorMessage = "Failed to approve application";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error approving application: {ex.Message}";
+        }
     }
 
-    private Task Decline(long userId)
+    private async Task Decline(int applicationId)
     {
-        Items.RemoveAll(x => x.UserId == userId);
-        // TODO: call backend decline
-        return Task.CompletedTask;
+        try
+        {
+            var currentUser = await AuthService.GetCurrentUserAsync();
+            if (currentUser == null)
+            {
+                ErrorMessage = "Admin user not found";
+                return;
+            }
+
+            var success = await TutorAppService.DeclineApplicationAsync(applicationId, currentUser.UserId);
+            if (success)
+            {
+                // Remove from local list
+                Items.RemoveAll(x => x.ApplicationId == applicationId);
+                StateHasChanged();
+            }
+            else
+            {
+                ErrorMessage = "Failed to decline application";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error declining application: {ex.Message}";
+        }
     }
 
     private static string AvatarFor(TutorApplicationVM x)
@@ -149,7 +246,8 @@
 
     private class TutorApplicationVM
     {
-        public long UserId { get; set; }
+        public int ApplicationId { get; set; }
+        public int UserId { get; set; }
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         public string? Email { get; set; }
@@ -160,7 +258,36 @@
         public int CompletedSessions { get; set; }
         public int? MinRequiredGrade { get; set; }
         public string? ProfilePicturePath { get; set; }
+        public string? TranscriptPath { get; set; }
         public DateTime CreatedAt { get; set; }
+    }
+
+    private async Task ViewTranscript(string transcriptPath)
+    {
+        try
+        {
+            // Clear any previous error messages
+            ErrorMessage = null;
+            
+            // Debug: Log the transcript path
+            Console.WriteLine($"🔍 [Frontend] Attempting to view transcript: {transcriptPath}");
+            
+            // Use the proxy endpoint to view the transcript with proper headers
+            // Use full backend URL since window.open doesn't use HttpClient base address
+            var transcriptUrl = $"https://localhost:7228/api/file/view-transcript?filePath={Uri.EscapeDataString(transcriptPath)}";
+            
+            Console.WriteLine($"🔍 [Frontend] Opening URL: {transcriptUrl}");
+            
+            // Open the PDF in a new tab using window.open to ensure it opens properly
+            await JSRuntime.InvokeVoidAsync("eval", $"window.open('{transcriptUrl}', '_blank');");
+            
+            Console.WriteLine($"🔍 [Frontend] Window.open called successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ [Frontend] Error opening transcript: {ex.Message}");
+            ErrorMessage = $"Error opening transcript: {ex.Message}";
+        }
     }
 }
 
@@ -373,7 +500,17 @@
             background: #1B998B
         }
 
-            .btn-icon.accept:hover {
-                filter: brightness(.95)
-            }
+        .btn-icon.accept:hover {
+            filter: brightness(.95)
+        }
+
+    .transcript-link {
+        color: #1B998B;
+        text-decoration: underline;
+        font-weight: 700;
+    }
+
+    .transcript-link:hover {
+        color: #158a7a;
+    }
 </style>

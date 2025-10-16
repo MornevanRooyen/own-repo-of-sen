@@ -1,4 +1,6 @@
 ﻿@page "/subjects"
+@using Frontend.Services
+@inject SubjectService SubjectService
 
 <main class="subjects-page">
     <div class="container page-inner">
@@ -15,17 +17,42 @@
         </div>
 
         <section class="grid">
-            @foreach (var s in subjects)
+            @foreach (var subject in subjects)
             {
-                <a class="card" href="/Topics">@s</a>
+                <a class="card" href="/Topics?subjectId=@subject.SubjectId">
+                    <div class="card-content">
+                        <div class="subject-code">@subject.SubjectCode</div>
+                        <div class="subject-name">@subject.Name</div>
+                        <div class="subject-year">Year @subject.Year</div>
+                    </div>
+                </a>
             }
         </section>
     </div>
 </main>
 
 @code {
-    // temporary placeholders to match the screenshot
-    private List<string> subjects = Enumerable.Repeat("BUM 281", 18).ToList();
+    private List<SubjectVM> subjects = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSubjects();
+    }
+
+    private async Task LoadSubjects()
+    {
+        try
+        {
+            subjects = await SubjectService.GetAllSubjectsAsync();
+            // Only show active subjects
+            subjects = subjects.Where(s => s.IsActive).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Subjects] Error loading subjects: {ex.Message}");
+            subjects = new List<SubjectVM>();
+        }
+    }
 }
 
 <style>
@@ -188,6 +215,32 @@
         .card:hover {
             transform: translateY(-2px)
         }
+
+    .card-content {
+        text-align: center;
+        padding: 0.5rem;
+    }
+
+    .subject-code {
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+        color: white;
+    }
+
+    .subject-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.1rem;
+        opacity: 0.9;
+        color: white;
+    }
+
+    .subject-year {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        color: white;
+    }
 
     /* ======= Responsive ======= */
     @@media (max-width: 900px) {

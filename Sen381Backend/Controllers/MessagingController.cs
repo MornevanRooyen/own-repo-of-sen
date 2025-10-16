@@ -249,6 +249,61 @@ namespace Sen381Backend.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
+
+        // =============================
+        // DELETE: Delete a message (only by sender)
+        // =============================
+        [HttpDelete("delete/{messageId}")]
+        public async Task<IActionResult> DeleteMessage(int messageId)
+        {
+            Console.WriteLine($"[MessagingController] Deleting message {messageId}");
+
+            try
+            {
+                await _supabase.InitializeAsync();
+                var client = _supabase.Client;
+
+                // First, get the message to verify ownership
+                var messageResponse = await client
+                    .From<DirectMessage>()
+                    .Select("*")
+                    .Filter("id", Operator.Equals, messageId)
+                    .Get();
+
+                var message = messageResponse.Models.FirstOrDefault();
+                if (message == null)
+                {
+                    return NotFound(new { error = "Message not found" });
+                }
+
+                // Get current user ID from query parameter (in a real app, this would come from authentication)
+                var currentUserId = Request.Query["userId"].FirstOrDefault();
+                if (string.IsNullOrEmpty(currentUserId) || !int.TryParse(currentUserId, out int userId))
+                {
+                    return BadRequest(new { error = "userId parameter is required" });
+                }
+
+                // Only allow the sender to delete their own messages
+                if (message.SenderId != userId)
+                {
+                    return Forbid("You can only delete your own messages");
+                }
+
+                // Delete the message
+                await client
+                    .From<DirectMessage>()
+                    .Filter("id", Operator.Equals, messageId)
+                    .Delete();
+
+                Console.WriteLine($"✅ [MessagingController] Message {messageId} deleted successfully");
+                return Ok(new { message = "Message deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ [MessagingController] Error deleting message: {ex.Message}");
+                return StatusCode(500, new { error = "Internal server error" });
+            }
+        }
     }
 
     public class SendMessageRequest

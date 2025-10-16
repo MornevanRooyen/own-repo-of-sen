@@ -12,3 +12,17 @@ C:\Sen381 github repo\own repo\own-repo-of-sen381\Sen381\obj\Debug\net8.0\Sen381
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Sen381\obj\Debug\net8.0\refint\Sen381.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Sen381\obj\Debug\net8.0\Sen381.pdb
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Sen381\obj\Debug\net8.0\ref\Sen381.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\bin\Debug\net8.0\Sen381.dll.config
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\bin\Debug\net8.0\Sen381.deps.json
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\bin\Debug\net8.0\Sen381.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\bin\Debug\net8.0\Sen381.pdb
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\Sen381.csproj.AssemblyReference.cache
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\Sen381.GeneratedMSBuildEditorConfig.editorconfig
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\Sen381.AssemblyInfoInputs.cache
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\Sen381.AssemblyInfo.cs
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\Sen381.csproj.CoreCompileInputs.cache
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\Sen381.sourcelink.json
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\Sen381.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\refint\Sen381.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\Sen381.pdb
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381\obj\Debug\net8.0\ref\Sen381.dll

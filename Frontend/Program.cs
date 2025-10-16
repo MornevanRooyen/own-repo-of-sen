@@ -22,5 +22,8 @@ builder.Services.AddScoped(sp => new HttpClient
 // ✅ Register services
 builder.Services.AddScoped<SupaBaseAuthService>();
 builder.Services.AddScoped<Frontend.Services.AuthService>();
+builder.Services.AddScoped<Frontend.Services.TutorApplicationService>();
+builder.Services.AddScoped<Frontend.Services.SubjectService>();
+builder.Services.AddScoped<Frontend.Services.TopicService>();
 
 await builder.Build().RunAsync();

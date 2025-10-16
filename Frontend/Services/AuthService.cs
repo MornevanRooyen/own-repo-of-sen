@@ -37,5 +37,54 @@ namespace Frontend.Services
         {
             await _js.InvokeVoidAsync("localStorage.clear");
         }
+
+        public async Task<CurrentUser?> GetCurrentUserAsync()
+        {
+            try
+            {
+                var userId = await GetCurrentUserIdAsync();
+                if (userId == null) return null;
+
+                var userRole = await GetCurrentUserRoleAsync();
+                
+                return new CurrentUser
+                {
+                    UserId = userId.Value,
+                    PhoneNum = await _js.InvokeAsync<string>("localStorage.getItem", "phoneNum"),
+                    StudentNo = await _js.InvokeAsync<string>("localStorage.getItem", "studentNo"),
+                    Program = await _js.InvokeAsync<string>("localStorage.getItem", "program"),
+                    Year = await _js.InvokeAsync<string>("localStorage.getItem", "year"),
+                    Role = userRole
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // Synchronous version for compatibility
+        public CurrentUser? GetCurrentUser()
+        {
+            // This is a fallback - prefer GetCurrentUserAsync for new code
+            return new CurrentUser
+            {
+                UserId = 1,
+                PhoneNum = "+27 82 123 4567",
+                StudentNo = "BC1234567",
+                Program = "BEng (Software)",
+                Year = "3"
+            };
+        }
+    }
+
+    public class CurrentUser
+    {
+        public int UserId { get; set; }
+        public string? PhoneNum { get; set; }
+        public string? StudentNo { get; set; }
+        public string? Program { get; set; }
+        public string? Year { get; set; }
+        public string? Role { get; set; }
     }
 }

@@ -1,6 +1,9 @@
 ﻿@page "/admin/manageSubAndTop"
 @using Microsoft.AspNetCore.Components.Web
 @using System.Threading
+@using Frontend.Services
+@inject SubjectService SubjectService
+@inject TopicService TopicService
 
 <PageTitle>Admin · Manage Subjects & Topics</PageTitle>
 
@@ -241,37 +244,20 @@
     private bool NewSubjectActive { get; set; } = true;
     private string? SubjectAddError { get; set; }
 
-    private long? SelectedSubjectId { get; set; } = 2; // default to BUM281 so you see topics immediately
+    private int? SelectedSubjectId { get; set; } = null;
 
     // Subject edit
-    private long? EditSubjectId { get; set; } = null;
+    private int? EditSubjectId { get; set; } = null;
     private string EditSubjectCode { get; set; } = "";
     private string EditSubjectName { get; set; } = "";
     private int EditSubjectYear { get; set; } = 1;
     private bool EditSubjectActive { get; set; } = true;
     private string? SubjectEditError { get; set; } = null;
 
-    private long? ConfirmDeleteSubjectId { get; set; } = null;
+    private int? ConfirmDeleteSubjectId { get; set; } = null;
 
-    // -------- Dummy subjects --------
-    private class SubjectVM
-    {
-        public SubjectVM(long id, string code, string name, int year, bool active)
-        { SubjectId = id; SubjectCode = code; Name = name; Year = year; IsActive = active; }
-        public long SubjectId { get; set; }
-        public string SubjectCode { get; set; } = "";
-        public string Name { get; set; } = "";
-        public int Year { get; set; }
-        public bool IsActive { get; set; }
-    }
-
-    private List<SubjectVM> Subjects = new()
-  {
-    new SubjectVM(1, "SEN381", "Software Engineering 3", 3, true),
-    new SubjectVM(2, "BUM281", "Business Management 2", 2, true),
-    new SubjectVM(3, "ENT381", "Entrepreneurship 3", 3, true),
-    new SubjectVM(4, "MAT181", "Mathematics 1", 1, true),
-  };
+    // Dynamic subjects loaded from API
+    private List<SubjectVM> Subjects = new();
 
     private IEnumerable<SubjectVM> SubjectsFiltered =>
       string.IsNullOrWhiteSpace(SubjectSearch)
@@ -285,53 +271,59 @@
     // ------------ Topics ------------
     private string TopicSearch { get; set; } = "";
 
-    private class TopicVM
-    {
-        public TopicVM(long id, string title) { TopicId = id; Title = title; }
-        public long TopicId { get; set; }
-        public string Title { get; set; } = "";
-    }
+    // Dynamic topics loaded from API
+    private List<TopicVM> CurrentTopics = new();
 
-    private Dictionary<long, List<TopicVM>> TopicsBySubject = new()
-    {
-        [1] = new() {
-      new TopicVM(1001,"Project Management"),
-      new TopicVM(1002,"System Arcitechture"),
-      new TopicVM(1003,"API's"),
-      new TopicVM(1004,"Study Tips"),
-      new TopicVM(1005,"Project Tips"),
-    },
-        [2] = new() {
-      new TopicVM(2001,"Leadership"),
-      new TopicVM(2002,"Lead her ship"),
-      new TopicVM(2003,"How to not fail BUM. Trust."),
-    },
-        [3] = new() {
-      new TopicVM(3001,"Technical Feasibility"),
-      new TopicVM(3002,"S.W.O.T."),
-      new TopicVM(3003,"The Life of a Business Gyal"),
-    },
-        [4] = new() {
-      new TopicVM(4001,"Parabolas and the Quadratic function"),
-      new TopicVM(4002,"Where tf the function?"),
-      new TopicVM(4003,"Numbers and stuff like that"),
-    },
-    };
-
-    private List<TopicVM> CurrentTopics =>
-      SelectedSubjectId is null ? new List<TopicVM>()
-      : (TopicsBySubject.TryGetValue(SelectedSubjectId.Value, out var list) ? list : new List<TopicVM>());
+    // CurrentTopics is now directly managed
 
     private List<TopicVM> TopicsFiltered =>
       string.IsNullOrWhiteSpace(TopicSearch)
         ? CurrentTopics.ToList()
         : CurrentTopics.Where(t => t.Title.Contains(TopicSearch, StringComparison.OrdinalIgnoreCase)).ToList();
 
+    // ------------ Initialization ------------
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSubjects();
+    }
+
+    private async Task LoadSubjects()
+    {
+        try
+        {
+            Subjects = await SubjectService.GetAllSubjectsAsync();
+            if (Subjects.Any() && SelectedSubjectId == null)
+            {
+                SelectedSubjectId = Subjects.First().SubjectId;
+                await LoadTopics();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error loading subjects: {ex.Message}");
+        }
+    }
+
+    private async Task LoadTopics()
+    {
+        if (SelectedSubjectId == null) return;
+        
+        try
+        {
+            CurrentTopics = await TopicService.GetTopicsBySubjectAsync(SelectedSubjectId.Value);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error loading topics: {ex.Message}");
+            CurrentTopics = new List<TopicVM>();
+        }
+    }
+
     // ------------ Subjects: actions ------------
     private void StartAddSubject() { IsAddingSubject = true; SubjectAddError = null; NewSubjectCode = ""; NewSubjectName = ""; NewSubjectYear = null; NewSubjectActive = true; }
     private void CancelAddSubject() { IsAddingSubject = false; SubjectAddError = null; }
 
-    private void AddSubject()
+    private async Task AddSubject()
     {
         SubjectAddError = null;
         var code = (NewSubjectCode ?? "").Trim();
@@ -343,18 +335,42 @@
         if (Subjects.Any(s => string.Equals(s.SubjectCode, code, StringComparison.OrdinalIgnoreCase)))
         { SubjectAddError = "Subject code must be unique."; return; }
 
-        var id = NextId();
-        Subjects.Add(new SubjectVM(id, code, name, year, NewSubjectActive));
-        TopicsBySubject[id] = new List<TopicVM>();
-        SelectedSubjectId = id;
-        IsAddingSubject = false;
+        try
+        {
+            var dto = new CreateSubjectDto
+            {
+                SubjectCode = code,
+                Name = name,
+                Year = year,
+                IsActive = NewSubjectActive
+            };
+
+            var newSubject = await SubjectService.CreateSubjectAsync(dto);
+            if (newSubject != null)
+            {
+                Subjects.Add(newSubject);
+                SelectedSubjectId = newSubject.SubjectId;
+                CurrentTopics = new List<TopicVM>(); // New subject has no topics yet
+                IsAddingSubject = false;
+            }
+            else
+            {
+                SubjectAddError = "Failed to create subject. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error adding subject: {ex.Message}");
+            SubjectAddError = "Failed to create subject. Please try again.";
+        }
     }
 
-    private void SelectSubject(long id)
+    private async Task SelectSubject(int id)
     {
         SelectedSubjectId = id;
         TopicSearch = "";
         ClearTopicEditing();
+        await LoadTopics();
     }
 
     private void BeginEditSubject(SubjectVM s)
@@ -367,7 +383,7 @@
         SubjectEditError = null;
     }
 
-    private void SaveSubjectEdit()
+    private async Task SaveSubjectEdit()
     {
         if (EditSubjectId is null) return;
         var s = Subjects.FirstOrDefault(x => x.SubjectId == EditSubjectId);
@@ -383,12 +399,37 @@
                               string.Equals(x.SubjectCode, code, StringComparison.OrdinalIgnoreCase)))
         { SubjectEditError = "Subject code must be unique."; return; }
 
-        s.SubjectCode = code;
-        s.Name = name;
-        s.Year = year;
-        s.IsActive = EditSubjectActive;
+        try
+        {
+            var dto = new UpdateSubjectDto
+            {
+                SubjectCode = code,
+                Name = name,
+                Year = year,
+                IsActive = EditSubjectActive
+            };
 
-        CancelSubjectEdit();
+            var updatedSubject = await SubjectService.UpdateSubjectAsync(EditSubjectId.Value, dto);
+            if (updatedSubject != null)
+            {
+                // Update the local list
+                var index = Subjects.FindIndex(x => x.SubjectId == EditSubjectId);
+                if (index >= 0)
+                {
+                    Subjects[index] = updatedSubject;
+                }
+                CancelSubjectEdit();
+            }
+            else
+            {
+                SubjectEditError = "Failed to update subject. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error updating subject: {ex.Message}");
+            SubjectEditError = "Failed to update subject. Please try again.";
+        }
     }
 
     private void CancelSubjectEdit()
@@ -406,45 +447,96 @@
          : bool.TryParse(e.Value?.ToString(), out var parsed) ? parsed
          : (e.Value?.ToString()?.Equals("on", StringComparison.OrdinalIgnoreCase) ?? false);
 
-    private void AskDeleteSubject(long id) => ConfirmDeleteSubjectId = id;
+    private void AskDeleteSubject(int id) => ConfirmDeleteSubjectId = id;
     private void CancelDeleteSubject() => ConfirmDeleteSubjectId = null;
 
-    private void DeleteSubject(long id)
+    private async Task DeleteSubject(int id)
     {
-        Subjects.RemoveAll(s => s.SubjectId == id);
-        TopicsBySubject.Remove(id);
-        if (SelectedSubjectId == id) SelectedSubjectId = null;
-        ConfirmDeleteSubjectId = null;
+        try
+        {
+            var success = await SubjectService.DeleteSubjectAsync(id);
+            if (success)
+            {
+                Subjects.RemoveAll(s => s.SubjectId == id);
+                if (SelectedSubjectId == id) 
+                {
+                    SelectedSubjectId = null;
+                    CurrentTopics = new List<TopicVM>();
+                }
+                ConfirmDeleteSubjectId = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error deleting subject: {ex.Message}");
+        }
     }
 
-    private void ToggleActive(long id, ChangeEventArgs e)
+    private async Task ToggleActive(int id, ChangeEventArgs e)
     {
         var s = Subjects.FirstOrDefault(x => x.SubjectId == id);
         if (s is null) return;
-        s.IsActive = ParseBool(e);
+        
+        var newActiveState = ParseBool(e);
+        try
+        {
+            var updatedSubject = await SubjectService.ToggleActiveAsync(id, newActiveState);
+            if (updatedSubject != null)
+            {
+                var index = Subjects.FindIndex(x => x.SubjectId == id);
+                if (index >= 0)
+                {
+                    Subjects[index] = updatedSubject;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error toggling active status: {ex.Message}");
+        }
     }
 
     // ------------ Topics: actions ------------
-    private long? EditingTopicId { get; set; }
+    private int? EditingTopicId { get; set; }
     private string EditingTitle { get; set; } = "";
     private string? TopicEditError { get; set; }
     private ElementReference EditTopicInputRef;
-    private long? ConfirmDeleteTopicId { get; set; }
-    private long? ReorderedTopicId { get; set; } // for slide animation
+    private int? ConfirmDeleteTopicId { get; set; }
+    private int? ReorderedTopicId { get; set; } // for slide animation
 
-    private void NewTopic()
+    private async Task NewTopic()
     {
         if (SelectedSubjectId is null) return;
-        var list = CurrentTopics;
 
         string baseTitle = "New topic";
         string title = baseTitle;
         int i = 2;
-        while (TitleExists(list, title)) title = $"{baseTitle} {i++}";
+        while (TitleExists(CurrentTopics, title)) title = $"{baseTitle} {i++}";
 
-        var id = NextId();
-        list.Add(new TopicVM(id, title));
-        _ = BeginEditTopic(list.Last());
+        try
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Creating topic for SubjectId: {SelectedSubjectId.Value}");
+            
+            var dto = new CreateTopicDto
+            {
+                SubjectId = SelectedSubjectId.Value,
+                Title = title,
+                IsActive = true
+            };
+
+            Console.WriteLine($"[ManageSubjectsAndTopics] DTO created: SubjectId={dto.SubjectId}, Title={dto.Title}");
+
+            var newTopic = await TopicService.CreateTopicAsync(dto);
+            if (newTopic != null)
+            {
+                CurrentTopics.Add(newTopic);
+                await BeginEditTopic(newTopic);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error creating topic: {ex.Message}");
+        }
     }
 
     private async Task BeginEditTopic(TopicVM t)
@@ -458,20 +550,46 @@
         await EditTopicInputRef.FocusAsync();
     }
 
-    private void SaveTopicEdit()
+    private async Task SaveTopicEdit()
     {
         if (SelectedSubjectId is null || EditingTopicId is null) return;
-        var list = CurrentTopics;
 
-        var t = list.FirstOrDefault(x => x.TopicId == EditingTopicId);
+        var t = CurrentTopics.FirstOrDefault(x => x.TopicId == EditingTopicId);
         if (t is null) return;
 
         var trimmed = (EditingTitle ?? "").Trim();
-        if (trimmed.Length == 0) { TopicEditError = "Title can’t be empty."; return; }
-        if (TitleExists(list, trimmed, t.TopicId)) { TopicEditError = "Title must be unique in this subject."; return; }
+        if (trimmed.Length == 0) { TopicEditError = "Title can't be empty."; return; }
+        if (TitleExists(CurrentTopics, trimmed, t.TopicId)) { TopicEditError = "Title must be unique in this subject."; return; }
 
-        t.Title = trimmed;
-        ClearTopicEditing();
+        try
+        {
+            var dto = new UpdateTopicDto
+            {
+                Title = trimmed,
+                IsActive = true
+            };
+
+            var updatedTopic = await TopicService.UpdateTopicAsync(EditingTopicId.Value, dto);
+            if (updatedTopic != null)
+            {
+                // Update the local list
+                var index = CurrentTopics.FindIndex(x => x.TopicId == EditingTopicId);
+                if (index >= 0)
+                {
+                    CurrentTopics[index] = updatedTopic;
+                }
+                ClearTopicEditing();
+            }
+            else
+            {
+                TopicEditError = "Failed to update topic. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error updating topic: {ex.Message}");
+            TopicEditError = "Failed to update topic. Please try again.";
+        }
     }
 
     private void CancelTopicEdit() => ClearTopicEditing();
@@ -483,42 +601,50 @@
         TopicEditError = null;
     }
 
-    private void OnEditTopicKeyDown(KeyboardEventArgs e)
+    private async Task OnEditTopicKeyDown(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter") SaveTopicEdit();
+        if (e.Key == "Enter") await SaveTopicEdit();
         else if (e.Key == "Escape") CancelTopicEdit();
     }
 
-    private void AskDeleteTopic(long id) => ConfirmDeleteTopicId = id;
+    private void AskDeleteTopic(int id) => ConfirmDeleteTopicId = id;
     private void CancelDeleteTopic() => ConfirmDeleteTopicId = null;
 
-    private void DeleteTopic(long id)
+    private async Task DeleteTopic(int id)
     {
-        if (SelectedSubjectId is null) return;
-        var list = CurrentTopics;
-        var idx = list.FindIndex(x => x.TopicId == id);
-        if (idx >= 0) list.RemoveAt(idx);
-        ConfirmDeleteTopicId = null;
+        try
+        {
+            var success = await TopicService.DeleteTopicAsync(id);
+            if (success)
+            {
+                CurrentTopics.RemoveAll(x => x.TopicId == id);
+                ConfirmDeleteTopicId = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error deleting topic: {ex.Message}");
+        }
     }
 
-    private static bool TitleExists(IEnumerable<TopicVM> list, string title, long? excludeId = null)
+    private static bool TitleExists(IEnumerable<TopicVM> list, string title, int? excludeId = null)
       => list.Any(x => x.TopicId != excludeId &&
                        string.Equals(x.Title, title, StringComparison.OrdinalIgnoreCase));
 
     // ----- Ordering helpers -----
-    private int GetOrder(long topicId)
+    private int GetOrder(int topicId)
       => Math.Max(1, CurrentTopics.FindIndex(x => x.TopicId == topicId) + 1);
 
-    private bool CanMoveUp(long topicId)
+    private bool CanMoveUp(int topicId)
       => CurrentTopics.FindIndex(t => t.TopicId == topicId) > 0;
 
-    private bool CanMoveDown(long topicId)
+    private bool CanMoveDown(int topicId)
     {
         var idx = CurrentTopics.FindIndex(t => t.TopicId == topicId);
         return idx >= 0 && idx < CurrentTopics.Count - 1;
     }
 
-    private void Nudge(long topicId, int delta)
+    private async Task Nudge(int topicId, int delta)
     {
         if (SelectedSubjectId is null) return;
         var list = CurrentTopics;
@@ -531,10 +657,19 @@
         var item = list[from];
         list.RemoveAt(from);
         list.Insert(to, item);
+        
+        // Update order numbers
+        for (int i = 0; i < list.Count; i++)
+        {
+            list[i].OrderNumber = i + 1;
+        }
+
+        // Send to API
+        await UpdateTopicOrder();
         ReorderedTopicFlash(topicId);
     }
 
-    private void OnOrderChange(long topicId, ChangeEventArgs e)
+    private async Task OnOrderChange(int topicId, ChangeEventArgs e)
     {
         if (SelectedSubjectId is null) return;
         var list = CurrentTopics;
@@ -557,20 +692,40 @@
         var item = list[from];
         list.RemoveAt(from);
         list.Insert(to, item);
+        
+        // Update order numbers
+        for (int i = 0; i < list.Count; i++)
+        {
+            list[i].OrderNumber = i + 1;
+        }
+
+        // Send to API
+        await UpdateTopicOrder();
         ReorderedTopicFlash(topicId);
     }
 
-    private async void ReorderedTopicFlash(long topicId)
+    private async Task UpdateTopicOrder()
+    {
+        if (SelectedSubjectId == null) return;
+        
+        try
+        {
+            var topicIds = CurrentTopics.Select(t => t.TopicId).ToList();
+            await TopicService.ReorderTopicsAsync(SelectedSubjectId.Value, topicIds);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ManageSubjectsAndTopics] Error updating topic order: {ex.Message}");
+        }
+    }
+
+    private async Task ReorderedTopicFlash(int topicId)
     {
         ReorderedTopicId = topicId;
         await Task.Delay(320);
         ReorderedTopicId = null;
         await InvokeAsync(StateHasChanged);
     }
-
-    // Helpers
-    private static long _next = 9000;
-    private static long NextId() => Interlocked.Increment(ref _next);
 }
 
 <style>

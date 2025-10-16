@@ -89,7 +89,7 @@ namespace Sen381Backend.Controllers
             }
         }
 
-        // ✅ NEW: Return list of users the current user follows (used by Messages page)
+        // ✅ Return list of users the current user follows (used by Messages page)
         [HttpGet("following")]
         public async Task<IActionResult> GetFollowing()
         {
@@ -98,13 +98,43 @@ namespace Sen381Backend.Controllers
                 await _supabase.InitializeAsync();
                 var client = _supabase.Client;
 
-                // ⚙️ In the future: Replace with a real join on UserFollow table
-                var response = await client
-                    .From<User>()
-                    .Select("user_id, first_name, last_name, role, profile_picture_path")
+                // Get current user ID from query parameter or authentication
+                var currentUserId = Request.Query["userId"].FirstOrDefault();
+                if (string.IsNullOrEmpty(currentUserId) || !int.TryParse(currentUserId, out int userId))
+                {
+                    return BadRequest(new { error = "userId parameter is required" });
+                }
+
+                // Get users that the current user follows
+                var followResponse = await client
+                    .From<UserFollow>()
+                    .Select("following_id")
+                    .Filter("follower_id", Operator.Equals, userId)
                     .Get();
 
-                var users = response.Models.Cast<User>().ToList();
+                var followedUserIds = followResponse.Models.Select(f => f.FollowingId).ToList();
+
+                if (!followedUserIds.Any())
+                {
+                    return Ok(new List<object>()); // Return empty list if no follows
+                }
+
+                // Get the actual user details for followed users
+                var users = new List<User>();
+                foreach (var followedId in followedUserIds)
+                {
+                    var userResponse = await client
+                        .From<User>()
+                        .Select("user_id, first_name, last_name, role, profile_picture_path")
+                        .Filter("user_id", Operator.Equals, followedId)
+                        .Get();
+                    
+                    var user = userResponse.Models.FirstOrDefault();
+                    if (user != null)
+                    {
+                        users.Add(user);
+                    }
+                }
 
                 // ✅ Project into plain DTOs (to avoid JSON serialization crash)
                 var dtoList = users.Select(u => new

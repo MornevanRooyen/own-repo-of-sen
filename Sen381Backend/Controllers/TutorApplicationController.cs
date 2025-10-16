@@ -107,7 +107,30 @@ namespace Sen381Backend.Controllers
                     .Order("created_at", Ordering.Descending)
                     .Get();
 
-                return Ok(response.Models);
+                // Map to clean DTOs to avoid serialization issues with Supabase attributes
+                var applications = response.Models.Select(app => new TutorApplicationDto
+                {
+                    ApplicationId = app.ApplicationId,
+                    UserId = app.UserId,
+                    FirstName = app.FirstName,
+                    LastName = app.LastName,
+                    Email = app.Email,
+                    PhoneNum = app.PhoneNum,
+                    StudentNo = app.StudentNo,
+                    Major = app.Major,
+                    YearOfStudy = app.YearOfStudy,
+                    CompletedSessions = app.CompletedSessions,
+                    MinRequiredGrade = app.MinRequiredGrade,
+                    ProfilePicturePath = app.ProfilePicturePath,
+                    TranscriptPath = app.TranscriptPath,
+                    Status = app.Status,
+                    CreatedAt = app.CreatedAt ?? DateTime.UtcNow,
+                    ReviewedAt = app.ReviewedAt,
+                    ReviewedBy = app.ReviewedBy,
+                    ReviewNotes = app.ReviewNotes
+                }).ToList();
+
+                return Ok(applications);
             }
             catch (Exception ex)
             {
@@ -255,4 +278,27 @@ namespace Sen381Backend.Controllers
         public int AdminUserId { get; set; }
         public string? Notes { get; set; }
     }
+
+    public class TutorApplicationDto
+    {
+        public int ApplicationId { get; set; }
+        public int UserId { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? PhoneNum { get; set; }
+        public string? StudentNo { get; set; }
+        public string? Major { get; set; }
+        public int? YearOfStudy { get; set; }
+        public int CompletedSessions { get; set; }
+        public int? MinRequiredGrade { get; set; }
+        public string? ProfilePicturePath { get; set; }
+        public string? TranscriptPath { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+        public DateTime? ReviewedAt { get; set; }
+        public int? ReviewedBy { get; set; }
+        public string? ReviewNotes { get; set; }
+    }
 }
+
