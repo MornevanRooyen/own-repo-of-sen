@@ -63,13 +63,93 @@
 
 <!-- ===== Tabs ===== -->
 <nav class="tabs" aria-label="Profile sections">
-    <a class="tab active" href="#details">Profile</a>
-    <a class="tab" href="#activity">Activity</a>
-    <a class="tab" href="#enrolments">Enrolments</a>
-    <a class="tab" href="#preferences">Preferences</a>
+    <button class="tab @(activeTab == "profile" ? "active" : "")" @onclick="SetProfileTab">Profile</button>
+    <button class="tab @(activeTab == "activity" ? "active" : "")" @onclick="SetActivityTab">Activity</button>
+    <button class="tab @(activeTab == "enrolments" ? "active" : "")" @onclick="SetEnrolmentsTab">Enrolments</button>
+    <button class="tab @(activeTab == "preferences" ? "active" : "")" @onclick="SetPreferencesTab">Preferences</button>
+    <button class="tab @(activeTab == "noodle" ? "active" : "")" @onclick="SetNoodleTab">Noodle</button>
 </nav>
 
-<!-- ===== Main two-column layout ===== -->
+<!-- ===== Main content area ===== -->
+@if (activeTab == "noodle")
+{
+    <!-- Noodle Full Interface -->
+    <main class="noodle-main">
+        <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 40px; margin-bottom: 30px; color: white; text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 30px; flex-wrap: wrap;">
+                <div style="font-size: 5rem; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.2); border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">🐼</div>
+                <div>
+                    <h1 style="margin: 0 0 20px 0; font-size: 2.5rem; font-weight: 900;">Meet Noodle!</h1>
+                    <img id="noodle-sprite" src="/images/Noodle idle frame.png" alt="Noodle the Panda" style="width: 270px; height: 270px; object-fit: contain;" />
+                </div>
+            </div>
+        </section>
+
+        <section class="noodle-content">
+            <div style="background: #ffffff; border: 3px solid #4a90e2; border-radius: 20px; padding: 30px; margin: 20px auto; max-width: 800px; box-shadow: 0 8px 32px rgba(74, 144, 226, 0.2); text-align: center;">
+                <h2 style="margin: 0 0 25px 0; font-size: 1.8rem; font-weight: 900; color: #2c5aa0; text-align: center;">🐼 Noodle's Current Stats</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <div style="background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 15px; padding: 20px; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">😊</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #2c5aa0; margin-bottom: 15px;">Happiness</div>
+                        <div style="width: 100%; height: 12px; background: #e9ecef; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
+                            <div style="height: 100%; background: linear-gradient(90deg, #4ade80, #22c55e); border-radius: 6px; width: 85%;"></div>
+                        </div>
+                        <div style="font-size: 1.1rem; font-weight: 800; color: #2c5aa0;">85%</div>
+                    </div>
+                    <div style="background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 15px; padding: 20px; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">⚡</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #2c5aa0; margin-bottom: 15px;">Energy</div>
+                        <div style="width: 100%; height: 12px; background: #e9ecef; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
+                            <div style="height: 100%; background: linear-gradient(90deg, #f59e0b, #eab308); border-radius: 6px; width: 70%;"></div>
+                        </div>
+                        <div style="font-size: 1.1rem; font-weight: 800; color: #2c5aa0;">70%</div>
+                    </div>
+                    <div style="background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 15px; padding: 20px; text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">🍎</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #2c5aa0; margin-bottom: 15px;">Hunger</div>
+                        <div style="width: 100%; height: 12px; background: #e9ecef; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
+                            <div style="height: 100%; background: linear-gradient(90deg, #ef4444, #dc2626); border-radius: 6px; width: @(hunger)%;"></div>
+                        </div>
+                        <div style="font-size: 1.1rem; font-weight: 800; color: #2c5aa0;">@(hunger)%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px auto; max-width: 800px;">
+                <button style="background: #ffffff; border: 2px solid #e0e0e0; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: #2c5aa0;" @onclick="FeedNoodle">
+                    <span style="font-size: 2.5rem;">🍎</span>
+                    <span style="font-size: 1.2rem; font-weight: 800; color: #2c5aa0;">Feed Noodle</span>
+                    <span style="font-size: 0.9rem; color: #6b7280; text-align: center; font-weight: 600;">Feed bamboo & increase happiness</span>
+                </button>
+                <button style="background: #ffffff; border: 2px solid #e0e0e0; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: #2c5aa0;" @onclick="PlayWithNoodle">
+                    <span style="font-size: 2.5rem;">🎾</span>
+                    <span style="font-size: 1.2rem; font-weight: 800; color: #2c5aa0;">Play with Noodle</span>
+                    <span style="font-size: 0.9rem; color: #6b7280; text-align: center; font-weight: 600;">Roll around & boost energy</span>
+                </button>
+                <button style="background: #ffffff; border: 2px solid #e0e0e0; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s ease; text-decoration: none; color: #2c5aa0;" @onclick="PetNoodle">
+                    <span style="font-size: 2.5rem;">💕</span>
+                    <span style="font-size: 1.2rem; font-weight: 800; color: #2c5aa0;">Pet Noodle</span>
+                    <span style="font-size: 0.9rem; color: #6b7280; text-align: center; font-weight: 600;">Show love & increase happiness</span>
+                </button>
+            </div>
+
+
+            <div style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 16px; padding: 24px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); margin: 30px auto; max-width: 600px; text-align: center;">
+                <h3 style="margin: 0 0 16px 0; font-size: 1.3rem; font-weight: 800; color: #2c5aa0;">💡 Daily Care Tips</h3>
+                <ul style="margin: 0; padding-left: 20px; list-style: none; text-align: left;">
+                    <li style="margin-bottom: 8px; font-weight: 600; color: #2c5aa0; position: relative;">✨ Log in daily to keep Noodle happy</li>
+                    <li style="margin-bottom: 8px; font-weight: 600; color: #2c5aa0; position: relative;">✨ Feed bamboo when hunger is low</li>
+                    <li style="margin-bottom: 8px; font-weight: 600; color: #2c5aa0; position: relative;">✨ Let Noodle roll around when energy is high</li>
+                    <li style="margin-bottom: 8px; font-weight: 600; color: #2c5aa0; position: relative;">✨ Give belly rubs for instant happiness boost</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+}
+else
+{
+    <!-- Regular Profile Layout -->
 <main class="grid">
     <!-- Left column -->
     <aside class="col-left">
@@ -161,6 +241,7 @@
                     <li><a href="/privacy">Privacy and policies</a></li>
                 </ul>
             </section>
+
         }
 
         <section class="card">
@@ -178,6 +259,7 @@
         </section>
     </section>
 </main>
+}
 
 <style>
     /* ===== Tokens ===== */
@@ -787,7 +869,658 @@
         .metrics {
             grid-template-columns: repeat(2, minmax(110px,1fr));
         }
+
+    /* ===== Noodle Virtual Pet Styles ===== */
+    .noodle-container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .noodle-pet {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+        border: 2px solid #b3d9ff;
+        border-radius: 16px;
+    }
+
+    .pet-avatar {
+        font-size: 3rem;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border: 3px solid #4a90e2;
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+    }
+
+    .pet-info {
+        flex: 1;
+    }
+
+    .pet-info h3 {
+        margin: 0 0 8px 0;
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: #2c5aa0;
+    }
+
+    .pet-status {
+        margin: 0 0 12px 0;
+        font-weight: 700;
+        color: #4a90e2;
+    }
+
+    .pet-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .stat-label {
+        font-weight: 700;
+        color: #2c5aa0;
+        min-width: 80px;
+        font-size: 0.9rem;
+    }
+
+    .stat-bar {
+        flex: 1;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .stat-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4a90e2 0%, #7bb3f0 100%);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    .stat-value {
+        font-weight: 700;
+        color: #2c5aa0;
+        min-width: 35px;
+        text-align: right;
+        font-size: 0.9rem;
+    }
+
+    .noodle-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .noodle-actions .btn {
+        min-width: 100px;
+        font-weight: 700;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .noodle-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+    }
+
+    .noodle-message {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 12px;
+        padding: 12px 16px;
+        text-align: center;
+    }
+
+    .noodle-message p {
+        margin: 0;
+        font-style: italic;
+        color: #856404;
+        font-weight: 600;
+    }
+
+    /* Dark mode support for Noodle */
+    .dark-mode .noodle-pet {
+        background: linear-gradient(135deg, #1a2332 0%, #2a3441 100%);
+        border-color: #4a90e2;
+    }
+
+    .dark-mode .pet-avatar {
+        background: #2a3441;
+        border-color: #7bb3f0;
+    }
+
+    .dark-mode .pet-info h3,
+    .dark-mode .stat-label,
+    .dark-mode .stat-value {
+        color: #7bb3f0;
+    }
+
+    .dark-mode .pet-status {
+        color: #4a90e2;
+    }
+
+    .dark-mode .stat-bar {
+        background: #3a4a5c;
+    }
+
+    .dark-mode .noodle-message {
+        background: #2d2a1a;
+        border-color: #4a3c00;
+    }
+
+    .dark-mode .noodle-message p {
+        color: #d4a574;
+    }
+
+    /* ===== Full Noodle Interface Styles ===== */
+    .noodle-main {
+        width: var(--container);
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .noodle-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+        text-align: center;
+    }
+
+    .noodle-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+    .pet-avatar-large {
+        font-size: 5rem;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .noodle-title h1 {
+        margin: 0 0 10px 0;
+        font-size: 2.5rem;
+        font-weight: 900;
+    }
+
+    .noodle-subtitle {
+        margin: 0;
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 600;
+    }
+
+    .noodle-content {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .noodle-stats-box {
+        background: #ffffff;
+        border: 3px solid #4a90e2;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 20px auto;
+        max-width: 800px;
+        box-shadow: 0 8px 32px rgba(74, 144, 226, 0.2);
+        text-align: center;
+    }
+
+    .stats-header {
+        margin: 0 0 25px 0;
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #2c5aa0;
+        text-align: center;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .stat-item {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-emoji {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .stat-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #2c5aa0;
+        margin-bottom: 15px;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 12px;
+        background: #e9ecef;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.5s ease;
+    }
+
+    .happiness-fill {
+        background: linear-gradient(90deg, #4ade80, #22c55e);
+    }
+
+    .energy-fill {
+        background: linear-gradient(90deg, #f59e0b, #eab308);
+    }
+
+    .hunger-fill {
+        background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .stat-percentage {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #2c5aa0;
+    }
+
+    .noodle-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .stat-card {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card.happiness {
+        border-left: 4px solid #4ade80;
+    }
+
+    .stat-card.energy {
+        border-left: 4px solid #f59e0b;
+    }
+
+    .stat-card.hunger {
+        border-left: 4px solid #ef4444;
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(74, 144, 226, 0.1);
+        border-radius: 12px;
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-info h3 {
+        margin: 0 0 12px 0;
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--ink);
+    }
+
+    .stat-bar-large {
+        width: 100%;
+        height: 12px;
+        background: #e5e7eb;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    .stat-fill-large {
+        height: 100%;
+        background: linear-gradient(90deg, #4a90e2 0%, #7bb3f0 100%);
+        border-radius: 6px;
+        transition: width 0.5s ease;
+    }
+
+    .stat-value-large {
+        font-weight: 800;
+        color: var(--ink);
+        font-size: 1.1rem;
+    }
+
+    .noodle-actions-large {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .action-btn {
+        background: var(--panel);
+        border: 2px solid var(--ring);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: var(--ink);
+    }
+
+    .action-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+        border-color: #4a90e2;
+    }
+
+    .feed-btn:hover {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-color: #f59e0b;
+    }
+
+    .play-btn:hover {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-color: #3b82f6;
+    }
+
+    .pet-btn:hover {
+        background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+        border-color: #ec4899;
+    }
+
+    .btn-icon {
+        font-size: 2.5rem;
+    }
+
+    .btn-text {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--ink);
+    }
+
+    .btn-desc {
+        font-size: 0.9rem;
+        color: #6b7280;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .noodle-message-large {
+        display: flex;
+        justify-content: center;
+    }
+
+    .message-bubble {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 2px solid #f59e0b;
+        border-radius: 20px;
+        padding: 24px 32px;
+        max-width: 600px;
+        text-align: center;
+        position: relative;
+    }
+
+    .message-bubble::before {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid #f59e0b;
+    }
+
+    .message-bubble p {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #92400e;
+        font-style: italic;
+    }
+
+    .noodle-tips {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+    }
+
+    .noodle-tips h3 {
+        margin: 0 0 16px 0;
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--ink);
+    }
+
+    .noodle-tips ul {
+        margin: 0;
+        padding-left: 20px;
+        list-style: none;
+    }
+
+    .noodle-tips li {
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--ink);
+        position: relative;
+    }
+
+    .noodle-tips li::before {
+        content: '✨';
+        position: absolute;
+        left: -20px;
+    }
+
+    /* Dark mode support for full Noodle interface */
+    .dark-mode .noodle-hero {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    }
+
+    .dark-mode .pet-avatar-large {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .dark-mode .stat-card {
+        background: var(--panel);
+        border-color: var(--ring);
+    }
+
+    .dark-mode .action-btn {
+        background: var(--panel);
+        border-color: var(--ring);
+        color: var(--ink);
+    }
+
+    .dark-mode .message-bubble {
+        background: linear-gradient(135deg, #2d2a1a 0%, #3a3a1a 100%);
+        border-color: #4a3c00;
+    }
+
+    .dark-mode .message-bubble::before {
+        border-top-color: #4a3c00;
+    }
+
+    .dark-mode .message-bubble p {
+        color: #d4a574;
+    }
+
+    .dark-mode .noodle-tips {
+        background: var(--panel);
+        border-color: var(--ring);
+    }
+
+    .dark-mode .noodle-stats-box {
+        background: #2a2a2a;
+        border-color: #7bb3f0;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .dark-mode .stats-header {
+        color: #7bb3f0;
+    }
+
+    .dark-mode .stat-item {
+        background: #3a3a3a;
+        border-color: #555555;
+    }
+
+    .dark-mode .stat-name {
+        color: #7bb3f0;
+    }
+
+    .dark-mode .stat-percentage {
+        color: #7bb3f0;
+    }
+
+    .dark-mode .progress-bar {
+        background: #555555;
+    }
+
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        .noodle-header {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .noodle-title h1 {
+            font-size: 2rem;
+        }
+
+        .noodle-stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .noodle-actions-large {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 16px;
+        }
+
+        .noodle-stats-box {
+            padding: 20px;
+            margin: 0 10px;
+        }
+
+        .stats-header {
+            font-size: 1.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        }
 </style>
+
+<script>
+    window.playEatingAnimationWithDelay = function(componentRef) {
+        const sprite = document.getElementById('noodle-sprite');
+        if (!sprite) return;
+        
+        // Wait 0.1 seconds before starting animation
+        setTimeout(() => {
+            const frames = [
+                '/images/Noodle eating/noodle-eating-1.png',
+                '/images/Noodle eating/noodle-eating-2.png',
+                '/images/Noodle eating/noodle-eating-3.png',
+                '/images/Noodle eating/noodle-eating-4.png',
+                '/images/Noodle eating/noodle-eating-5.png',
+                '/images/Noodle eating/noodle-eating-6.png'
+            ];
+            
+            let currentFrame = 0;
+            const frameInterval = 300; // 300ms per frame (50% slower than 200ms)
+            
+            const animation = setInterval(() => {
+                sprite.src = frames[currentFrame];
+                currentFrame++;
+                
+                if (currentFrame >= frames.length) {
+                    clearInterval(animation);
+                    // Wait one more frame interval to show the last frame, then return to idle
+                    setTimeout(() => {
+                        sprite.src = '/images/Noodle idle frame.png';
+                        // Call the C# method to update hunger after animation completes
+                        if (componentRef) {
+                            componentRef.invokeMethodAsync('UpdateHungerAfterAnimation');
+                        }
+                    }, frameInterval);
+                }
+            }, frameInterval);
+        }, 100); // 0.1 second delay
+    };
+</script>
 
 @code {
     [Parameter]
@@ -795,6 +1528,12 @@
 
     private User? currentUser;
     private bool isLoading = true;
+    private string activeTab = "profile";
+    
+    // Noodle stats
+    private int happiness = 85;
+    private int energy = 70;
+    private int hunger = 60;
     private List<string> Interests = new();
     private bool isOwnProfile = false;
     private bool isFollowing = false;
@@ -969,6 +1708,48 @@
     private class FollowStatusResponse
     {
         public bool IsFollowing { get; set; }
+    }
+
+    // ===== Tab Management =====
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+        StateHasChanged();
+    }
+
+    private void SetProfileTab() => SetActiveTab("profile");
+    private void SetActivityTab() => SetActiveTab("activity");
+    private void SetEnrolmentsTab() => SetActiveTab("enrolments");
+    private void SetPreferencesTab() => SetActiveTab("preferences");
+    private void SetNoodleTab() => SetActiveTab("noodle");
+
+    // ===== Noodle Virtual Pet Methods =====
+    private async Task FeedNoodle()
+    {
+        // Play eating animation after 0.1s delay
+        await JS.InvokeVoidAsync("playEatingAnimationWithDelay", DotNetObjectReference.Create(this));
+    }
+
+    [JSInvokable]
+    public void UpdateHungerAfterAnimation()
+    {
+        // Increase hunger (feeding makes him less hungry)
+        hunger = Math.Min(100, hunger + 15);
+        StateHasChanged();
+    }
+
+    private async Task PlayWithNoodle()
+    {
+        // TODO: Implement playing logic - increase happiness and decrease energy
+        await JS.InvokeVoidAsync("console.log", "Playing with Noodle...");
+        await JS.InvokeVoidAsync("alert", "🎾 Noodle is rolling around and having fun! Happiness increased!");
+    }
+
+    private async Task PetNoodle()
+    {
+        // TODO: Implement petting logic - increase happiness
+        await JS.InvokeVoidAsync("console.log", "Petting Noodle...");
+        await JS.InvokeVoidAsync("alert", "💕 Noodle chirps happily and loves the belly rubs! Happiness increased!");
     }
 
     private class CountResponse

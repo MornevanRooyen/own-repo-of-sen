@@ -59,6 +59,13 @@ wwwroot\css\messages.css
 wwwroot\favicon.png
 wwwroot\icon-192.png
 wwwroot\images\default-avatar.svg
+wwwroot\images\Noodle eating\noodle-eating-1.png
+wwwroot\images\Noodle eating\noodle-eating-2.png
+wwwroot\images\Noodle eating\noodle-eating-3.png
+wwwroot\images\Noodle eating\noodle-eating-4.png
+wwwroot\images\Noodle eating\noodle-eating-5.png
+wwwroot\images\Noodle eating\noodle-eating-6.png
+wwwroot\images\Noodle idle frame.png
 wwwroot\index.html
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.css.map

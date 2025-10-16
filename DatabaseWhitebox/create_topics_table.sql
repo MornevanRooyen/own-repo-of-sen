@@ -72,3 +72,4 @@ FROM subjects s,
 WHERE s.subject_code = 'MAT181'
 ON CONFLICT (subject_id, title) DO NOTHING;
 
+
