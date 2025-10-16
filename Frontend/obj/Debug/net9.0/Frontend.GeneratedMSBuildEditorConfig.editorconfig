@@ -13,125 +13,125 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = Frontend
 build_property.RootNamespace = Frontend
-build_property.ProjectDir = C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\
+build_property.ProjectDir = C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = false
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend
+build_property.MSBuildProjectDirectory = C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/App.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/AdminProfile.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/AdminProfile.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5Qcm9maWxlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Analytics.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Analytics.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQW5hbHl0aWNzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/BecomeTutor.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/BecomeTutor.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQmVjb21lVHV0b3IucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Chatbot.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Chatbot.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hhdGJvdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/CreateProfile.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/CreateProfile.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3JlYXRlUHJvZmlsZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Dashboard.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Dashboard.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Forum.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Forum.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRm9ydW0ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/LandingPage.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/LandingPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGFuZGluZ1BhZ2UucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/LearningResources.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/LearningResources.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTGVhcm5pbmdSZXNvdXJjZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Login.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/ManageSubjectsAndTopics.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/ManageSubjectsAndTopics.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFuYWdlU3ViamVjdHNBbmRUb3BpY3MucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Messages.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Messages.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVzc2FnZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Peers.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Peers.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGVlcnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Reports.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Reports.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/SignUp.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/SignUp.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2lnblVwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/StudentProfile.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/StudentProfile.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3R1ZGVudFByb2ZpbGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Subjects.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Subjects.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3ViamVjdHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/TopicHub.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/TopicHub.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVG9waWNIdWIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Topics.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Topics.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVG9waWNzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/TutorApplication.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/TutorApplication.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHV0b3JBcHBsaWNhdGlvbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/TutorApplications.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/TutorApplications.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHV0b3JBcHBsaWNhdGlvbnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/TutorProfile.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/TutorProfile.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHV0b3JQcm9maWxlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Pages/Tutors.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Pages/Tutors.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHV0b3JzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Shared/ClaraPanel.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Shared/ClaraPanel.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXENsYXJhUGFuZWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Shared/Navigation.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Shared/Navigation.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdmlnYXRpb24ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/Shared/TopicHubLayout.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/Shared/TopicHubLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFRvcGljSHViTGF5b3V0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Sen381 github repo/own repo/own-repo-of-sen381/Frontend/_Imports.razor]
+[C:/Sen381 github repo/own repo/own-repo-of-sen/Frontend/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

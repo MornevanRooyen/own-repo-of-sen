@@ -1,13 +1,60 @@
-﻿@inherits LayoutComponentBase
+﻿@using Frontend.Services
+@inherits LayoutComponentBase
 @inject NavigationManager Nav
+@inject AuthService AuthService
+@inject IJSRuntime _js
 
 @code {
     public enum UserRole { Student, Tutor, Admin, Unknown }
 
-    [Parameter] public bool IsAdmin { get; set; } = false;
-    [Parameter] public UserRole Role { get; set; } = UserRole.Student;
-
+    private bool IsAdmin = false;
+    private UserRole Role = UserRole.Student;
     private bool IsMenuOpen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckUserRole();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CheckUserRole();
+        }
+    }
+
+    private async Task CheckUserRole()
+    {
+        try
+        {
+            var currentUser = await AuthService.GetCurrentUserAsync();
+            Console.WriteLine($"[Navigation] Current user: {currentUser?.UserId}, Role: '{currentUser?.Role}'");
+            
+            if (currentUser != null && !string.IsNullOrEmpty(currentUser.Role))
+            {
+                Role = currentUser.Role.ToLower() switch
+                {
+                    "admin" => UserRole.Admin,
+                    "tutor" => UserRole.Tutor,
+                    "student" => UserRole.Student,
+                    _ => UserRole.Unknown
+                };
+                IsAdmin = Role == UserRole.Admin;
+                Console.WriteLine($"[Navigation] Set Role: {Role}, IsAdmin: {IsAdmin}");
+            }
+            else
+            {
+                Console.WriteLine($"[Navigation] No user or role found");
+            }
+            
+            StateHasChanged(); // Force re-render to update the UI
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Navigation] Error checking user role: {ex.Message}");
+        }
+    }
 
     private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
 
@@ -15,6 +62,39 @@
     {
         IsMenuOpen = false;
         Nav.NavigateTo(path);
+    }
+
+    // Public method to refresh user role (can be called from other components)
+    public async Task RefreshUserRoleAsync()
+    {
+        await CheckUserRole();
+    }
+
+    // Temporary test method - remove in production
+    private async Task TestAdminRole()
+    {
+        try
+        {
+            // Toggle admin role for testing
+            if (Role == UserRole.Admin)
+            {
+                Role = UserRole.Student;
+                IsAdmin = false;
+                await _js.InvokeVoidAsync("localStorage.setItem", "role", "student");
+            }
+            else
+            {
+                Role = UserRole.Admin;
+                IsAdmin = true;
+                await _js.InvokeVoidAsync("localStorage.setItem", "role", "admin");
+            }
+            Console.WriteLine($"[Navigation] TEST: Toggled role to {Role}, IsAdmin: {IsAdmin}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Navigation] TEST: Error toggling admin role: {ex.Message}");
+        }
     }
 
     private string AvatarGradientClass =>
@@ -72,6 +152,9 @@
         {
             <a @onclick='() => NavigateTo("/adminprofile")'>Admin</a>
         }
+
+        @* Temporary test button - remove in production *@
+        <a @onclick='TestAdminRole' style="background: #ff6b6b; color: white;">TEST: Toggle Admin</a>
 
         <a @onclick='() => NavigateTo("/")'>Logout</a>
     </nav>
@@ -276,6 +359,7 @@
             font-weight: 800;
             text-decoration: none;
             color: var(--ink);
+            cursor: pointer;
         }
 
             .drawer-nav a:hover {

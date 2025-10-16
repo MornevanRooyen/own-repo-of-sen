@@ -40,13 +40,13 @@
         <section class="grid">
             @foreach (var s in FilteredSubjects)
             {
-                <a class="card" href="/Topics">
-                    <div class="code">@s.Code</div>
+                <a class="card" href="/Topics?subjectId=@s.SubjectId">
+                    <div class="code">@s.SubjectCode</div>
                     <div class="name">@s.Name</div>
 
                     <div class="meta">
                         <span class="year-badge">@YearBadge(s.Year)</span>
-                        <span class="cluster-pill">@s.Cluster</span>
+                        <span class="cluster-pill">@GetCluster(s.SubjectCode)</span>
                     </div>
                 </a>
             }
@@ -84,10 +84,10 @@
             .Where(s =>
                 string.IsNullOrWhiteSpace(SearchQuery) ||
                 s.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                s.Code.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                s.Cluster.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
+                s.SubjectCode.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                GetCluster(s.SubjectCode).Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
             .OrderBy(s => s.Year)
-            .ThenBy(s => s.Code);
+            .ThenBy(s => s.SubjectCode);
 
     private bool ApplyFilter(SubjectVM s) => CurrentFilter switch
     {
@@ -95,10 +95,10 @@
         "y2" => s.Year == 2,
         "y3" => s.Year == 3,
         "y4" => s.Year == 4,
-        "c-business" => s.Cluster.Equals("Business", StringComparison.OrdinalIgnoreCase),
-        "c-computing" => s.Cluster.Equals("Computing", StringComparison.OrdinalIgnoreCase),
-        "c-quant" => s.Cluster.Equals("Quant", StringComparison.OrdinalIgnoreCase),
-        "c-law" => s.Cluster.Equals("Law", StringComparison.OrdinalIgnoreCase),
+        "c-business" => GetCluster(s.SubjectCode).Equals("Business", StringComparison.OrdinalIgnoreCase),
+        "c-computing" => GetCluster(s.SubjectCode).Equals("Computing", StringComparison.OrdinalIgnoreCase),
+        "c-quant" => GetCluster(s.SubjectCode).Equals("Quant", StringComparison.OrdinalIgnoreCase),
+        "c-law" => GetCluster(s.SubjectCode).Equals("Law", StringComparison.OrdinalIgnoreCase),
         _ => true
     };
 
@@ -111,6 +111,15 @@
         3 => "3rd year",
         4 => "4th year",
         _ => $"{y} year"
+    };
+
+    private static string GetCluster(string subjectCode) => subjectCode.ToUpper() switch
+    {
+        var code when code.StartsWith("BUM") || code.StartsWith("BUS") || code.StartsWith("MGT") || code.StartsWith("MKT") => "Business",
+        var code when code.StartsWith("CS") || code.StartsWith("IT") || code.StartsWith("SWE") || code.StartsWith("INF") => "Computing",
+        var code when code.StartsWith("MTH") || code.StartsWith("STA") || code.StartsWith("CAL") || code.StartsWith("STAT") => "Quant",
+        var code when code.StartsWith("LAW") || code.StartsWith("LEG") => "Law",
+        _ => "General"
     };
 }
 

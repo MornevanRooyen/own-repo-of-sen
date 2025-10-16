@@ -11,8 +11,7 @@
 
 <main class="topics-scope">
     <div class="topics-wrap">
-
-<main class="topics-page">
+        <div class="topics-page">
     <div class="container page-inner">
 
         <!-- Header: title left, search right -->
@@ -67,6 +66,7 @@ else
 }
 
         </section>
+    </div>
     </div>
 </main>
 
@@ -367,6 +367,10 @@ private List<TopicVM> topics = new();
         --shadow: 0 8px 22px rgba(0,0,0,.06);
         --radius: 16px;
         --stud-blue: #1D4ED8;
+        --orange: #F97316;
+        --rose: #E11D48;
+        --panel-ring: rgba(0,0,0,.08);
+        --shadow-1: 0 2px 8px rgba(0,0,0,.06);
         /* lock a clean sans within this page so we never fall back to Times */
         font-family: system-ui, -apple-system, "Segoe UI", Inter, Roboto, Arial, "Helvetica Neue", sans-serif;
         color: var(--ink);
@@ -706,7 +710,7 @@ private List<TopicVM> topics = new();
     cursor: not-allowed;
 }
 
-@keyframes tmPop {
+@@keyframes tmPop {
     from {
         opacity: 0;
         transform: translate(-50%,-46%);
@@ -717,7 +721,7 @@ private List<TopicVM> topics = new();
     }
 }
 
-@keyframes tmFade {
+@@keyframes tmFade {
     from {
         opacity: 0;
     }
@@ -869,8 +873,8 @@ private List<TopicVM> topics = new();
     justify-self: start;
 }
 
-/* ===== NAV STABILIZER (page-local; won’t restyle, just prevents layout drift) ===== */
-@layer topics_nav_fix {
+/* ===== NAV STABILIZER (page-local; won't restyle, just prevents layout drift) ===== */
+@@layer topics_nav_fix {
     nav {
         display: flex !important;
         align-items: center !important;

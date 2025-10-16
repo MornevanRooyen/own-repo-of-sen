@@ -71,3 +71,4 @@ FROM subjects s,
 ) AS t(title, description, order_number, is_active)
 WHERE s.subject_code = 'MAT181'
 ON CONFLICT (subject_id, title) DO NOTHING;
+

@@ -349,8 +349,8 @@
     .layout {
         display: grid;
         grid-template-columns: 1fr 320px;
-        gap: clamp(16px,3vw,28px);
-        padding-block: clamp(14px,3vw,22px)
+        gap: clamp(8px,2vw,16px); /* Minimal layout gap */
+        padding-block: clamp(6px,2vw,12px); /* Minimal padding */
     }
 
     .content {
@@ -362,7 +362,7 @@
         .content > .greeting {
             grid-column: 1 / -1;
             grid-row: 1;
-            margin-bottom: 0;
+            margin-bottom: 4px; /* Minimal spacing below greeting */
         }
 
         /* Row 2: Notifications (col 1) and Quick actions (col 2) start at same height */
@@ -398,13 +398,16 @@
        so the notifications list sits immediately under the heading */
         .content > .panel:nth-of-type(1) {
             grid-template-columns: 1fr auto; /* title | button */
-            align-items: center;
+            grid-template-rows: min-content;
+            align-items: baseline; /* Align to text baseline instead of center */
+            gap: 2px; /* Ultra-minimal gap between heading and button */
         }
 
             .content > .panel:nth-of-type(1) .panel-hd {
                 grid-column: 1; /* left */
                 grid-row: 1;
                 margin: 0;
+                align-self: baseline; /* Ensure consistent baseline alignment */
             }
 
             .content > .panel:nth-of-type(1) .notif-header-actions {
@@ -412,11 +415,13 @@
                 grid-row: 1;
                 justify-self: end;
                 margin: 0;
+                align-self: baseline; /* Ensure consistent baseline alignment */
             }
 
             .content > .panel:nth-of-type(1) .notif-bubble {
                 grid-column: 1 / -1; /* span both columns */
                 grid-row: 2; /* sits right under the heading row */
+                margin-top: 0px; /* No spacing - notifications directly below header */
             }
 
     /* optional: stack on narrow screens */
@@ -457,7 +462,8 @@
     /* panels & bubbles */
     .panel {
         display: grid;
-        gap: 10px
+        gap: 4px; /* Further reduced internal gap within panels */
+        margin-bottom: 8px; /* Minimal spacing between major sections */
     }
 
     .panel-hd {
@@ -470,14 +476,14 @@
         border: 1px solid var(--panel-ring);
         border-radius: var(--radius);
         box-shadow: var(--shadow);
-        padding: clamp(12px,2.2vw,18px);
+        padding: clamp(6px,1.5vw,10px); /* Further reduced bubble padding */
         display: grid;
-        gap: 12px
+        gap: 4px; /* Minimal gap within bubbles */
     }
 
     .notif-bubble {
         background: #FFFF;
-        padding: 10px
+        padding: 4px; /* Minimal padding for notification bubble specifically */
     }
 
     .sessions-bubble {
@@ -487,7 +493,7 @@
     .notif-header-actions {
         display: flex;
         justify-content: flex-end;
-        margin-bottom: 4px
+        margin-bottom: 0; /* Remove bottom margin for better alignment */
     }
 
     .btn-mark-read {
@@ -499,7 +505,9 @@
         font-size: .85rem;
         cursor: pointer;
         color: var(--ink);
-        transition: all .2s ease
+        transition: all .2s ease;
+        line-height: 1.2; /* Ensure consistent line height with heading */
+        align-self: baseline; /* Align with text baseline */
     }
 
         .btn-mark-read:hover:not(:disabled) {
@@ -521,16 +529,16 @@
         margin: 0;
         padding: 0;
         display: grid;
-        gap: 1rem
+        gap: 0.1rem; /* Much smaller gap between notification rows */
     }
 
     .notif-item {
         color: #fff;
-        padding: 1rem 1.2rem;
+        padding: 0.6rem 0.8rem; /* Further reduced padding on notification items */
         border-radius: var(--radius);
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 0.6rem; /* Further reduced gap within notification items */
         cursor: pointer;
         transition: transform .14s ease, filter .14s ease
     }
@@ -793,6 +801,145 @@
         border-radius: 10px;
         font-weight: 700;
         cursor: pointer
+    }
+
+    /* Modal styles */
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.4);
+        z-index: 1000;
+    }
+
+    .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-ring);
+        border-radius: var(--radius);
+        box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        z-index: 1001;
+        width: min(500px, 90vw);
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--panel-ring);
+        background: var(--mist);
+    }
+
+    .modal-head h3 {
+        margin: 0;
+        font-weight: 800;
+        color: var(--ink);
+    }
+
+    .modal-x {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--ink);
+        padding: 4px;
+        border-radius: 4px;
+    }
+
+    .modal-x:hover {
+        background: rgba(0,0,0,.1);
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .field-row {
+        margin-bottom: 16px;
+    }
+
+    .label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: var(--ink);
+    }
+
+    .req {
+        color: var(--rose);
+    }
+
+    .ipt, .sel {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--panel-ring);
+        border-radius: 8px;
+        font: inherit;
+        background: var(--panel-bg);
+        color: var(--ink);
+    }
+
+    .ipt:focus, .sel:focus {
+        outline: none;
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(27, 153, 139, 0.1);
+    }
+
+    .date-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+    }
+
+    .btn-row {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        border: 1px solid var(--panel-ring);
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+    .btn-primary {
+        background: var(--teal);
+        color: white;
+        border-color: var(--teal);
+    }
+
+    .btn-primary:hover {
+        background: color-mix(in oklab, var(--teal) 85%, black);
+    }
+
+    .btn-secondary {
+        background: var(--panel-bg);
+        color: var(--ink);
+        border-color: var(--panel-ring);
+    }
+
+    .btn-secondary:hover {
+        background: var(--mist);
+    }
+
+    .btn-danger {
+        background: var(--rose);
+        color: white;
+        border-color: var(--rose);
+    }
+
+    .btn-danger:hover {
+        background: color-mix(in oklab, var(--rose) 85%, black);
     }
 
     /* Clara floating bubble */

@@ -46,6 +46,7 @@ namespace Frontend.Services
                 if (userId == null) return null;
 
                 var userRole = await GetCurrentUserRoleAsync();
+                Console.WriteLine($"[AuthService] Retrieved role from localStorage: '{userRole}'");
                 
                 return new CurrentUser
                 {
@@ -57,8 +58,9 @@ namespace Frontend.Services
                     Role = userRole
                 };
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"[AuthService] Error getting current user: {ex.Message}");
                 return null;
             }
         }

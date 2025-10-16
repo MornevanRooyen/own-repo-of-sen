@@ -33,3 +33,4 @@ COMMENT ON COLUMN tutor_applications.status IS 'Application status: pending, app
 COMMENT ON COLUMN tutor_applications.reviewed_by IS 'Admin user ID who reviewed the application';
 COMMENT ON COLUMN tutor_applications.transcript_path IS 'Path to the uploaded transcript PDF file';
 
+
