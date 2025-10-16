@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "4pE9um77iNo=",
+  "dgSpecHash": "9pmZW4LeUdE=",
   "success": true,
-  "projectFilePath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381.Tests\\Sen381.Tests.csproj",
+  "projectFilePath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Sen381.Tests\\Sen381.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\morne\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\morne\\.nuget\\packages\\coverlet.collector\\6.0.0\\coverlet.collector.6.0.0.nupkg.sha512",

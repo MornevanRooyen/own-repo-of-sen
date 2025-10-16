@@ -2,31 +2,282 @@
 
 <PageTitle>Become a Tutor | CampusLearn</PageTitle>
 
-<h2>Sign Up to Become a Tutor</h2>
+<main class="bt-scope bt-page">
+    <div class="bt-wrap">
+        <header class="bt-head">
+            <h1 class="bt-title">
+                Become a <span class="tutor-word">Tutor</span>
+            </h1>
+            <p class="bt-sub">
+                Please fill in your details to apply as a tutor. We’ll review your application shortly.
+            </p>
+        </header>
 
-<p>Please fill in your details below to apply as a tutor.</p>
+        <section class="bt-panel">
+            <!-- prevent page navigation on submit -->
+            <form class="bt-form" @onsubmit:preventDefault @onsubmit="HandleSubmit">
+                <div class="bt-grid">
+                    <div class="bt-field">
+                        <label for="studentName">Full Name</label>
+                        <input id="studentName" class="bt-input" placeholder="e.g., Alex Johnson" />
+                    </div>
 
-<form>
-    <div class="form-group">
-        <label for="studentName">Full Name</label>
-        <input id="studentName" class="form-control" />
+                    <div class="bt-field">
+                        <label for="studentEmail">Email</label>
+                        <input id="studentEmail" type="email" class="bt-input" placeholder="you@campus.edu" />
+                    </div>
+
+                    <div class="bt-field">
+                        <label for="subject">Subject(s) you want to tutor</label>
+                        <input id="subject" class="bt-input" placeholder="e.g., BUM281, MTH102" />
+                    </div>
+
+                    <div class="bt-field">
+                        <label for="availability">Availability</label>
+                        <input id="availability" class="bt-input" placeholder="e.g., Weekdays 3–5pm" />
+                    </div>
+                </div>
+
+                <div class="bt-field bt-file-field">
+                    <label for="transcript" class="bt-file-label">Transcript (PDF or image)</label>
+
+                    <div class="bt-drop">
+                        <div class="bt-drop-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="22" height="22">
+                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.64 16.2a2 2 0 0 1-2.83-2.83l8.49-8.49"
+                                      fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="bt-drop-copy">
+                            <strong>Attach your transcript</strong><br />
+                            <span>PDF, PNG or JPG — max ~10 MB</span>
+                        </div>
+                        <label class="bt-file-btn">
+                            <input id="transcript" type="file" accept=".pdf,.png,.jpg,.jpeg" />
+                            Choose file
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bt-actions">
+                    <button class="bt-btn primary" type="submit">Submit Application</button>
+                    <button class="bt-btn ghost" type="button" onclick="this.closest('form').reset()">Clear</button>
+                </div>
+            </form>
+        </section>
     </div>
+</main>
 
-    <div class="form-group">
-        <label for="studentEmail">Email</label>
-        <input id="studentEmail" type="email" class="form-control" />
-    </div>
+@code {
+    private void HandleSubmit()
+    {
+        // TODO: send to API, show toast, etc.
+        // This handler exists so the event binding compiles cleanly.
+    }
+}
 
-    <div class="form-group">
-        <label for="subject">Subject(s) you want to tutor</label>
-        <input id="subject" class="form-control" />
-    </div>
+<style>
+    /* ========= Scoped tokens (do NOT affect nav) ========= */
+    .bt-scope {
+        --bg: #edf3f6;
+        --panel: #ffffff;
+        --ink: #1f2937;
+        --muted: #6b7280;
+        --ring: rgba(0,0,0,.12);
+        --shadow: 0 18px 50px rgba(0,0,0,.08);
+        --radius: 18px;
+        /* orange gradient for “Tutor” */
+        --tutor-a: #B45309;
+        --tutor-b: #F59E0B;
+        /* accents */
+        --btn: #F28A1E;
+        --btn-2: #FDBA74;
+        font-family: "Lexend", system-ui, -apple-system, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+        color: var(--ink);
+    }
 
-    <div class="form-group">
-        <label for="availability">Availability</label>
-        <input id="availability" type="text" class="form-control" placeholder="e.g., Weekdays 3-5pm" />
-    </div>
+        /* Page wrapper */
+        .bt-scope.bt-page {
+            background: var(--bg);
+            min-height: calc(100svh - var(--nav-h, 88px));
+            padding: clamp(14px, 3vw, 24px) 0 46px;
+        }
 
-    <button type="submit" class="btn btn-primary">Submit Application</button>
-</form>
+        /* Content width */
+        .bt-scope .bt-wrap {
+            width: min(1100px, 92vw);
+            margin-inline: auto;
+        }
 
+        /* Header */
+        .bt-scope .bt-head {
+            margin-bottom: 18px;
+        }
+
+        .bt-scope .bt-title {
+            margin: 0 0 6px 0;
+            font-weight: 900;
+            font-size: clamp(34px, 5vw, 52px);
+            letter-spacing: .3px;
+            line-height: 1.06;
+        }
+
+            .bt-scope .bt-title .tutor-word {
+                background: linear-gradient(90deg, var(--tutor-a), var(--tutor-b));
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
+
+        .bt-scope .bt-sub {
+            margin: 0;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        /* Panel */
+        .bt-scope .bt-panel {
+            background: var(--panel);
+            border: 1px solid var(--ring);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            padding: clamp(16px, 3vw, 28px);
+        }
+
+        /* Grid */
+        .bt-scope .bt-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 22px;
+            margin-bottom: 16px;
+        }
+
+    @@media (max-width: 820px) {
+        .bt-scope .bt-grid
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    }
+
+    /* Fields */
+    .bt-scope .bt-field label {
+        display: block;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .bt-scope .bt-input {
+        width: 100%;
+        height: 48px;
+        border-radius: 12px;
+        border: 1px solid var(--ring);
+        outline: none;
+        padding: 0 14px;
+        font: inherit;
+        color: var(--ink);
+        background: #fff;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.02);
+    }
+
+        .bt-scope .bt-input::placeholder {
+            color: #a3a8b3;
+        }
+
+    /* File section */
+    .bt-scope .bt-file-field {
+        margin-top: 8px;
+    }
+
+    .bt-scope .bt-file-label {
+        display: block;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .bt-scope .bt-drop {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px;
+        border: 2px dashed color-mix(in oklab, var(--ring) 70%, #fff);
+        border-radius: 14px;
+        background: #fff;
+    }
+
+    .bt-scope .bt-drop-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        color: #78350f;
+        background: linear-gradient(180deg, #FDBA74, #F59E0B);
+        box-shadow: 0 10px 24px rgba(245,158,11,.25);
+    }
+
+    .bt-scope .bt-drop-copy {
+        line-height: 1.25;
+        font-weight: 700;
+    }
+
+        .bt-scope .bt-drop-copy span {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+    .bt-scope .bt-file-btn {
+        margin-left: auto;
+        display: inline-block;
+        position: relative;
+        font-weight: 900;
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: linear-gradient(180deg,var(--btn),var(--btn-2));
+        cursor: pointer;
+        box-shadow: 0 12px 28px rgba(242,138,30,.25);
+    }
+
+        .bt-scope .bt-file-btn input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+    /* Actions */
+    .bt-scope .bt-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .bt-scope .bt-btn {
+        border: 1px solid var(--ring);
+        border-radius: 14px;
+        padding: 12px 18px;
+        font-weight: 900;
+        cursor: pointer;
+        background: #fff;
+    }
+
+        .bt-scope .bt-btn.primary {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(180deg, var(--btn), var(--btn-2));
+            box-shadow: 0 16px 36px rgba(242,138,30,.28);
+        }
+
+        .bt-scope .bt-btn.ghost {
+            background: #fff;
+        }
+
+    /* (optional) tiny nav stabilization only, does not restyle it */
+    @@layer bt_local_nav_fix {
+        .cl-nav .nav-row {
+            height: var(--nav-h, 88px);
+        }
+    }
+</style>

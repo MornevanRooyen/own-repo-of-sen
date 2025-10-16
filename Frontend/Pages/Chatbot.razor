@@ -1,153 +1,413 @@
-﻿@page "/topichub/claratea"
-@layout TopicHubLayout
+﻿@page "/claratea"
+@using System.Globalization
+@inject IJSRuntime JS
 
-<!-- Chatbot (3.2.3) -->
+<PageTitle>Ask Clara | CampusLearn</PageTitle>
 
-<section class="clara">
-    <h1 class="title">Ask <span class="accent">CLARA!</span></h1>
+<!-- top-right controls (outside the main Clara box, as requested) -->
+<div class="clara-scope clara-page-actions">
+    <button class="action ghost">New chat</button>
+    <button class="action ghost">Help</button>
+</div>
 
-    <div class="chat-window">
-        <div class="msg user">
-            <div class="bubble">Hey Clara, can you help me with my assignment?</div>
+<!-- EVERYTHING for Clara lives inside this one main div -->
+<main class="clara-scope clara-page">
+    <section class="clara-shell @(FlashGlow ? "flash-on" : "")">
+        <header class="clara-head">
+            <h1 class="clara-title">
+                <span class="ask">ASK</span>
+                <span class="name">CLARA</span>
+                <img class="sparkle" src="/svgs/glitter-2-svgrepo-com.svg" alt="" aria-hidden="true" />
+            </h1>
+        </header>
+
+        <div class="clara-box">
+            <!-- messages (only this scrolls) -->
+            <div class="chat" @ref="ChatScroll">
+                @if (Messages.Count == 0)
+                {
+                    <div class="empty-hint">
+                        <span>Say hi to Clara</span>
+                        <img src="/svgs/glitter-2-svgrepo-com.svg" alt="" aria-hidden="true" />
+                    </div>
+                }
+                else
+                {
+                    @foreach (var m in Messages)
+                    {
+                        <div class="msg @(m.IsUser ? "me" : "clara")">
+                            <div class="bubble">
+                                @m.Text
+                                @if (!m.IsUser)
+                                {
+                                    <img class="mini-spark" src="/svgs/glitter-2-svgrepo-com.svg" alt="" aria-hidden="true" />
+                                }
+                            </div>
+                            <div class="meta">@m.At.ToString("HH:mm")</div>
+                        </div>
+                    }
+                }
+            </div>
+
+            <!-- input -->
+            <div class="composer">
+                <button class="tool" title="Attach">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.64 16.2a2 2 0 0 1-2.83-2.83l8.49-8.49"
+                              fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+
+                <input class="field"
+                       placeholder="Ask Clara anything…"
+                       @bind="Draft"
+                       @bind:event="oninput"
+                       @onkeydown="HandleEnter" />
+
+                <button class="send-btn" @onclick="SendAsync" disabled="@string.IsNullOrWhiteSpace(Draft)" title="Send">
+                    <svg class="send-ico" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M22 2 11 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M22 2 15 22 11 13 2 9 22 2Z" fill="currentColor" />
+                    </svg>
+                </button>
+            </div>
         </div>
+    </section>
+</main>
 
-        <div class="msg bot">
-            <div class="bubble">Of course! What part are you struggling with?</div>
-        </div>
-    </div>
+@code {
+    private class ChatMsg
+    {
+        public bool IsUser { get; set; }
+        public string Text { get; set; } = "";
+        public DateTime At { get; set; } = DateTime.Now;
+    }
 
-    <!-- Input area -->
-    <div class="input-row">
-        <input type="text" class="input" placeholder="type text here to post to ask the chatbot." />
-        <button class="send-btn" aria-label="send">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="#AD1F54">
-                <path d="M3 20v-5l9-3-9-3V4l18 8-18 8z" />
-            </svg>
-        </button>
-    </div>
-</section>
+    private readonly List<ChatMsg> Messages = new();
+    private string Draft = string.Empty;
+    private bool FlashGlow = false;
+    private ElementReference ChatScroll;
+
+    private async Task SendAsync()
+    {
+        var text = (Draft ?? "").Trim();
+        if (text.Length == 0) return;
+
+        Messages.Add(new ChatMsg { IsUser = true, Text = text, At = DateTime.Now });
+        Draft = string.Empty;
+
+        // Purple+gold flash on the whole panel
+        FlashGlow = true;
+        StateHasChanged();
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(380);
+            FlashGlow = false;
+            await InvokeAsync(StateHasChanged);
+        });
+
+        // Fake Clara response
+        await Task.Delay(300);
+        Messages.Add(new ChatMsg
+        {
+            IsUser = false,
+            Text = "Got it! I’m thinking…",
+            At = DateTime.Now
+        });
+
+        StateHasChanged();
+    }
+
+    private async Task HandleEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            await SendAsync();
+        }
+    }
+}
 
 <style>
-    /* ===== Design tokens ===== */
-    :root {
-        --bg: #FFFFFF;
-        --ink: #2D3034;
-        --teal: #1B998B;
-        --bluegray: #DBE4EE;
-        --rose: #AD1F54;
-        --radius: 1.25rem;
-        --shadow: 0 4px 12px rgba(0,0,0,.06);
-        --font-body: "Lexend", system-ui, sans-serif;
-        --font-head: "Outfit", system-ui, sans-serif;
-    }
-
-    *, *::before, *::after {
-        box-sizing: border-box
-    }
-
-    html, body {
-        margin: 0;
-        padding: 0;
+    /* =========================
+       Scoped variables & tokens
+       ========================= */
+    .clara-scope {
+        /* colors */
+        --ink: #2a2a2a;
+        --panel: #ffffff;
+        --ring: color-mix(in oklab, var(--ink) 12%, white);
+        --shadow: 0 14px 34px rgba(0,0,0,.10);
+        --radius: 18px;
+        /* Clara accents */
+        --clara-a: #B14CF4; /* purple */
+        --clara-b: #FFA3F9; /* pinky */
+        --clara-gold: #FFD76A; /* gold for flash */
+        /* try to reuse your site fonts; if they’re globally loaded, these will pick them up */
+        font-family: "Lexend", system-ui, -apple-system, "Segoe UI", Inter, Roboto, Arial, sans-serif;
         color: var(--ink);
-        font-family: var(--font-body)
     }
 
-    .clara {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        padding: clamp(12px,3vw,22px);
-        height: 100%;
-    }
-
-    .title {
-        text-align: center;
-        font-weight: 800;
-        font-family: var(--font-head);
-        font-size: clamp(24px,3vw,32px);
-    }
-
-        .title .accent {
-            font-family: "Outfit", system-ui;
-            font-style: italic;
-            color: var(--rose);
-        }
-
-    /* ===== Chat Area ===== */
-    .chat-window {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        flex: 1;
-        padding: 8px 0;
-    }
-
-    .msg {
-        display: flex;
-    }
-
-        .msg.user {
-            justify-content: flex-start;
-        }
-
-        .msg.bot {
+        /* =========================
+       Page controls (outside box)
+       ========================= */
+        .clara-scope.clara-page-actions {
+            display: flex;
+            gap: 10px;
             justify-content: flex-end;
+            width: min(1200px,92vw);
+            margin: 18px auto 8px;
         }
 
-    .bubble {
-        max-width: 70%;
-        padding: 14px 18px;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        font-weight: 600;
-        font-size: .95rem;
-    }
-
-    .msg.user .bubble {
-        background: var(--teal);
-        color: #fff;
-    }
-
-    .msg.bot .bubble {
-        background: var(--bluegray);
-        color: var(--ink);
-    }
-
-    /* ===== Input Row ===== */
-    .input-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: var(--bluegray);
-        border-top: 1px solid rgba(0,0,0,.08);
-        border-radius: 999px;
-        padding: 6px 10px;
-    }
-
-    .input {
-        flex: 1;
-        height: 40px;
-        border: 0;
-        background: transparent;
-        padding: 0 10px;
-        outline: none;
-        font: inherit;
-        color: var(--ink);
-    }
-
-    .send-btn {
-        border: 0;
-        background: none;
-        cursor: pointer;
-        display: grid;
-        place-items: center;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        transition: background .2s ease;
-    }
-
-        .send-btn:hover {
-            background: rgba(0,0,0,.06);
+        .clara-scope .action {
+            border: 1px solid var(--ring);
+            background: #fff;
+            border-radius: 999px;
+            padding: .55rem .9rem;
+            font-weight: 700;
+            color: var(--ink);
+            box-shadow: 0 6px 16px rgba(0,0,0,.06);
+            cursor: pointer;
         }
+
+            .clara-scope .action.ghost {
+                background: #fff;
+            }
+
+        /* =========================
+       Main page container
+       ========================= */
+        .clara-scope.clara-page {
+            /* no global body/nav changes, only our section below */
+        }
+
+        /* =========================
+       Clara shell (panel)
+       ========================= */
+        .clara-scope .clara-shell {
+            width: min(1200px,92vw);
+            margin: 0 auto 26px;
+            background: var(--panel);
+            border: 1px solid var(--ring);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+            .clara-scope .clara-shell.flash-on {
+                box-shadow: 0 0 0 6px color-mix(in oklab, var(--clara-gold) 46%, transparent), 0 16px 44px color-mix(in oklab, var(--clara-a) 55%, transparent), var(--shadow);
+                transition: box-shadow .28s ease;
+            }
+
+        /* header */
+        .clara-scope .clara-head {
+            padding: 18px 22px 10px;
+            border-bottom: 1px solid var(--ring);
+        }
+
+        .clara-scope .clara-title {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1;
+        }
+
+            .clara-scope .clara-title .ask {
+                font-family: "Outfit", "Lexend", system-ui, -apple-system, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+                font-weight: 900;
+                font-size: clamp(30px, 3.4vw, 46px);
+                color: #A05AE8; /* solid purple */
+                letter-spacing: .4px;
+            }
+
+            .clara-scope .clara-title .name {
+                font-family: "Outfit", "Lexend", system-ui, -apple-system, "Segoe UI", Inter, Roboto, Arial, sans-serif;
+                font-weight: 900;
+                font-size: clamp(30px, 3.4vw, 46px);
+                background: linear-gradient(90deg, var(--clara-a), var(--clara-b));
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                letter-spacing: .4px;
+            }
+
+            .clara-scope .clara-title .sparkle {
+                width: 28px;
+                height: 28px;
+                display: block;
+                opacity: .95;
+            }
+
+        /* =========================
+       Height management: no page scroll, only chat scroll
+       ========================= */
+        /* keep the entire panel on screen:
+       header (~64px) + page-actions (~42px) + margins -> subtract ~220px from viewport height */
+        .clara-scope .clara-box {
+            height: clamp(460px, calc(100svh - 220px), 1000px);
+            display: grid;
+            grid-template-rows: 1fr auto; /* chat grows, composer fixed */
+            background: #F6F0FF;
+        }
+
+        .clara-scope .chat {
+            overflow: auto;
+            padding: 18px 20px 14px;
+            scroll-behavior: smooth;
+        }
+
+        /* empty hint */
+        .clara-scope .empty-hint {
+            margin: 12vh auto 0;
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #6f6f7a;
+            font-weight: 800;
+            background: #fff8;
+            border: 1px dashed var(--ring);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 8px 22px rgba(0,0,0,.06);
+        }
+
+            .clara-scope .empty-hint img {
+                width: 20px;
+                height: 20px;
+            }
+
+        /* =========================
+       Messages
+       ========================= */
+        .clara-scope .msg {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-width: min(600px, 85%);
+            margin: 16px 0;
+        }
+
+            .clara-scope .msg .bubble {
+                position: relative;
+                padding: 12px 14px;
+                border-radius: 16px;
+                font-weight: 800;
+                box-shadow: 0 12px 28px rgba(0,0,0,.10);
+            }
+
+            .clara-scope .msg .meta {
+                font-size: .78rem;
+                color: #72757e;
+                font-weight: 700;
+            }
+
+        .clara-scope .mini-spark {
+            width: 16px;
+            height: 16px;
+            margin-left: 6px;
+            vertical-align: -2px;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,.15));
+        }
+
+        /* user bubble (right) */
+        .clara-scope .msg.me {
+            align-self: flex-end;
+            text-align: right;
+        }
+
+            .clara-scope .msg.me .bubble {
+                color: #fff;
+                background: linear-gradient(135deg, var(--clara-a), var(--clara-b));
+                border: 1px solid color-mix(in oklab, #ffffff 15%, var(--clara-a));
+            }
+
+        /* Clara bubble (left) */
+        .clara-scope .msg.clara {
+            align-self: flex-start;
+        }
+
+            .clara-scope .msg.clara .bubble {
+                background: #fff;
+                border: 1px solid var(--ring);
+            }
+
+        /* =========================
+       Composer
+       ========================= */
+        .clara-scope .composer {
+            display: grid;
+            grid-template-columns: 40px 1fr 46px;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            border-top: 1px solid var(--ring);
+            background: #fff;
+        }
+
+        .clara-scope .tool {
+            height: 40px;
+            width: 40px;
+            border: 1px solid var(--ring);
+            background: #fff;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: #6f6f7a;
+            cursor: pointer;
+        }
+
+        .clara-scope .field {
+            height: 40px;
+            border: 1px solid var(--ring);
+            border-radius: 999px;
+            padding: 0 14px;
+            outline: none;
+            font: inherit;
+            color: var(--ink);
+            background: #fff;
+        }
+
+            .clara-scope .field::placeholder {
+                color: #989ba4;
+            }
+
+        .clara-scope .send-btn {
+            height: 40px;
+            width: 46px;
+            border-radius: 12px;
+            border: 1px solid var(--ring);
+            background: linear-gradient(180deg, var(--clara-a), var(--clara-b));
+            display: flex;
+            align-items: center;
+            justify-content: center; /* centers icon */
+            color: #fff;
+            box-shadow: 0 10px 22px color-mix(in oklab, var(--clara-a) 40%, transparent);
+            cursor: pointer;
+        }
+
+            .clara-scope .send-btn:disabled {
+                filter: saturate(.2) contrast(.9);
+                cursor: not-allowed;
+                opacity: .6;
+            }
+
+        .clara-scope .send-ico {
+            width: 18px;
+            height: 18px;
+            display: block;
+        }
+
+        /* subtle border emphasis on hover */
+        .clara-scope .clara-shell:hover {
+            border-color: color-mix(in oklab, var(--ink) 20%, white);
+        }
+
+    /* responsive */
+    @@media (max-width: 720px) {
+        .clara-scope .composer {
+            grid-template-columns: 40px 1fr 42px;
+        }
+    }
 </style>

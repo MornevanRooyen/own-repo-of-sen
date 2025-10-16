@@ -1,239 +1,386 @@
-﻿@page "/topichub/learningresources"
+﻿@page "/topichub/resources"
 @layout TopicHubLayout
 
-<section class="lr">
-    <h1 class="title">Learning Resources</h1>
-    <h2 class="subtitle">BUM 281</h2>
+<section class="lr-scope lr">
+    <header class="lr-head">
+        <h1 class="lr-title">
+            <span class="code">BUM 281</span>
+            <span class="dot">•</span>
+            <span class="label">Resources</span>
+        </h1>
 
-    <div class="tutor-list">
-        @foreach (var t in tutors)
+        <div class="filters">
+            <!-- name/title search -->
+            <label class="search">
+                <svg class="ico" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="2" fill="none" />
+                    <line x1="14" y1="14" x2="20" y2="20" stroke="currentColor" stroke-width="2" />
+                </svg>
+                <input class="search-field"
+                       placeholder="Search by name…"
+                       @bind-value="NameQuery"
+                       @bind-value:event="oninput" />
+            </label>
+
+            
+        </div>
+    </header>
+
+    <!-- results -->
+    <section class="grid">
+        @foreach (var r in FilteredResources)
         {
-            <details class="tutor" open="@t.Open">
-                <summary>
-                    <span class="avatar"></span>
-                    <span class="tutor-name">@t.Name</span>
-                    <span class="spacer"></span>
-                    <span class="chev" aria-hidden="true"></span>
-                </summary>
-
-                <div class="topics">
-                    @for (int i = 0; i < t.Topics.Count; i++)
-                    {
-                        var topic = t.Topics[i];
-                        var link = $"/topichub/resources/{Uri.EscapeDataString(t.Name)}/{Uri.EscapeDataString(topic.Title)}";
-                        <a class="topic-row" href="@link">
-                            <span class="num">@(i + 1).</span>
-                            <span class="text">@topic.Title</span>
-                            <span class="spacer"></span>
-                            <span class="uploads">
-                                <span class="count">@topic.Uploads</span> Uploads
-                            </span>
-                        </a>
-                    }
+            <article class="card">
+                <div class="row-top">
+                    <div class="avatar" aria-hidden="true">@GetInitials(r.Tutor)</div>
+                    <div class="id">
+                        <div class="title" title="@r.Title">@r.Title</div>
+                        <div class="meta">
+                            <span>@r.Tutor</span>
+                            <span class="sep">•</span>
+                            <span>@r.UploadedAt.ToString("yyyy-MM-dd HH:mm")</span>
+                            @if (r.Duration is not null)
+                            {
+                                <span class="sep">•</span>
+                                <span>@FormatDuration(r.Duration.Value)</span>
+                            }
+                        </div>
+                    </div>
                 </div>
-            </details>
+
+                @if (r.Tags?.Length > 0)
+                {
+                    <div class="tags">
+                        @foreach (var tag in r.Tags)
+                        {
+                            <span class="pill">@tag</span>
+                        }
+                    </div>
+                }
+
+                <footer class="row-bottom">
+                    <a class="btn" href="#">Open</a>
+                </footer>
+            </article>
         }
-    </div>
+
+        @if (!FilteredResources.Any())
+        {
+            <div class="empty">No resources match your filters.</div>
+        }
+    </section>
 </section>
 
 @code {
-    private record TopicItem(string Title, int Uploads);
-    private record TutorBlock(string Name, List<TopicItem> Topics, bool Open);
+    // ------- data model -------
+    private record ResourceItem(
+        string Title,
+        string Tutor,
+        DateTime UploadedAt,
+        TimeSpan? Duration,
+        string[] Tags
+    );
 
-    // Mock data to match the screenshot
-    private List<TutorBlock> tutors = new()
-  {
-    new TutorBlock(
-      "Taylor Swift",
-      new List<TopicItem>{
-        new("Introduction to bum 281", 5),
-        new("Second topic in subject", 13),
-        new("Third topic", 0)
-      },
-      false
-    ),
-    new TutorBlock(
-      "Gracie Abrahams",
-      new List<TopicItem>{
-        new("Introduction to bum 281", 5),
-        new("Second topic in subject", 13),
-        new("Third topic", 0)
-      },
-      true // open like your mock
-    )
-  };
+    // ------- filter state (string-bound dates fix the CS1503/CS0029 errors) -------
+    private string NameQuery { get; set; } = "";
+    private string FromDateString { get; set; } = "";
+    private string ToDateString { get; set; } = "";
+    private string SelectedTutor { get; set; } = "all";
+
+    // ------- demo data -------
+    private readonly List<ResourceItem> AllResources = new()
+    {
+        new("Intro: Opportunity Cost",      "Taylor Swift",  DateTime.Now.AddDays(-6).AddHours(-2),  TimeSpan.FromMinutes(12), new[] { "slides", "pdf" }),
+        new("Supply & Demand – Recap",      "Gracie Abrahams", DateTime.Now.AddDays(-4).AddHours(-1), TimeSpan.FromMinutes(18), new[] { "video" }),
+        new("Elasticity quick practice",    "Taylor Swift",  DateTime.Now.AddDays(-2).AddHours(-5),  TimeSpan.FromMinutes(9),  new[] { "practice" }),
+        new("Past paper Q1 walkthrough",    "Luzuko D",      DateTime.Now.AddDays(-1).AddHours(-3),  TimeSpan.FromMinutes(22), new[] { "video", "solutions" }),
+        new("Study guide (Ch 1–2)",         "Gracie Abrahams", DateTime.Now.AddDays(-7).AddHours(-6), TimeSpan.FromMinutes(7),  new[] { "pdf" }),
+        new("Microeconomics formula sheet", "Taylor Swift",  DateTime.Now.AddDays(-9),               null,                      new[] { "cheatsheet" })
+    };
+
+    private IEnumerable<string> TutorNames =>
+        AllResources.Select(r => r.Tutor).Distinct().OrderBy(s => s);
+
+    // ------- filtering -------
+    private IEnumerable<ResourceItem> FilteredResources
+    {
+        get
+        {
+            var q = AllResources.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(NameQuery))
+                q = q.Where(r => r.Title.Contains(NameQuery, StringComparison.OrdinalIgnoreCase));
+
+            if (SelectedTutor != "all")
+                q = q.Where(r => r.Tutor.Equals(SelectedTutor, StringComparison.OrdinalIgnoreCase));
+
+            var from = ParseDate(FromDateString);
+            var to = ParseDate(ToDateString);
+
+            if (from is not null)
+                q = q.Where(r => r.UploadedAt >= from.Value.Date);
+
+            if (to is not null)
+            {
+                // include the whole "to" day
+                var toEnd = to.Value.Date.AddDays(1).AddTicks(-1);
+                q = q.Where(r => r.UploadedAt <= toEnd);
+            }
+
+            return q.OrderByDescending(r => r.UploadedAt);
+        }
+    }
+
+    // ------- helpers -------
+    private static DateTime? ParseDate(string? s)
+        => DateTime.TryParse(s, out var d) ? d : null;
+
+    private static string GetInitials(string name)
+    {
+        var parts = (name ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0) return "•";
+        if (parts.Length == 1) return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpperInvariant();
+        return (parts[0][0].ToString() + parts[^1][0]).ToUpperInvariant();
+    }
+
+    private static string FormatDuration(TimeSpan ts)
+        => ts.TotalHours >= 1 ? $"{(int)ts.TotalHours}h {ts.Minutes}m" : $"{ts.Minutes}m";
 }
-
 <style>
-    :root {
-        --ink: #2D3034;
-        --mist: #DBE4EE;
-        --white: #FFFFFF;
-        --orange: #F17300;
-        --ring: color-mix(in oklab, var(--ink) 12%, white);
-        --radius: 1.25rem;
-        --shadow: 0 8px 22px rgba(0,0,0,.06);
-    }
-
-    *, *::before, *::after {
-        box-sizing: border-box
-    }
-
-    html, body {
-        margin: 0;
+    /* scoped theme */
+    .lr-scope {
+        --ink: #1F2937;
+        --muted: #6B7280;
+        --bg: #F2F3F5;
+        --panel: #FFFFFF;
+        --ring: rgba(0,0,0,.12);
+        --shadow: 0 10px 26px rgba(0,0,0,.08);
+        --radius: 16px;
+        --accent-a: #B14CF4; /* purple */
+        --accent-b: #FFA3F9; /* pink  */
+        --pill-bg: #EEF2FF;
+        --pill-ink: #4338CA;
+        font-family: system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial, sans-serif;
         color: var(--ink);
-        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif
     }
 
     .lr {
-        padding: clamp(12px,3vw,20px)
+        width: min(1200px, 92vw);
+        margin-inline: auto;
+        padding: clamp(12px, 3vw, 22px);
     }
 
-    .title {
-        margin: 0;
-        font-weight: 800;
-        font-size: clamp(22px,3.2vw,36px);
-        letter-spacing: .2px
-    }
-
-    .subtitle {
-        margin: 4px 0 12px;
-        font-weight: 800;
-        opacity: .85;
-        font-size: clamp(16px,2.4vw,22px)
-    }
-
-    .tutor-list {
-        display: grid;
-        gap: 12px
-    }
-
-    .tutor {
-        background: var(--mist);
-        border: 1px solid var(--ring);
-        border-radius: 16px;
-        box-shadow: var(--shadow);
-        overflow: hidden;
-    }
-
-        .tutor summary {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px;
-            cursor: pointer;
-        }
-
-            .tutor summary::-webkit-details-marker {
-                display: none
-            }
-
-    .avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: #9AA0A6
-    }
-
-    .tutor-name {
-        font-weight: 700
-    }
-
-    .spacer {
-        flex: 1
-    }
-
-    .chev {
-        width: 30px;
-        height: 30px;
-        position: relative;
-        display: grid;
-        place-items: center
-    }
-
-        .chev::before, .chev::after {
-            content: "";
-            position: absolute;
-            width: 10px;
-            height: 2px;
-            background: var(--ink);
-            transition: transform .18s ease;
-        }
-
-        .chev::before {
-            transform: translateX(-2px) rotate(40deg)
-        }
-
-        .chev::after {
-            transform: translateX( 2px) rotate(-40deg)
-        }
-
-    .tutor[open] .chev::before {
-        transform: translateX(-2px) rotate(-40deg)
-    }
-
-    .tutor[open] .chev::after {
-        transform: translateX( 2px) rotate(40deg)
-    }
-
-    .topics {
+    .lr-head {
         display: grid;
         gap: 12px;
-        padding: 0 14px 14px
+        margin-bottom: 10px;
     }
 
-    .topic-row {
+    .lr-title {
+        margin: 0;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: .2px;
+    }
+
+        .lr-title .code {
+            font-size: clamp(22px, 3.6vw, 40px);
+        }
+
+        .lr-title .dot {
+            opacity: .5;
+            font-size: clamp(20px, 3.2vw, 36px);
+        }
+
+        .lr-title .label {
+            font-size: clamp(22px, 3.6vw, 40px);
+            background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+    /* filters */
+    .filters {
+        display: grid;
+        grid-template-columns: 1.2fr .8fr .8fr .8fr;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .search {
         display: flex;
         align-items: center;
         gap: 10px;
-        background: var(--white);
+        background: #fff;
         border: 1px solid var(--ring);
-        border-radius: 14px;
-        padding: 12px;
-        text-decoration: none;
+        border-radius: 999px;
+        padding: 10px 14px;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.03);
+        color: #9aa0a6;
+    }
+
+    .search-field {
+        border: 0;
+        outline: 0;
+        width: 100%;
         color: var(--ink);
-        box-shadow: var(--shadow);
+        background: transparent;
+        font: inherit;
     }
 
-    .num {
+    .ico {
+        color: #9aa0a6;
+    }
+
+    .date, .tutor {
+        display: grid;
+        gap: 6px;
         font-weight: 800;
-        opacity: .9
+        font-size: .9rem;
+        color: var(--muted);
     }
 
-    .text {
-        font-weight: 700;
+        .date input, .tutor select {
+            height: 40px;
+            border: 1px solid var(--ring);
+            border-radius: 12px;
+            padding: 0 12px;
+            background: #fff;
+            color: var(--ink);
+            font: inherit;
+        }
+
+    /* grid of cards */
+    .grid {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .card {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 14px;
+        display: grid;
+        gap: 10px;
+    }
+
+    .row-top {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: conic-gradient(from 0deg, #e9ddff, #ffe9fd, #e9ddff);
+        color: #3b3b3b;
+        font-weight: 900;
+        border: 1px solid var(--ring);
+    }
+
+    .id {
+        min-width: 0;
+    }
+
+    .title {
+        font-weight: 900;
+        letter-spacing: .2px;
         white-space: nowrap;
         overflow: hidden;
-        text-overflow: ellipsis
+        text-overflow: ellipsis;
     }
 
-    .uploads {
+    .meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-weight: 800;
+    }
+
+    .sep {
+        opacity: .6;
+    }
+
+    .tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .pill {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        background: var(--white);
-        padding: 4px;
+        justify-content: center;
+        background: var(--pill-bg);
+        color: var(--pill-ink);
+        border: 1px solid color-mix(in oklab, var(--pill-ink) 22%, #fff);
         border-radius: 999px;
-        border: 2px solid var(--white);
-        box-shadow: 0 0 0 2px var(--white);
+        padding: 6px 10px;
+        font-weight: 900;
+        font-size: .8rem;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-        .uploads .count {
-            background: var(--orange);
-            color: #fff;
-            font-weight: 800;
-            padding: 6px 12px;
-            border-radius: 999px;
+    .row-bottom {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: 900;
+        background: #111827;
+        border: 1px solid #111827;
+        box-shadow: 0 10px 22px rgba(0,0,0,.12);
+    }
+
+    .empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: var(--muted);
+        font-weight: 900;
+        padding: 20px 0;
+    }
+
+    @@media (max-width: 1100px) {
+        .grid
+
+    {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    }
+
+    @@media (max-width: 720px) {
+        .filters {
+            grid-template-columns: 1fr 1fr;
         }
 
-    @@media (max-width: 560px) {
-        .topic-row {
-            padding: 10px
-        }
-
-        .uploads .count {
-            padding: 6px 10px
+        .grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>

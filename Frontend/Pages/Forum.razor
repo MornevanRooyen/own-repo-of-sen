@@ -1,201 +1,334 @@
 ﻿@page "/topichub/forum"
 @layout TopicHubLayout
 
+<section class="forum-scope forum">
+    <h1 class="forum-title">
+        <span class="code">BUM 281</span>
+        <span class="dot">•</span>
+        <span class="label">Forum</span>
+    </h1>
 
-<section class="forum">
-    <h1 class="forum-title">BUM 281 [TOPIC CHOICE] FORUM</h1>
-
-    <!-- Message bubbles -->
-    <div class="chat-area">
+    <!-- Chat thread (scrolls) -->
+    <div class="thread">
+        <!-- student -->
         <div class="msg student">
-            <div class="avatar">T</div>
-            <div class="bubble">
-                Taylor | <span class="time">20:47</span>
+            <div class="avatar">TS</div>
+            <div class="body">
+                <div class="meta">
+                    <span class="name">Taylor Student</span>
+                    <span class="time">09:18</span>
+                </div>
+                <div class="bubble">
+                    Hey everyone — is the first quiz covering Chapters 1–3 or just 1–2?
+                </div>
             </div>
         </div>
 
+        <!-- tutor -->
+        <div class="msg tutor">
+            <div class="avatar">TN</div>
+            <div class="body">
+                <div class="meta">
+                    <span class="name">Thabo (Tutor)</span>
+                    <span class="time">09:22</span>
+                </div>
+                <div class="bubble">
+                    Great question! It’s **Chapters 1–2** only. I’ll post a short practice set by noon. 🍊
+                </div>
+            </div>
+        </div>
+
+        <!-- admin -->
+        <div class="msg admin">
+            <div class="avatar">AD</div>
+            <div class="body">
+                <div class="meta">
+                    <span class="name">Admin</span>
+                    <span class="time">09:24</span>
+                </div>
+                <div class="bubble">
+                    Reminder: forum guidelines apply — be respectful and stay on topic. Thanks! ✨
+                </div>
+            </div>
+        </div>
+
+        <!-- student -->
+        <div class="msg student">
+            <div class="avatar">LM</div>
+            <div class="body">
+                <div class="meta">
+                    <span class="name">Luzuko Student</span>
+                    <span class="time">09:26</span>
+                </div>
+                <div class="bubble">
+                    Anyone got tips for the “opportunity cost” definition? I keep mixing examples.
+                </div>
+            </div>
+        </div>
+
+        <!-- tutor -->
+        <div class="msg tutor">
+            <div class="avatar">GP</div>
+            <div class="body">
+                <div class="meta">
+                    <span class="name">Grace (Tutor)</span>
+                    <span class="time">09:28</span>
+                </div>
+                <div class="bubble">
+                    Try this: “What you give up to get something else.” Think: study 1 hour → give up gaming 1 hour.
+                </div>
+            </div>
+        </div>
+
+        <!-- anonymous (neutral) -->
         <div class="msg anon">
             <div class="avatar">A/</div>
-            <div class="bubble">
-                Anonymous | <span class="time">20:49</span>
-            </div>
-        </div>
-
-        <div class="msg tutor">
-            <div class="avatar">✦</div>
-            <div class="bubble">
-                Tutor | <span class="time">20:47</span>
+            <div class="body">
+                <div class="meta">
+                    <span class="name">Anonymous</span>
+                    <span class="time">09:30</span>
+                </div>
+                <div class="bubble">
+                    The past paper link in Resources is 🔥 — thanks whoever uploaded!
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Input area -->
-    <div class="input-row">
-        <input type="text" class="input" placeholder="type text here to post to forum." />
-        <button class="send-btn" aria-label="send">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="#2D3034">
-                <path d="M3 20v-5l9-3-9-3V4l18 8-18 8z" />
+    <!-- Composer (sticks to bottom of section) -->
+    <div class="composer">
+        <input type="text" class="field" placeholder="Type a message to the forum…" />
+        <label class="anon">
+            <input type="checkbox" />
+            <span>Anonymous</span>
+        </label>
+        <button class="send" title="Send">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path d="M3 20v-5l9-3-9-3V4l18 8-18 8z" fill="currentColor" />
             </svg>
         </button>
-
-        <label class="anon-label">
-            <input type="checkbox" /> anonymous
-        </label>
     </div>
 </section>
 
 <style>
-    /* ===== Tokens ===== */
-    :root {
-        --bg: #FFFFFF;
-        --ink: #2D3034;
-        --nav: #DBE4EE;
-        --teal: #1B998B;
-        --orange: #F17300;
-        --rose: #AD1F54;
-        --bluegray: #DBE4EE;
-        --radius: 1.25rem;
-        --shadow: 0 4px 12px rgba(0,0,0,.06);
-    }
-
-    *, *::before, *::after {
-        box-sizing: border-box
-    }
-
-    html, body {
-        margin: 0;
-        padding: 0;
+    /* ===== Scoped tokens so we don’t touch the global nav ===== */
+    .forum-scope {
+        --ink: #1f2937;
+        --muted: #6b7280;
+        --panel: #ffffff;
+        --ring: rgba(0,0,0,.12);
+        --shadow: 0 10px 24px rgba(0,0,0,.08);
+        --radius: 16px;
+        /* role palettes */
+        --stud-a: #1D4ED8;
+        --stud-b: #3B82F6;
+        --tutor-a: #B45309;
+        --tutor-b: #F59E0B;
+        --admin-a: #F4C430;
+        --admin-b: #FFD76A;
+        --neutral: #e9eef6;
+        --bg: #f2f5f8;
+        font-family: "Lexend", system-ui, -apple-system, "Segoe UI", Inter, Roboto, Arial, sans-serif;
         color: var(--ink);
-        font-family: "Lexend", system-ui, sans-serif
     }
 
+    /* page wrapper inside content-host */
     .forum {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        padding: clamp(12px,3vw,22px);
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 12px;
+        padding: clamp(12px, 2.4vw, 18px);
+        background: transparent;
     }
 
+    /* title */
     .forum-title {
-        text-align: center;
-        font-weight: 800;
-        font-family: "Outfit", system-ui, sans-serif;
+        margin: 0;
+        font-weight: 900;
         letter-spacing: .2px;
-    }
-
-    /* ===== Chat Area ===== */
-    .chat-area {
+        font-size: clamp(22px, 3.2vw, 36px);
         display: flex;
-        flex-direction: column;
-        gap: 14px;
-        padding: 8px 0;
+        align-items: baseline;
+        gap: .6rem;
     }
 
+        .forum-title .code {
+            font-weight: 900;
+        }
+
+        .forum-title .dot {
+            opacity: .6;
+        }
+
+        .forum-title .label {
+            background: linear-gradient(90deg, var(--stud-a), var(--stud-b));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 900;
+        }
+
+    /* thread */
+    .thread {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        padding: 14px;
+        overflow: auto;
+        box-shadow: var(--shadow);
+        max-height: min(66vh, 620px); /* keep page from scrolling, thread does */
+    }
+
+    /* message row */
     .msg {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: 38px 1fr;
+        gap: 10px;
+        align-items: start;
+        margin: 10px 0;
     }
 
     .avatar {
-        width: 32px;
-        height: 32px;
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
         display: grid;
         place-items: center;
-        border-radius: 50%;
-        background: var(--nav);
-        font-weight: 800;
+        background: #fff;
+        border: 1px solid var(--ring);
+        font-weight: 900;
+        color: var(--ink);
     }
+
+    .body {
+        min-width: 0;
+    }
+
+    .meta {
+        display: flex;
+        gap: .6rem;
+        align-items: baseline;
+        font-weight: 800;
+        font-size: .92rem;
+    }
+
+        .meta .time {
+            color: var(--muted);
+            font-size: .8rem;
+            font-weight: 700;
+        }
 
     .bubble {
-        border-radius: 12px;
-        padding: 10px 16px;
-        background: var(--bluegray);
-        font-weight: 600;
-        font-size: .9rem;
-        box-shadow: var(--shadow);
+        margin-top: 6px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--ring);
+        background: var(--neutral);
+        font-weight: 700;
+        line-height: 1.35;
+        word-break: break-word;
     }
 
-    .time {
-        font-weight: 500;
-        font-size: .8rem
-    }
-
-    /* Roles / colors */
+    /* role colors */
     .msg.student .bubble {
-        background: var(--teal);
-        color: #fff
+        color: #fff;
+        border-color: color-mix(in oklab, var(--stud-a) 30%, white);
+        background: linear-gradient(135deg, var(--stud-a), var(--stud-b));
+    }
+
+    .msg.student .avatar {
+        background: radial-gradient(closest-side, #fff 72%, transparent 73%) center/100% 100% no-repeat;
+    }
+
+        .msg.student .avatar::before {
+            content: "";
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            -webkit-mask: radial-gradient(farthest-side, transparent 70%, #000 71%);
+            mask: radial-gradient(farthest-side, transparent 70%, #000 71%);
+            background: conic-gradient(var(--stud-a), var(--stud-b), var(--stud-a));
+        }
+
+    .msg.tutor .bubble {
+        color: #fff;
+        border-color: color-mix(in oklab, var(--tutor-b) 35%, white);
+        background: linear-gradient(135deg, var(--tutor-a), var(--tutor-b));
+    }
+
+    .msg.admin .bubble {
+        color: #1a1a1a;
+        border-color: color-mix(in oklab, var(--admin-a) 40%, white);
+        background: linear-gradient(135deg, var(--admin-a), var(--admin-b));
     }
 
     .msg.anon .bubble {
-        background: var(--bluegray)
+        background: var(--neutral);
+        color: var(--ink);
     }
 
-    .msg.tutor .bubble {
-        background: var(--orange);
-        color: #fff
-    }
-
-    /* ===== Input Row ===== */
-    .input-row {
-        margin-top: auto;
-        display: flex;
+    /* composer */
+    .composer {
+        position: sticky;
+        bottom: 0;
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 10px;
         align-items: center;
-        gap: 8px;
-        background: #fff;
-        border-top: 1px solid rgba(0,0,0,.08);
         padding-top: 10px;
+        background: transparent;
     }
 
-    .input {
-        flex: 1;
-        height: 40px;
-        border: 1px solid rgba(0,0,0,.15);
+    .field {
+        height: 42px;
+        border: 1px solid var(--ring);
         border-radius: 999px;
         padding: 0 14px;
-        font: inherit;
         outline: none;
+        font: inherit;
+        background: #fff;
     }
 
-    .send-btn {
-        border: 0;
-        background: none;
-        cursor: pointer;
-        display: grid;
-        place-items: center;
-        border-radius: 50%;
-        padding: 4px;
-        width: 34px;
-        height: 34px;
-        transition: background .2s ease;
-    }
-
-        .send-btn:hover {
-            background: rgba(0,0,0,.06);
-        }
-
-    .anon-label {
-        display: flex;
+    .anon {
+        display: inline-flex;
         align-items: center;
+        gap: 6px;
+        font-weight: 800;
         font-size: .9rem;
-        font-weight: 600;
-        gap: 4px;
+        color: var(--muted);
     }
 
-        .anon-label input {
+        .anon input {
             width: 16px;
             height: 16px;
             accent-color: var(--ink);
         }
 
-    /* Responsive */
-    @@media(max-width:600px) {
-        .forum-title {
-            font-size: 1.2rem
-        }
+    .send {
+        height: 42px;
+        width: 46px;
+        border-radius: 12px;
+        border: 1px solid var(--ring);
+        background: linear-gradient(180deg, var(--stud-a), var(--stud-b));
+        color: #fff;
+        display: grid;
+        place-items: center;
+        box-shadow: 0 10px 20px color-mix(in oklab, var(--stud-a) 35%, transparent);
+        cursor: pointer;
+    }
 
-        .input {
-            font-size: .9rem
-        }
+    /* responsive */
+    @@media (max-width: 720px) {
+        .forum-title
+
+    {
+        font-size: 1.4rem;
+    }
+
+    .thread {
+        max-height: 60vh;
+    }
+
     }
 </style>

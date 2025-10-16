@@ -11,35 +11,494 @@
 
 <link rel="stylesheet" href="css/messages.css" />
 
-<div class="messages-container">
+<style>
+    /* ===== Page-local tokens ===== */
+    :root {
+        --bg: #F2F3F5;
+        --panel: #FFFFFF;
+        --ink: #1F2937;
+        --muted: #6B7280;
+        --ring: rgba(0,0,0,.10);
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+        --radius: 16px;
+        /* Role colours (dynamic theme) */
+        --role-admin: #F59E0B; /* amber/yellow */
+        --role-tutor: #10B981; /* emerald */
+        --role-student: #3B82F6; /* blue */
+        --role-clara: #B14CF4; /* purple */
+
+        --sidebar-w: 320px;
+        --sidebar-w-collapsed: 76px;
+        /* navbar space; adjust if your shell header changes */
+        --nav-h: 72px;
+    }
+
+    /* no page scroll; only internal scrollers */
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif;
+        overflow: hidden;
+    }
+
+    /* ===== Layout (animate sidebar width) ===== */
+    .messages-container {
+        height: calc(100vh - var(--nav-h));
+        padding: 10px 14px 12px;
+        display: grid;
+        grid-template-columns: auto 1fr; /* first col width is the actual sidebar width */
+        gap: 10px;
+        overflow: hidden;
+    }
+
+    .people-sidebar {
+        width: var(--sidebar-w);
+        min-width: 0; /* allows shrinking */
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        display: grid;
+        grid-template-rows: auto 1fr;
+        overflow: hidden; /* clip when collapsed */
+        transition: width .26s cubic-bezier(.22,1,.36,1);
+    }
+
+    .messages-container.collapsed .people-sidebar {
+        width: var(--sidebar-w-collapsed);
+    }
+
+    /* ===== People header ===== */
+    .people-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 12px 8px;
+        border-bottom: 1px solid var(--ring);
+    }
+
+    .people-title {
+        margin: 0;
+        font-weight: 800;
+    }
+
+    .collapse-btn {
+        border: 1px solid var(--ring);
+        background: #fff;
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+        .collapse-btn:hover {
+            box-shadow: 0 8px 18px rgba(0,0,0,.06);
+        }
+
+    .messages-container.collapsed .collapse-btn svg {
+        transform: rotate(180deg);
+    }
+
+    /* ===== People list ===== */
+    .people-list {
+        overflow: auto;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* compact person rows */
+    .person-item {
+        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: 40px 1fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid var(--ring);
+        cursor: pointer;
+        transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease;
+    }
+
+        .person-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0,0,0,.06);
+        }
+
+        .person-item.active {
+            outline: 2px solid color-mix(in oklab, var(--ink) 15%, white);
+            outline-offset: 0;
+        }
+
+    .person-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        background: #E5E7EB;
+        font-weight: 800;
+        color: #374151;
+    }
+
+    .person-info {
+        min-width: 0;
+    }
+
+    .person-name {
+        font-weight: 800;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .person-sub {
+        font-size: .85rem;
+        color: var(--muted);
+        margin-top: 1px;
+    }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        background: #10B981;
+        border-radius: 50%;
+    }
+
+    .person-status svg {
+        opacity: .7;
+    }
+
+    /* Pinned AI */
+    .person-item.ai {
+        background: linear-gradient(180deg, #fff 0%, #fff 65%), linear-gradient(135deg, var(--role-clara), #FFA3F9);
+        background-clip: padding-box, border-box;
+        border: 1px solid transparent;
+    }
+
+        .person-item.ai .person-name {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .person-item.ai .pin {
+            font-size: .72rem;
+            font-weight: 900;
+            color: #B45309;
+            background: #FFF7ED;
+            border: 1px solid #FCD34D;
+            padding: 0 6px;
+            border-radius: 999px;
+        }
+
+    /* Collapsed visuals */
+    .messages-container.collapsed .people-title {
+        display: none;
+    }
+
+    .messages-container.collapsed .people-list {
+        padding: 8px 6px;
+    }
+
+    .messages-container.collapsed .person-item {
+        grid-template-columns: 1fr;
+        padding: 8px 6px;
+        justify-items: center;
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .messages-container.collapsed .person-info,
+    .messages-container.collapsed .person-status {
+        display: none;
+    }
+
+    .messages-container.collapsed .person-avatar {
+        width: 44px;
+        height: 44px;
+    }
+
+    /* ===== Dynamic role colours (higher specificity + !important to beat external css) ===== */
+    .people-list .person-item[data-role="Admin"] .person-name {
+        color: var(--role-admin) !important;
+    }
+
+    .people-list .person-item[data-role="Tutor"] .person-name {
+        color: var(--role-tutor) !important;
+    }
+
+    .people-list .person-item[data-role="Student"] .person-name {
+        color: var(--role-student) !important;
+    }
+
+    .people-list .person-item[data-role="Clara"] .person-name {
+        color: var(--role-clara) !important;
+    }
+
+    .people-list .person-item[data-role="Admin"] .person-avatar {
+        box-shadow: 0 0 0 2px var(--role-admin) inset, 0 0 0 2px var(--role-admin);
+    }
+
+    .people-list .person-item[data-role="Tutor"] .person-avatar {
+        box-shadow: 0 0 0 2px var(--role-tutor) inset, 0 0 0 2px var(--role-tutor);
+    }
+
+    .people-list .person-item[data-role="Student"] .person-avatar {
+        box-shadow: 0 0 0 2px var(--role-student) inset, 0 0 0 2px var(--role-student);
+    }
+
+    .people-list .person-item[data-role="Clara"] .person-avatar {
+        box-shadow: 0 0 0 2px var(--role-clara) inset, 0 0 0 2px var(--role-clara);
+    }
+
+    /* ===== Chat column (outlined panel) ===== */
+    .chat-area {
+        display: grid;
+        grid-template-rows: auto 1fr auto; /* header | scroller | input */
+        height: 100%;
+        overflow: hidden;
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+    }
+
+    .chat-header {
+        border-bottom: 1px solid var(--ring);
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .chat-user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    .chat-user-name {
+        font-weight: 800;
+        position: relative;
+    }
+
+    .chat-user-role {
+        color: var(--muted);
+        font-size: .9rem;
+    }
+
+    /* Role underline/ring in header via data-role on .chat-header */
+    .chat-header[data-role="Admin"] {
+        --role: var(--role-admin);
+    }
+
+    .chat-header[data-role="Tutor"] {
+        --role: var(--role-tutor);
+    }
+
+    .chat-header[data-role="Student"] {
+        --role: var(--role-student);
+    }
+
+    .chat-header[data-role="Clara"] {
+        --role: var(--role-clara);
+    }
+
+    .chat-header .chat-user-name::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -8px;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--role);
+    }
+
+    .chat-header .chat-user-avatar {
+        box-shadow: 0 0 0 2px var(--role) inset, 0 0 0 2px var(--role);
+    }
+
+    .messages-area {
+        padding: 14px 12px; /* hugs panel edges; keeps input visible without page scroll */
+        overflow: auto;
+        background: #FBFBFC;
+        display: grid;
+        gap: 10px;
+        align-content: start;
+    }
+
+    .message-row {
+        display: grid;
+        gap: 6px;
+    }
+
+        .message-row.outgoing {
+            justify-items: end;
+            padding-right: 2px;
+        }
+
+        .message-row.incoming {
+            justify-items: start;
+            padding-left: 2px;
+        }
+
+    .message-bubble {
+        max-width: min(72%, 70ch);
+        padding: 10px 12px;
+        border-radius: 14px;
+        line-height: 1.35;
+        box-shadow: 0 1px 0 rgba(0,0,0,.03);
+    }
+
+    .outgoing-bubble {
+        background: #111827;
+        color: #fff;
+        border-top-right-radius: 4px;
+    }
+
+    .incoming-bubble {
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-top-left-radius: 4px;
+    }
+
+    .message-time {
+        font-size: .75rem;
+        color: var(--muted);
+    }
+
+    .message-input-area {
+        border-top: 1px solid var(--ring);
+        padding: 10px;
+        background: var(--panel);
+    }
+
+    .input-container {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        background: #fff;
+        border: 1px solid var(--ring);
+        border-radius: 999px;
+        padding: 8px 10px;
+    }
+
+    .message-input {
+        flex: 1;
+        border: 0;
+        outline: 0;
+        font: inherit;
+        background: transparent;
+    }
+
+    .send-btn, .attachment-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid var(--ring);
+        background: #fff;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+    }
+
+    @@media (max-width: 980px) {
+        :root {
+            --sidebar-w: 280px;
+            --sidebar-w-collapsed: 64px;
+            --nav-h: 64px;
+        }
+    }
+</style>
+
+<div class="messages-container @(isSidebarCollapsed ? "collapsed" : "")">
     <!-- ===== Left Sidebar - People List ===== -->
-    <div class="people-sidebar">
+    <div class="people-sidebar" @onclick="HandleSidebarClick">
         <div class="people-header">
             <h3 class="people-title">People</h3>
-            <button class="toggle-sidebar" @onclick="ToggleSidebar">
+            <!-- stopPropagation keeps this click from re-opening immediately -->
+            <button class="collapse-btn" @onclick:stopPropagation="true" @onclick="ToggleSidebar">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
         </div>
 
-        <div class="people-list @(isSidebarCollapsed ? "collapsed" : "")">
+        <div class="people-list">
+            <!-- Pinned AI contact -->
+            <div class="person-item ai" data-role="Clara" @onclick="SelectClara">
+                <div class="person-avatar">
+                    <div class="avatar-placeholder">C</div>
+                </div>
+                <div class="person-info">
+                    <div class="person-name">Clara Tea <span class="pin">PIN</span></div>
+                    <div class="person-sub">AI Assistant</div>
+                </div>
+                <div class="person-status"><div class="status-dot"></div></div>
+            </div>
+
             @if (FollowedUsers == null)
             {
-                <div class="people-loading">Loading...</div>
+                <div class="loading-state" style="color:var(--muted); padding:6px 10px;">Loading...</div>
             }
             else if (!FollowedUsers.Any())
             {
-                <div class="people-empty">No people found. Follow someone to chat.</div>
+                <div class="empty-state" style="color:var(--muted); padding:6px 10px;">
+                    You're not following anyone yet.<br />
+                    Follow users to start messaging them!
+                </div>
             }
             else
             {
                 @foreach (var user in FollowedUsers)
                 {
-                    var isActive = (SelectedUser?.Id == user.Id);
-                    <div class="person @(isActive ? "active" : "")" @onclick="() => LoadConversation(user)">
-                        <div class="person-avatar">
-                            <img src="@(user.ProfilePicturePath ?? "https://placehold.co/64x64/png")" alt="avatar" />
+                    var isActive = (user.Id == SelectedUser?.Id);
+                    <div class="person-item @(isActive ? "active" : "")" data-role="@user.RoleString" @onclick="() => LoadConversation(user)">
+                        <div class="person-avatar @(isActive ? "active-border" : "")">
+                            @if (!string.IsNullOrEmpty(user.ProfilePicturePath))
+                            {
+                                <img src="@user.ProfilePicturePath" alt="@user.FirstName" class="avatar-image" />
+                            }
+                            else
+                            {
+                                <div class="avatar-placeholder">@user.FirstName[0]</div>
+                            }
                         </div>
                         <div class="person-info">
                             <div class="person-name">@($"{user.FirstName} {user.LastName}")</div>
@@ -54,22 +513,30 @@
     <div class="chat-area">
         @if (SelectedUser == null)
         {
-            <div class="chat-empty-state">
-                <div class="empty-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <div class="no-chat-selected" style="display:grid; place-items:center; gap:8px; color:var(--muted);">
+                <div class="no-chat-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
                 </div>
-                <h3>Select a person to start messaging</h3>
+                <h3 style="margin:0; color:#374151;">Select a person to start messaging</h3>
+                <p style="margin:0;">Choose someone from the People list to begin your conversation</p>
             </div>
         }
         else
         {
             <!-- Chat Header -->
-            <div class="chat-header">
-                <div class="chat-user">
-                    <div class="chat-user-avatar">
-                        <img src="@(SelectedUser.ProfilePicturePath ?? "https://placehold.co/64x64/png")" alt="avatar" />
+            <div class="chat-header" data-role="@SelectedUser.RoleString">
+                <div class="chat-user-info">
+                    <div class="chat-user-avatar @(SelectedUser.Id == SelectedUser?.Id ? "active-border" : "")">
+                        @if (!string.IsNullOrEmpty(SelectedUser.ProfilePicturePath))
+                        {
+                            <img src="@SelectedUser.ProfilePicturePath" alt="@SelectedUser.FirstName" class="avatar-image" />
+                        }
+                        else
+                        {
+                            <div class="avatar-placeholder">@SelectedUser.FirstName[0]</div>
+                        }
                     </div>
                     <div class="chat-user-details">
                         <div class="chat-user-name">@($"{SelectedUser.FirstName} {SelectedUser.LastName}")</div>
@@ -432,6 +899,26 @@
     private void ToggleSidebar()
     {
         isSidebarCollapsed = !isSidebarCollapsed;
+        StateHasChanged();
+    }
+
+    private void HandleSidebarClick()
+    {
+        if (isSidebarCollapsed) ToggleSidebar(); // clicking the white pill re-opens
+    }
+
+    // Treat Clara like a selectable user so the chat panel loads normally
+    private void SelectClara()
+    {
+        SelectedUser = new User
+        {
+            Id = -999,
+            FirstName = "Clara",
+            LastName = "Tea",
+            RoleString = "Clara",
+            ProfilePicturePath = string.Empty
+        };
+        ConversationMessages = new List<DirectMessage>(); // standard "No messages yet" state
         StateHasChanged();
     }
 }

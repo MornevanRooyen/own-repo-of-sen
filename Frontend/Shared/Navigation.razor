@@ -1,28 +1,45 @@
 ﻿@inherits LayoutComponentBase
-@* Shared/Navigation.razor — used as main layout *@
+@inject NavigationManager Nav
+
+@code {
+    public enum UserRole { Student, Tutor, Admin, Unknown }
+
+    [Parameter] public bool IsAdmin { get; set; } = false;
+    [Parameter] public UserRole Role { get; set; } = UserRole.Student;
+
+    private bool IsMenuOpen;
+
+    private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
+
+    private void NavigateTo(string path)
+    {
+        IsMenuOpen = false;
+        Nav.NavigateTo(path);
+    }
+
+    private string AvatarGradientClass =>
+        Role switch
+        {
+            UserRole.Tutor => "ring-tutor",
+            UserRole.Admin => "ring-admin",
+            UserRole.Student => "ring-student",
+            _ => "ring-ai" // purple default
+        };
+}
 
 <nav class="cl-nav">
-    <div class="nav-row">
-        <a class="brand" href="/Landing">
-            <span class="brand-text">CampusLearn</span>
+    <div class="container nav-row">
+        <!-- Brand -->
+        <a class="brand" href="/landing">
+            <h1 id="mainTitle">Campus<span>Learn</span></h1>
         </a>
 
+        <!-- Right controls: avatar then burger (burger far right) -->
         <div class="nav-actions">
-            <button class="theme-toggle" @onclick="ToggleDarkMode" title="Toggle Dark Mode">
-                <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
+            <!-- round avatar (role ring) -->
+            <button class="user-avatar @AvatarGradientClass"
+                    title="My profile"
+                    @onclick="@(() => Nav.NavigateTo("/studentprofile"))">
             </button>
 
             <button class="hamburger @(IsMenuOpen ? "active" : "")"
@@ -36,26 +53,27 @@
     </div>
 </nav>
 
-<!-- Backdrop -->
+<!-- Backdrop (sits ABOVE the top bar) -->
 <button class="backdrop"
         type="button"
         data-open="@IsMenuOpen.ToString().ToLowerInvariant()"
         @onclick="ToggleMenu"></button>
 
-<!-- Slide-out Drawer -->
+<!-- Slide-out Drawer (z-index > nav) -->
 <aside class="drawer" data-open="@IsMenuOpen.ToString().ToLowerInvariant()">
     <nav class="drawer-nav">
         <a @onclick='() => NavigateTo("/dashboard")'>Dashboard</a>
-        <a @onclick='() => NavigateTo("/studentprofile")'>My Profile</a> 
-        @* pretty sure there needs to be some backend code here depending on which email you sign up with *@
         <a @onclick='() => NavigateTo("/subjects")'>Subjects</a>
         <a @onclick='() => NavigateTo("/peers")'>Peers</a>
+        <a @onclick='() => NavigateTo("/messages")'>Messages</a>
+        <a @onclick='() => NavigateTo("/claratea")'>Ask ClaraTea</a>
 
         @if (IsAdmin)
         {
             <a @onclick='() => NavigateTo("/adminprofile")'>Admin</a>
         }
-        <a @onclick='Logout'>Logout</a>
+
+        <a @onclick='() => NavigateTo("/")'>Logout</a>
     </nav>
 </aside>
 
@@ -65,390 +83,214 @@
 
 <style>
     :root {
-        --bg: #FFFFFF;
-        --nav: #DBE4EE;
-        --ink: #2D3034;
+        --nav-bg: #3f3f3f;
+        --ink: #2a2a2a;
+        --ink-on: #fff;
+        --ring: rgba(0,0,0,.15);
         --radius: 1.25rem;
-        --ring: color-mix(in oklab, var(--ink) 12%, white);
-        --shadow: 0 12px 28px rgba(0,0,0,.08);
         --container: min(1200px,92vw);
-        
-        /* Light mode colors */
-        --bg-primary: #ffffff;
-        --bg-secondary: #f8f9fa;
-        --text-primary: #2c3e50;
-        --text-secondary: #6c757d;
-        --border-color: #e9ecef;
-        --shadow-dark: rgba(0, 0, 0, 0.1);
-    }
-
-    .dark-mode {
-        /* Dark mode colors */
-        --bg-primary: #1a1a1a;
-        --bg-secondary: #2d2d2d;
-        --text-primary: #ffffff;
-        --text-secondary: #b3b3b3;
-        --border-color: #404040;
-        --shadow-dark: rgba(0, 0, 0, 0.3);
-        
-        /* Override specific colors for dark mode */
-        --nav: #2d2d2d;
-        --ink: #ffffff;
-        --ring: #404040;
-        --bg: #1a1a1a;
-    }
-
-    /* Apply dark mode to body and main content */
-    .dark-mode body {
-        background-color: var(--bg-primary);
-        color: var(--text-primary);
-    }
-
-    .dark-mode main {
-        background-color: var(--bg-primary);
-    }
-
-    /* base */
-    *, *::before, *::after {
-        box-sizing: border-box
+        --nav-h: 88px;
+        /* role colours */
+        --stud-a: #2025B8;
+        --stud-b: #78D6FF;
+        --tutor-a: #E12929;
+        --tutor-b: #F3E17F;
+        --admin-a: #F4C430; /* warm yellow */
+        --admin-b: #FFD76A;
+        --ai-a: #B14CF4;
+        --ai-b: #FFA3F9;
     }
 
     .container {
         width: var(--container);
         margin-inline: auto;
-        padding-inline: clamp(12px,3vw,24px)
+        padding-inline: clamp(12px,3vw,24px);
     }
 
-    /* top bar */
+    /* stick the bar */
     .cl-nav {
         position: sticky;
         top: 0;
-        z-index: 50;
-        background: #4A5568; /* Dark gray background */
-        border-bottom: 1px solid var(--ring);
-        width: 100%;
+        z-index: 1000;
+        background: var(--nav-bg);
+        border-bottom: 1px solid rgba(255,255,255,.12);
+        box-shadow: 0 8px 28px rgba(0,0,0,.25);
     }
 
-    /* Override text colors for navigation bar only */
-    .cl-nav .brand {
-        color: #FFFFFF !important; /* White text for brand */
+    .nav-row {
+        height: var(--nav-h);
+        display: grid;
+        grid-template-columns: 1fr auto; /* brand | actions */
+        align-items: center;
+        gap: 16px;
     }
 
-    .cl-nav .brand-text {
-        color: #FFFFFF !important; /* White text for brand text */
-        text-decoration: underline;
-        text-decoration-color: #007bff;
-        text-underline-offset: 4px;
+    #mainTitle {
+        margin: 0;
+        color: var(--ink-on);
+        font-weight: 900;
+        font-size: clamp(24px,3vw,32px);
     }
 
-    .cl-nav .hamburger span {
-        background: #FFFFFF !important; /* White hamburger lines */
-    }
+        #mainTitle span {
+            font-weight: 300;
+            color: var(--ink-on);
+        }
 
-    /* ========== Navigation Actions ========== */
     .nav-actions {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: .8rem;
     }
 
-    /* ========== Theme Toggle Button ========== */
-    .theme-toggle {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        padding: 8px;
+    /* avatar ring per role + hover glow */
+    .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 0;
         cursor: pointer;
-        transition: all 0.3s ease;
         position: relative;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background: radial-gradient(closest-side,#fff 71%,transparent 72%) center/100% 100% no-repeat;
+        box-shadow: 0 8px 18px rgba(0,0,0,.35);
+        transition: box-shadow .18s ease, transform .18s ease, width 0.2s, height 0.2s;
     }
 
-    .theme-toggle:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.3);
-        transform: scale(1.05);
-    }
+        .user-avatar:hover {
+            box-shadow: 0 10px 24px rgba(0,0,0,.45);
+            transform: translateY(-1px);
+            width: 50px;
+            height: 50px;
 
-    .theme-toggle:active {
-        transform: scale(0.95);
-    }
+        }
 
-    .theme-toggle svg {
-        position: absolute;
-        transition: all 0.3s ease;
-        color: #FFFFFF;
-    }
+        .user-avatar::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            -webkit-mask: radial-gradient(farthest-side, transparent 70%, #000 71%);
+            mask: radial-gradient(farthest-side, transparent 70%, #000 71%);
+            background: conic-gradient(var(--ai-a), var(--ai-b), var(--ai-a));
+        }
 
-    .sun-icon {
-        opacity: 1;
-        transform: rotate(0deg);
-    }
+        .user-avatar.ring-student::before {
+            background: conic-gradient(var(--stud-a), var(--stud-b), var(--stud-a));
+        }
 
-    .moon-icon {
-        opacity: 0;
-        transform: rotate(180deg);
-    }
+        .user-avatar.ring-tutor::before {
+            background: conic-gradient(var(--tutor-a), var(--tutor-b), var(--tutor-a));
+        }
 
-    .dark-mode .sun-icon {
-        opacity: 0;
-        transform: rotate(180deg);
-    }
+        .user-avatar.ring-admin::before {
+            background: conic-gradient(var(--admin-a), var(--admin-b), var(--admin-a));
+        }
 
-    .dark-mode .moon-icon {
-        opacity: 1;
-        transform: rotate(0deg);
-    }
+        .user-avatar.ring-ai::before {
+            background: conic-gradient(var(--ai-a), var(--ai-b), var(--ai-a));
+        }
 
-    /* Dark mode for hamburger menu */
-    .dark-mode .hamburger span {
-        background: var(--ink);
-        transition: background-color 0.3s ease, transform 0.25s ease, opacity 0.25s ease;
-    }
-
-    /* Dark mode for drawer menu */
-    .dark-mode .drawer {
-        background: var(--bg-primary);
-        border-color: var(--border-color);
-        box-shadow: var(--shadow-dark);
-    }
-
-    .dark-mode .drawer-nav a {
-        color: var(--text-primary);
-    }
-
-    .dark-mode .drawer-nav a:hover {
-        background: var(--bg-secondary);
-    }
-
-
-    .nav-row {
-        height: 64px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 24px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        text-decoration: none;
-        color: var(--ink)
-    }
-
-    .brand-text {
-        font-weight: 800;
-        font-size: clamp(18px,2.1vw,24px);
-    }
-
-    .logo {
-        color: var(--ink)
-    }
-
-
-    /* hamburger */
+    /* burger far right */
     .hamburger {
         background: none;
         border: 0;
         cursor: pointer;
-        width: 40px;
-        height: 34px;
+        width: 36px;
+        height: 28px;
         display: grid;
-        place-items: center
+        place-items: center;
+        padding: 0;
     }
 
         .hamburger span {
-            display: block;
             width: 26px;
             height: 3px;
-            background: var(--ink);
-            border-radius: 8px;
-            transition: transform .25s ease, opacity .25s ease, background-color 0.3s ease;
+            background: #fff;
+            border-radius: 6px;
+            display: block;
+            transition: transform .25s, opacity .25s;
         }
 
             .hamburger span + span {
-                margin-top: 5px
+                margin-top: 5px;
             }
 
         .hamburger.active span:nth-child(1) {
-            transform: translateY(8px) rotate(45deg)
+            transform: translateY(8px) rotate(45deg);
         }
 
         .hamburger.active span:nth-child(2) {
-            opacity: 0
+            opacity: 0;
         }
 
         .hamburger.active span:nth-child(3) {
-            transform: translateY(-8px) rotate(-45deg)
+            transform: translateY(-8px) rotate(-45deg);
         }
 
-    /* backdrop */
+    /* Backdrop and Drawer sit well above the nav */
     .backdrop {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,.25);
+        background: rgba(0,0,0,.28);
         border: 0;
-        padding: 0;
         margin: 0;
+        padding: 0;
         opacity: 0;
         pointer-events: none;
-        transition: opacity .24s ease;
-        z-index: 59;
+        transition: opacity .22s ease;
+        z-index: 1200;
     }
 
         .backdrop[data-open="true"] {
             opacity: 1;
-            pointer-events: auto
+            pointer-events: auto;
         }
 
-    /* drawer */
     .drawer {
         position: fixed;
         inset: 0 0 0 auto;
         width: min(78vw,360px);
         translate: 100% 0;
-        transition: translate .24s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        transition: translate .22s ease;
         background: #fff;
         border-left: 1px solid var(--ring);
-        box-shadow: var(--shadow);
-        z-index: 60;
-        padding: 20px;
+        box-shadow: 0 12px 24px rgba(0,0,0,.30);
+        z-index: 1300;
+        padding: 18px 16px;
     }
 
         .drawer[data-open="true"] {
-            translate: 0 0
+            translate: 0 0;
         }
 
     .drawer-nav {
         display: grid;
         gap: 10px;
-        margin-top: 6px
+        margin-top: 6px;
     }
 
         .drawer-nav a {
             display: block;
-            padding: 12px;
+            padding: 12px 14px;
             border-radius: 12px;
             font-weight: 800;
             text-decoration: none;
             color: var(--ink);
-            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
             .drawer-nav a:hover {
-                background: color-mix(in oklab, var(--ink) 6%, white)
+                background: rgba(0,0,0,.06);
             }
 
-    /* small screens */
-    @@media (max-width:520px) {
-        .brand-text {
-            display: none
+    /* allow content below nav */
+    .page-body {
+        display: block;
+    }
+
+    /* responsive */
+    @@media (max-width: 760px) {
+        .nav-row {
+            grid-template-columns: auto auto;
         }
     }
 </style>
-
-@implements IDisposable
-
-@code {
-    [Inject] private NavigationManager Nav { get; set; }
-    [Inject] private Frontend.Services.AuthService Auth { get; set; }
-    [Inject] private IJSRuntime JS { get; set; }
-
-    [Parameter] public bool IsAdmin { get; set; } = false;
-    private bool IsMenuOpen;
-    private bool IsDarkMode = false;
-
-    private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
-
-    private async Task ToggleDarkMode()
-    {
-        IsDarkMode = !IsDarkMode;
-        await ApplyTheme();
-        
-        // Save preference to localStorage
-        try
-        {
-            await JS.InvokeVoidAsync("localStorage.setItem", "darkMode", IsDarkMode.ToString().ToLowerInvariant());
-        }
-        catch
-        {
-            // localStorage might not be available in some contexts
-        }
-    }
-
-    private async Task ApplyTheme()
-    {
-        try
-        {
-            if (IsDarkMode)
-            {
-                await JS.InvokeVoidAsync("document.documentElement.classList.add", "dark-mode");
-            }
-            else
-            {
-                await JS.InvokeVoidAsync("document.documentElement.classList.remove", "dark-mode");
-            }
-        }
-        catch
-        {
-            // JS interop might fail in some contexts
-        }
-    }
-
-    private void NavigateTo(string path)
-    {
-        IsMenuOpen = false;
-        Nav.NavigateTo(path);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        Nav.LocationChanged += HandleLocationChanged;
-        _ = RefreshRoleAsync();
-        
-        // Load dark mode preference from localStorage
-        try
-        {
-            var darkModePreference = await JS.InvokeAsync<string>("localStorage.getItem", "darkMode");
-            IsDarkMode = darkModePreference == "true";
-            await ApplyTheme();
-        }
-        catch
-        {
-            // If localStorage is not available, default to light mode
-            IsDarkMode = false;
-        }
-    }
-
-    private async Task RefreshRoleAsync()
-    {
-        var role = await Auth.GetCurrentUserRoleAsync();
-        IsAdmin = !string.IsNullOrWhiteSpace(role) && role.Trim().Equals("admin", StringComparison.OrdinalIgnoreCase);
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private void HandleLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
-    {
-        _ = RefreshRoleAsync();
-    }
-
-    private async Task Logout()
-    {
-        await Auth.LogoutAsync();
-        IsAdmin = false;
-        NavigateTo("/");
-    }
-
-    public void Dispose()
-    {
-        Nav.LocationChanged -= HandleLocationChanged;
-    }
-}

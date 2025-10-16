@@ -26,8 +26,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwr
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.afc3tfe91d.wasm
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.ud1w8xy0o7.wasm
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.kgtgiubdmj.wasm
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.n2u0plre32.pdb
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.c6emizcxsk.wasm
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\icudt_CJK.tjcz0u77k5.dat
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\icudt_EFIGS.tptq2av103.dat
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\icudt_no_CJK.lfu7j35m59.dat
@@ -115,8 +113,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwr
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.9era4dagmb.wasm
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dbxi910nvs.wasm
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.dll.config
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.kksyvi18pe.pdb
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.0il38yu7zc.wasm
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Supabase.Core.zcuz262cdn.wasm
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Supabase.Functions.das9utiwul.wasm
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Supabase.Gotrue.xbua2clo5a.wasm
@@ -336,7 +332,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwr
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Diagnostics.DiagnosticSource.onf7a771xa.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Xml.Serialization.ue0pg3pj3d.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Runtime.Loader.ny7ii14wer.wasm.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.kksyvi18pe.pdb.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Microsoft.TestPlatform.Utilities.kupnjntebp.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Core.i2gfsit2dg.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\mscorlib.xd6mv31d55.wasm.gz
@@ -375,7 +370,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwr
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Threading.Thread.ela0zpa4cu.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\MimeMapping.gmxjevqz69.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Microsoft.Extensions.Configuration.Json.7a8qwg1fzw.wasm.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.n2u0plre32.pdb.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\pl\Microsoft.TestPlatform.CrossPlatEngine.resources.vc7724fskb.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Microsoft.EntityFrameworkCore.Abstractions.3lmupq1tu2.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Runtime.InteropServices.ksoqlt99hd.wasm.gz
@@ -456,7 +450,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwr
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Microsoft.VisualBasic.Core.qljjwgjnrn.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.IO.FileSystem.278u1momgg.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\ru\Microsoft.TestPlatform.CrossPlatEngine.resources.4pqkibfbrq.wasm.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.c6emizcxsk.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Runtime.Extensions.te5ibe9mop.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dbxi910nvs.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Xml.XPath.XDocument.k25bvuxkbu.wasm.gz
@@ -475,7 +468,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwr
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.kgtgiubdmj.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Runtime.hexcao080t.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.gkiz6b0ca4.wasm.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.0il38yu7zc.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Diagnostics.FileVersionInfo.3u9sednzu3.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.1p44dgvfax.wasm.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\System.Data.DataSetExtensions.rwrekrq7sx.wasm.gz
@@ -1240,7 +1232,6 @@ C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\blaz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\blazor.boot.json
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\3ranqx5z3g-khy4lop6wu.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\nc4k800ojr-8rbvw3on5j.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\gagwzvzvfg-4u46ww5i4s.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\g1hjx21r9s-qhwzjpm6hj.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\6n8q7nco3q-h9o0enghgw.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\qgerszyb1m-t1cqhe9u97.gz
@@ -1595,12 +1586,7 @@ C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\comp
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\iw0ae27wof-tjcz0u77k5.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\285b9jwisc-tptq2av103.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\gigkqu8b6v-lfu7j35m59.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\kltuif5gvt-0il38yu7zc.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\3xre9mjkz3-kksyvi18pe.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\jlteakxexk-tofjs4wrvy.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-c6emizcxsk.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-n2u0plre32.gz
-C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-2b3u3phs1d.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\staticwebassets.build.json
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\staticwebassets.development.json
@@ -3224,3 +3210,17 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\bin\Debug\net9.0\wwwroot
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-hq9v1jzbia.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-kf10k5mzje.gz
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-n4k3f7dxx5.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.ty0t4iq7po.pdb
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.yp7bcq6nrk.wasm
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.k90yv3xvdp.pdb
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.jsf4ph5m8v.wasm
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.k90yv3xvdp.pdb.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.ty0t4iq7po.pdb.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Frontend.yp7bcq6nrk.wasm.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\bin\Debug\net9.0\wwwroot\_framework\Sen381.jsf4ph5m8v.wasm.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\gagwzvzvfg-yoj7644l4p.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\kltuif5gvt-jsf4ph5m8v.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\3xre9mjkz3-k90yv3xvdp.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\idv3gmpu33-yp7bcq6nrk.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\820j4a4l7m-ty0t4iq7po.gz
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Frontend\obj\Debug\net9.0\compressed\njn95cf9xo-lakgswcvi5.gz

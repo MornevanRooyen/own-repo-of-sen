@@ -1,32 +1,258 @@
 ﻿@page "/topichub"
+@inject NavigationManager Nav
 
+<main class="hub-scope">
+    <div class="hub-wrap">
+        <div class="hub-grid">
+            <!-- LEFT: subject menu -->
+            <aside class="menu-card">
+                <header class="menu-head">
+                    <div class="code">BUM 281</div>
+                    <div class="sub">Topic hub</div>
+                </header>
 
-<main class="hub">
-    <div class="container grid">
-        <!-- LEFT: Subject menu card -->
-        <aside class="menu-card">
-            <div class="menu-head">
-                <div class="code">BUM 281</div>
-                <div class="sub">TOPIC CHOICE</div>
-            </div>
+                <nav class="menu-links">
+                    <a href="/topichub/tutors"
+                       class="menu-link @(Active == "tutors" ? "active" : null)">
+                        <span class="dot"></span>
+                        <span class="txt">Tutors</span>
+                    </a>
 
-            <nav class="menu-links">
-                <a href="/topichub/tutors">Tutors</a>
-                <a href="/topichub/forum">Discussion Forum</a>
-                <a href="/topichub/resources">Learning Resources</a>
-                <a href="/topichub/claratea">AI Chatbot</a>
-                <a href="/topichub/tutorprofile">Tutor Profile</a>
-            </nav>
+                    <a href="/topichub/forum"
+                       class="menu-link @(Active == "forum" ? "active" : null)">
+                        <span class="dot"></span>
+                        <span class="txt">Forum</span>
+                    </a>
 
-            <div class="menu-foot">
-                <span class="chev">^</span>
-            </div>
-        </aside>
+                    <a href="/topichub/resources"
+                       class="menu-link @(Active == "resources" ? "active" : null)">
+                        <span class="dot"></span>
+                        <span class="txt">Resources</span>
+                    </a>
+                </nav>
 
-        <!-- RIGHT: Content host (placeholder grey block) -->
-        <section class="content-host">
-            <div class="placeholder"></div>
-        </section>
+                <footer class="menu-foot">
+                    <span class="hint">Pick a section</span>
+                </footer>
+            </aside>
+
+            <!-- RIGHT: content host (placeholder for now) -->
+            <section class="content-host">
+                <div class="placeholder">
+                    <div class="ghost"></div>
+                    <div class="ghost wide"></div>
+                    <div class="ghost mid"></div>
+                </div>
+            </section>
+        </div>
     </div>
 </main>
 
+@code {
+    private string Active = "tutors";
+
+    protected override void OnInitialized()
+    {
+        // Make Tutors the default: /topichub -> /topichub/tutors
+        var uri = new Uri(Nav.Uri);
+        if (uri.AbsolutePath.TrimEnd('/').Equals("/topichub", StringComparison.OrdinalIgnoreCase))
+        {
+            Nav.NavigateTo("/topichub/tutors", replace: true);
+            Active = "tutors";
+            return;
+        }
+
+        // Detect active section from path
+        var segs = uri.AbsolutePath.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+        Active = segs.Length >= 2 ? segs[1].ToLowerInvariant() : "tutors";
+    }
+}
+<style>
+    /* ===== scoped page tokens (no globals) ===== */
+    .hub-scope {
+        --bg: #F2F3F5;
+        --panel: #fff;
+        --ink: #1F2937;
+        --muted: #6B7280;
+        --ring: rgba(0,0,0,.10);
+        --radius: 16px;
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+        --container: min(1200px,92vw);
+        --accent-a: #1D4ED8; /* student blue family */
+        --accent-b: #3B82F6;
+        font-family: system-ui,-apple-system,"Segoe UI",Inter,Roboto,Arial,"Helvetica Neue",sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+    }
+
+        .hub-scope .hub-wrap {
+            width: var(--container);
+            margin-inline: auto;
+            padding-inline: clamp(12px,3vw,24px);
+            padding-block: clamp(16px,3.2vw,28px);
+        }
+
+        .hub-scope .hub-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: clamp(14px,2vw,22px);
+        }
+
+        /* ===== left menu ===== */
+        .hub-scope .menu-card {
+            background: var(--panel);
+            border: 1px solid var(--ring);
+            border-radius: calc(var(--radius) + 2px);
+            box-shadow: var(--shadow);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            overflow: hidden;
+        }
+
+        .hub-scope .menu-head {
+            padding: 16px 16px 10px;
+            border-bottom: 1px solid var(--ring);
+        }
+
+            .hub-scope .menu-head .code {
+                font-weight: 900;
+                letter-spacing: .3px;
+            }
+
+            .hub-scope .menu-head .sub {
+                color: var(--muted);
+                font-weight: 800;
+                margin-top: 4px;
+            }
+
+        .hub-scope .menu-links {
+            display: grid;
+            gap: 8px;
+            padding: 12px 10px;
+        }
+
+        .hub-scope .menu-link {
+            display: grid;
+            grid-template-columns: 18px 1fr;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--ink);
+            border: 1px solid var(--ring);
+            background: #fff;
+            font-weight: 900;
+            transition: transform .14s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
+        }
+
+            .hub-scope .menu-link .dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 999px;
+                background: color-mix(in oklab, var(--accent-a) 80%, #fff);
+                box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent-a) 18%, transparent);
+            }
+
+            .hub-scope .menu-link:hover {
+                transform: translateY(-1px);
+                border-color: color-mix(in oklab, var(--ink) 22%, #fff);
+                box-shadow: 0 12px 34px rgba(0,0,0,.10), 0 0 0 10px color-mix(in oklab, var(--accent-a) 10%, transparent);
+            }
+
+            .hub-scope .menu-link.active {
+                background: linear-gradient(180deg,#fff, #fafbff);
+                border-color: color-mix(in oklab, var(--accent-a) 42%, #fff);
+                box-shadow: 0 10px 28px color-mix(in oklab, var(--accent-a) 18%, transparent);
+            }
+
+                .hub-scope .menu-link.active .dot {
+                    background: conic-gradient(var(--accent-a), var(--accent-b), var(--accent-a));
+                    box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent-a) 22%, transparent);
+                }
+
+        .hub-scope .menu-foot {
+            padding: 10px 12px 14px;
+            border-top: 1px solid var(--ring);
+            color: var(--muted);
+            font-weight: 800;
+            text-align: center;
+        }
+
+            .hub-scope .menu-foot .hint {
+                opacity: .85;
+            }
+
+        /* ===== right content host ===== */
+        .hub-scope .content-host {
+            background: var(--panel);
+            border: 1px solid var(--ring);
+            border-radius: calc(var(--radius) + 2px);
+            box-shadow: var(--shadow);
+            min-height: 420px;
+            display: grid;
+            place-items: start stretch;
+            overflow: hidden;
+        }
+
+        /* placeholder skeleton */
+        .hub-scope .placeholder {
+            padding: 18px 18px 24px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .hub-scope .ghost {
+            height: 14px;
+            width: 38%;
+            border-radius: 8px;
+            background: linear-gradient(90deg,#f2f4f9 0%,#eef2f8 50%,#f2f4f9 100%);
+            animation: shimmer 1.2s linear infinite;
+        }
+
+            .hub-scope .ghost.wide {
+                width: 78%;
+                height: 12px;
+            }
+
+            .hub-scope .ghost.mid {
+                width: 56%;
+                height: 12px;
+            }
+
+    @@keyframes shimmer {
+        from {
+            background-position: -200px 0;
+        }
+
+        to {
+            background-position: 200px 0;
+        }
+    }
+
+    /* ===== responsive ===== */
+    @@media (max-width: 960px) {
+        .hub-scope .hub-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ===== NAV STABILIZER (page-local) =====
+         Keeps the top bar looking like the dashboard without restyling it. */
+    @@layer hub_nav_fix {
+        nav {
+            display: flex !important;
+            align-items: center !important;
+            min-height: 64px !important;
+            padding-block: 0 !important;
+        }
+
+            nav * {
+                font-family: inherit;
+            }
+
+            nav :is(.mainTitle,.avatar,.hamburger,.menu-toggle) {
+                align-self: center !important;
+            }
+    }
+</style>

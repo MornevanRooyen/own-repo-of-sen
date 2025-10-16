@@ -1,163 +1,148 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Nav
 
-<!-- ===== Top Bar (same behavior as Shared/Navigation.razor) ===== -->
+@code {
+    private bool menuOpen;
+
+    private void ToggleMenu() => menuOpen = !menuOpen;
+    private void Go(string path) { menuOpen = false; Nav.NavigateTo(path); }
+
+    // Left-card links
+    [Parameter] public string SubjectCode { get; set; } = "BUM 281";
+}
+
+<!-- Top navigation (same structure/styles as the app’s main nav) -->
 <nav class="cl-nav">
     <div class="container nav-row">
-        <a class="brand" href="/Landing">
-            <span class="logo" aria-hidden="true">
-                <svg viewBox="0 0 64 64" width="34" height="34" role="img" focusable="false">
-                    <g stroke="currentColor" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M42 14c-4-4-9-6-14-6C15 8 8 15 8 26s7 18 20 18c5 0 10-2 14-6" />
-                        <path d="M56 12v32H34" />
-                    </g>
-                </svg>
-            </span>
-            <span class="brand-text">CampusLearn</span>
+        <a class="brand" href="/dashboard">
+            <h1 id="mainTitle">Campus<span>Learn</span></h1>
         </a>
 
-        <button class="hamburger @(IsMenuOpen ? "active" : "")"
-                aria-label="Menu"
-                aria-expanded="@IsMenuOpen.ToString().ToLowerInvariant()"
-                type="button"
-                @onclick="ToggleMenu">
-            <span></span><span></span><span></span>
-        </button>
+        <div class="nav-actions">
+            <button class="hamburger @(menuOpen ? "active" : "")"
+                    aria-label="Menu"
+                    aria-expanded="@menuOpen.ToString().ToLowerInvariant()"
+                    @onclick="ToggleMenu" type="button">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
     </div>
 </nav>
 
-<!-- Backdrop (click to close) -->
-<button class="backdrop"
-        type="button"
-        data-open="@IsMenuOpen.ToString().ToLowerInvariant()"
-        @onclick="ToggleMenu"></button>
-
-<!-- Slide-out Drawer (mobile nav for TopicHub) -->
-<aside class="drawer" data-open="@IsMenuOpen.ToString().ToLowerInvariant()">
+<!-- Drawer -->
+<button class="backdrop" type="button" data-open="@menuOpen.ToString().ToLowerInvariant()" @onclick="ToggleMenu"></button>
+<aside class="drawer" data-open="@menuOpen.ToString().ToLowerInvariant()">
     <nav class="drawer-nav">
-        <a @onclick='() => NavigateTo("/dashboard")'>Dashboard</a>
-        <a @onclick='() => NavigateTo("/studentprofile")'>My Profile</a>
-        <a @onclick='() => NavigateTo("/subjects")'>Subjects</a>
-        <a @onclick='() => NavigateTo("/peers")'>Peers</a>
+        <a @onclick='() => Go("/dashboard")'>Dashboard</a>
+        <a @onclick='() => Go("/subjects")'>Subjects</a>
+        <a @onclick='() => Go("/peers")'>Peers</a>
+        <a @onclick='() => Go("/messages")'>Messages</a>
+        <a @onclick='() => Go("/claratea")'>Ask Clara</a>
+        <a @onclick='() => Go("/")'>Log out</a>
     </nav>
 </aside>
 
-<!-- ===== Page Body ===== -->
-<main class="hub">
-    <div class="container grid">
-        <!-- Desktop sidebar (hidden on mobile; drawer replaces it) -->
+<!-- Hub grid -->
+<main class="hub-shell">
+    <div class="container hub-grid">
+        <!-- left menu card -->
         <aside class="menu-card">
             <div class="menu-head">
-                <div class="code">BUM 281</div>
+                <div class="code">@SubjectCode</div>
                 <div class="sub">TOPIC CHOICE</div>
             </div>
 
             <nav class="menu-links">
-                <a href="/topichub/tutors">Tutors</a>
-                <a href="/topichub/forum">Discussion Forum</a>
-                <a href="/topichub/learningresources">Learning Resources</a>
-                <a href="/topichub/claratea">AI Chatbot</a>
-                <a href="/topichub/tutorprofile">Tutor Profile</a>
+                <a href="/topichub/tutors" class="link">Tutors</a>
+                <a href="/topichub/forum" class="link">Forum</a>
+                <a href="/topichub/resources" class="link">Resources</a>
             </nav>
 
-            <div class="menu-foot">
-                <span class="chev">^</span>
-            </div>
+            <div class="menu-foot"><span class="chev">^</span></div>
         </aside>
 
-        <section class="content-host">
-            <div class="content-inner">
-                @Body
-            </div>
+        <!-- right side content -->
+        <section class="hub-content">
+            @Body
         </section>
     </div>
 </main>
 
 <style>
     :root {
-        --bg: #FFFFFF;
-        --nav: #DBE4EE;
-        --ink: #2D3034;
-        --panel: #DBE4EE;
-        --ring: color-mix(in oklab, var(--ink) 12%, white);
-        --radius: 1.25rem;
-        --container: min(1200px, 92vw);
-        --shadow-1: 0 8px 22px rgba(0,0,0,.06);
-        --shadow-2: 0 12px 28px rgba(0,0,0,.08);
+        --nav-bg: #3f3f3f;
+        --ink: #2a2a2a;
+        --ink-on: #fff;
+        --ring: rgba(0,0,0,.15);
+        --container: min(1200px,92vw);
+        --nav-h: 88px;
+        --panel: #fff;
+        --bg: #eef2f6;
+        --radius: 18px;
+        --shadow: 0 12px 32px rgba(0,0,0,.10);
+        --ring-soft: color-mix(in oklab,var(--ink) 12%, white);
     }
 
-    *, *::before, *::after {
-        box-sizing: border-box
-    }
-
-    html, body {
-        height: 100%
-    }
-
-    body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--ink);
-        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif;
-    }
-
+    /* ===== Top nav (copied style footprint of your main nav) ===== */
     .container {
         width: var(--container);
         margin-inline: auto;
         padding-inline: clamp(12px,3vw,24px)
     }
 
-    /* ===== Top bar (mirrors Shared/Navigation.razor) ===== */
     .cl-nav {
         position: sticky;
         top: 0;
-        z-index: 50;
-        background: var(--nav);
-        border-bottom: 1px solid var(--ring)
+        z-index: 1000;
+        background: var(--nav-bg);
+        border-bottom: 1px solid rgba(255,255,255,.12);
+        box-shadow: 0 8px 28px rgba(0,0,0,.25)
     }
 
     .nav-row {
-        height: 64px;
-        display: flex;
+        height: var(--nav-h);
+        display: grid;
+        grid-template-columns: 1fr auto;
         align-items: center;
-        justify-content: space-between;
         gap: 16px
     }
 
-    .brand {
+    #mainTitle {
+        margin: 0;
+        color: var(--ink-on);
+        font-weight: 900;
+        font-size: clamp(24px,3vw,32px)
+    }
+
+        #mainTitle span {
+            font-weight: 300;
+            color: var(--ink-on)
+        }
+
+    .nav-actions {
         display: flex;
         align-items: center;
-        gap: 10px;
-        text-decoration: none;
-        color: var(--ink)
+        gap: .8rem
     }
 
-    .brand-text {
-        font-weight: 800;
-        font-size: clamp(18px,2.1vw,24px)
-    }
-
-    .logo {
-        color: var(--ink)
-    }
-
-    /* Hamburger (same animation & API) */
     .hamburger {
         background: none;
         border: 0;
         cursor: pointer;
-        width: 40px;
-        height: 34px;
+        width: 36px;
+        height: 28px;
         display: grid;
-        place-items: center
+        place-items: center;
+        padding: 0
     }
 
         .hamburger span {
-            display: block;
             width: 26px;
             height: 3px;
-            background: var(--ink);
-            border-radius: 8px;
-            transition: transform .25s ease, opacity .25s ease
+            background: #fff;
+            border-radius: 6px;
+            display: block;
+            transition: transform .25s,opacity .25s
         }
 
             .hamburger span + span {
@@ -176,18 +161,15 @@
             transform: translateY(-8px) rotate(-45deg)
         }
 
-    /* Backdrop (same attributes/data-open approach) */
     .backdrop {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,.25);
+        background: rgba(0,0,0,.28);
         border: 0;
-        padding: 0;
-        margin: 0;
         opacity: 0;
         pointer-events: none;
-        transition: opacity .24s ease;
-        z-index: 59;
+        transition: opacity .22s ease;
+        z-index: 1200
     }
 
         .backdrop[data-open="true"] {
@@ -195,18 +177,17 @@
             pointer-events: auto
         }
 
-    /* Drawer (same attributes/data-open approach) */
     .drawer {
         position: fixed;
         inset: 0 0 0 auto;
         width: min(78vw,360px);
         translate: 100% 0;
-        transition: translate .24s ease;
+        transition: translate .22s ease;
         background: #fff;
         border-left: 1px solid var(--ring);
-        box-shadow: var(--shadow-2);
-        z-index: 60;
-        padding: 20px;
+        box-shadow: 0 12px 24px rgba(0,0,0,.30);
+        z-index: 1300;
+        padding: 18px 16px
     }
 
         .drawer[data-open="true"] {
@@ -221,7 +202,7 @@
 
         .drawer-nav a {
             display: block;
-            padding: 12px;
+            padding: 12px 14px;
             border-radius: 12px;
             font-weight: 800;
             text-decoration: none;
@@ -229,104 +210,87 @@
         }
 
             .drawer-nav a:hover {
-                background: color-mix(in oklab, var(--ink) 6%, white)
+                background: rgba(0,0,0,.06)
             }
 
-    /* ===== TopicHub layout ===== */
-    .hub {
-        padding-block: clamp(14px, 3.4vw, 22px)
+    /* ===== Hub grid ===== */
+    .hub-shell {
+        background: var(--bg)
     }
 
-    .grid {
+    .hub-grid {
         display: grid;
-        grid-template-columns: 280px 1fr; /* sidebar + content */
-        gap: clamp(14px, 3vw, 22px);
+        grid-template-columns: 280px 1fr;
+        gap: 22px;
+        padding-block: 16px;
+        overflow-x: hidden
     }
 
     .menu-card {
-        background: var(--panel);
-        border: 1px solid var(--ring);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-1);
-        padding: 18px 16px 8px;
+        background: #dbe4ee;
+        border: 1px solid var(--ring-soft);
+        border-radius: 22px;
+        box-shadow: 0 10px 26px rgba(0,0,0,.08);
+        padding: 18px;
         display: flex;
         flex-direction: column;
-        min-height: 360px;
+        gap: 12px
     }
 
     .menu-head .code {
         font-weight: 900;
-        font-size: 28px;
-        line-height: 1;
+        font-size: 22px
     }
 
     .menu-head .sub {
-        margin-top: 6px;
-        font-size: 12px;
-        letter-spacing: .8px;
-        font-weight: 800;
+        letter-spacing: .12em;
+        font-size: .78rem;
+        font-weight: 900;
+        opacity: .75
     }
 
     .menu-links {
-        margin-top: 16px;
         display: grid;
-        gap: 14px;
+        gap: 10px;
+        margin-top: 8px
     }
 
-        .menu-links a {
+        .menu-links .link {
+            display: block;
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-weight: 800;
+            color: #111;
             text-decoration: none;
-            color: var(--ink);
-            font-weight: 600;
-            padding: 6px 6px;
-            border-radius: 10px;
+            border: 1px solid var(--ring-soft);
+            background: #fff
         }
 
-            .menu-links a:hover {
-                background: color-mix(in oklab, var(--ink) 6%, white);
+            .menu-links .link:hover {
+                box-shadow: 0 8px 18px rgba(0,0,0,.08)
             }
 
     .menu-foot {
-        margin-top: auto;
-        display: flex;
-        justify-content: center;
-        padding-top: 10px;
+        display: grid;
+        place-items: center;
+        color: #111;
+        opacity: .55
     }
 
-    .chev {
-        font-weight: 800
+    .hub-content {
+        min-width: 0
     }
-
-    .content-host {
-        border-radius: var(--radius)
-    }
-
-    /* ===== Responsive ===== */
     @@media (max-width: 900px) {
-        .brand-text {
-            display: none
-        }
+        .hub-grid
 
-        .grid {
-            grid-template-columns: 1fr;
-        }
+    {
+        grid-template-columns: 1fr
+    }
 
-        .menu-card {
-            display: none;
-        }
-        /* use drawer on mobile */
+    .menu-card {
+        position: sticky;
+        top: calc(var(--nav-h) + 8px)
+    }
+
     }
 </style>
-
-@code {
-    [Inject] private NavigationManager Nav { get; set; } = default!;
-
-    private bool IsMenuOpen;
-
-    private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
-
-    private void NavigateTo(string path)
-    {
-        IsMenuOpen = false;   // close the drawer before navigating
-        Nav.NavigateTo(path);
-    }
-}
