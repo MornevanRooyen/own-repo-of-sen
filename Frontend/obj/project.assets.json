@@ -4946,11 +4946,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\Frontend.csproj",
+      "projectUniqueName": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\Frontend.csproj",
       "projectName": "Frontend",
-      "projectPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\Frontend.csproj",
+      "projectPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\Frontend.csproj",
       "packagesPath": "C:\\Users\\morne\\.nuget\\packages\\",
-      "outputPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\obj\\",
+      "outputPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -4971,8 +4971,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\Sen381.csproj": {
-              "projectPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\Sen381.csproj"
+            "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Sen381\\Sen381.csproj": {
+              "projectPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Sen381\\Sen381.csproj"
             }
           }
         }

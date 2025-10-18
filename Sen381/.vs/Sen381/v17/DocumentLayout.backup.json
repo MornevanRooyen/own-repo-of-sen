@@ -1,9 +1,18 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\",
+  "WorkspaceRootPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Sen381\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F71772DD-08CB-4B67-878D-2A90E4D77AEF}|..\\Frontend\\Frontend.csproj|c:\\sen381 github repo\\own repo\\own-repo-of-sen\\frontend\\pages\\adminprofile.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{F71772DD-08CB-4B67-878D-2A90E4D77AEF}|..\\Frontend\\Frontend.csproj|c:\\sen381 github repo\\own repo\\own-repo-of-sen381\\frontend\\wwwroot\\js\\clarabot.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F71772DD-08CB-4B67-878D-2A90E4D77AEF}|..\\Frontend\\Frontend.csproj|c:\\sen381 github repo\\own repo\\own-repo-of-sen381\\frontend\\pages\\chatbot.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F71772DD-08CB-4B67-878D-2A90E4D77AEF}|..\\Frontend\\Frontend.csproj|c:\\sen381 github repo\\own repo\\own-repo-of-sen381\\frontend\\wwwroot\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\Pages\\AdminProfile.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -13,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -36,17 +45,56 @@
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "clarabot.js",
+              "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\wwwroot\\js\\clarabot.js",
+              "RelativeDocumentMoniker": "..\\Frontend\\wwwroot\\js\\clarabot.js",
+              "ToolTip": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\wwwroot\\js\\clarabot.js",
+              "RelativeToolTip": "..\\Frontend\\wwwroot\\js\\clarabot.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-10-17T11:43:00.243Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Chatbot.razor",
+              "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\Pages\\Chatbot.razor",
+              "RelativeDocumentMoniker": "..\\Frontend\\Pages\\Chatbot.razor",
+              "ToolTip": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\Pages\\Chatbot.razor",
+              "RelativeToolTip": "..\\Frontend\\Pages\\Chatbot.razor",
+              "ViewState": "AgIAAE0AAAAAAAAAAAAiwFoAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-17T11:42:41.244Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "index.html",
+              "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\wwwroot\\index.html",
+              "RelativeDocumentMoniker": "..\\Frontend\\wwwroot\\index.html",
+              "ToolTip": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\wwwroot\\index.html",
+              "RelativeToolTip": "..\\Frontend\\wwwroot\\index.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-10-17T11:42:22.436Z",
+              "EditorCaption": ""
+            },
+            {
               "$type": "Bookmark",
               "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "AdminProfile.razor",
               "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\Pages\\AdminProfile.razor",
-              "RelativeDocumentMoniker": "..\\Frontend\\Pages\\AdminProfile.razor",
+              "RelativeDocumentMoniker": "..\\..\\own-repo-of-sen\\Frontend\\Pages\\AdminProfile.razor",
               "ToolTip": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\Pages\\AdminProfile.razor",
-              "RelativeToolTip": "..\\Frontend\\Pages\\AdminProfile.razor",
+              "RelativeToolTip": "..\\..\\own-repo-of-sen\\Frontend\\Pages\\AdminProfile.razor",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-10-16T16:16:02.369Z",

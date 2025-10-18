@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Sen381Backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d959cf80e780841f080d73222ea47f21d8439aee")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2d0789bd0d5a9f6d8aa7445bfa994230ecd58dae")]
 [assembly: System.Reflection.AssemblyProductAttribute("Sen381Backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Sen381Backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
