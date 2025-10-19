@@ -111,3 +111,4 @@ ON CONFLICT (subject_id, title) DO NOTHING;
 -- SELECT 'Topics table created successfully' as status, COUNT(*) as topic_count FROM topics;
 
 
+

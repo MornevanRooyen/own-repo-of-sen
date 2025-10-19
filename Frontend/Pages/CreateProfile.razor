@@ -635,7 +635,7 @@
     {
         try
         {
-            var uid = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
+            var uid = await JS.InvokeAsync<string>("sessionStorage.getItem", "userId");
             if (string.IsNullOrEmpty(uid) || !int.TryParse(uid, out int userId))
             {
                 Console.WriteLine("⚠️ Missing or invalid userId — cannot load profile.");
@@ -686,7 +686,7 @@
     {
         try
         {
-            var uid = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
+            var uid = await JS.InvokeAsync<string>("sessionStorage.getItem", "userId");
             if (!int.TryParse(uid, out int userId))
             {
                 Console.WriteLine("⚠️ Invalid userId — cannot save.");

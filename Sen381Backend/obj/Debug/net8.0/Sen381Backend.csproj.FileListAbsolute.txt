@@ -109,11 +109,14 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Mi
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Json.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileProviders.Abstractions.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileProviders.Physical.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.FileSystemGlobbing.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Hosting.Abstractions.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.ObjectPool.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
@@ -142,6 +145,7 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\Sy
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\System.IO.Pipelines.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\System.Net.WebSockets.WebSocketProtocol.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\System.Reactive.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\bin\Debug\net8.0\System.Text.Encodings.Web.dll
@@ -171,10 +175,10 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\st
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.json.cache
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\staticwebassets.development.json
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\Sen381Ba.DCFF40D0.Up2Date
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\Sen381Backend.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\refint\Sen381Backend.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\Sen381Backend.pdb
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\Sen381Backend.genruntimeconfig.cache
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\ref\Sen381Backend.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

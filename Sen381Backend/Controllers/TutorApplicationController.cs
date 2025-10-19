@@ -40,16 +40,28 @@ namespace Sen381Backend.Controllers
                 if (user == null)
                     return NotFound(new TutorApplicationResponse { Success = false, Message = "User not found" });
 
-                // Check if user already has a pending application
+                // Check if user already has a pending application for this specific subject
                 var existingResponse = await client
                     .From<TutorApplication>()
                     .Select("application_id")
                     .Filter("user_id", Operator.Equals, input.UserId)
+                    .Filter("subject_id", Operator.Equals, (int?)input.SubjectId)
                     .Filter("status", Operator.Equals, "pending")
                     .Get();
 
                 if (existingResponse.Models.Any())
-                    return BadRequest(new TutorApplicationResponse { Success = false, Message = "You already have a pending tutor application" });
+                    return BadRequest(new TutorApplicationResponse { Success = false, Message = "You already have a pending tutor application for this subject" });
+
+                // Check if user is already an approved tutor for this subject
+                var existingTutorResponse = await client
+                    .From<SubjectTutor>()
+                    .Select("subject_tutor_id")
+                    .Filter("user_id", Operator.Equals, input.UserId)
+                    .Filter("subject_id", Operator.Equals, input.SubjectId)
+                    .Get();
+
+                if (existingTutorResponse.Models.Any(t => t.IsActive))
+                    return BadRequest(new TutorApplicationResponse { Success = false, Message = "You are already an approved tutor for this subject" });
 
                 // Create new application
                 var application = new TutorApplication
@@ -66,6 +78,7 @@ namespace Sen381Backend.Controllers
                     ProfilePicturePath = user.ProfilePicturePath,
                     TranscriptPath = input.TranscriptPath,
                     Status = "pending",
+                    SubjectId = input.SubjectId,
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -127,8 +140,26 @@ namespace Sen381Backend.Controllers
                     CreatedAt = app.CreatedAt ?? DateTime.UtcNow,
                     ReviewedAt = app.ReviewedAt,
                     ReviewedBy = app.ReviewedBy,
-                    ReviewNotes = app.ReviewNotes
+                    ReviewNotes = app.ReviewNotes,
+                    SubjectId = app.SubjectId
                 }).ToList();
+
+                // Get subject information for each application
+                foreach (var app in applications.Where(a => a.SubjectId.HasValue))
+                {
+                    var subjectResponse = await client
+                        .From<Sen381Backend.Models.Subject>()
+                        .Select("subject_code, name")
+                        .Filter("subject_id", Operator.Equals, app.SubjectId.Value)
+                        .Get();
+
+                    var subject = subjectResponse.Models.FirstOrDefault();
+                    if (subject != null)
+                    {
+                        app.SubjectCode = subject.SubjectCode;
+                        app.SubjectName = subject.Name;
+                    }
+                }
 
                 return Ok(applications);
             }
@@ -172,12 +203,54 @@ namespace Sen381Backend.Controllers
                     .Filter("application_id", Operator.Equals, applicationId)
                     .Update();
 
-                // Update user role to tutor
+                // Update user role to tutor if not already
                 await client
                     .From<User>()
                     .Set(x => x.RoleString, "tutor")
                     .Filter("user_id", Operator.Equals, application.UserId)
                     .Update();
+
+                // Create subject-tutor relationship (only if it doesn't already exist)
+                if (application.SubjectId.HasValue)
+                {
+                    // Check if user is already a tutor for this subject
+                    var existingTutorResponse = await client
+                        .From<SubjectTutor>()
+                        .Filter("user_id", Operator.Equals, application.UserId)
+                        .Filter("subject_id", Operator.Equals, application.SubjectId.Value)
+                        .Get();
+
+                    if (!existingTutorResponse.Models.Any())
+                    {
+                        // Create new subject-tutor relationship
+                        var subjectTutor = new SubjectTutor
+                        {
+                            UserId = application.UserId,
+                            SubjectId = application.SubjectId.Value,
+                            IsActive = true,
+                            ApprovedAt = DateTime.UtcNow,
+                            ApprovedBy = request.AdminUserId,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        await client.From<SubjectTutor>().Insert(subjectTutor);
+                    }
+                    else
+                    {
+                        // User is already a tutor for this subject, just activate if needed
+                        var existingTutor = existingTutorResponse.Models.First();
+                        if (!existingTutor.IsActive)
+                        {
+                            await client
+                                .From<SubjectTutor>()
+                                .Set(x => x.IsActive, true)
+                                .Set(x => x.ApprovedAt, DateTime.UtcNow)
+                                .Set(x => x.ApprovedBy, request.AdminUserId)
+                                .Filter("subject_tutor_id", Operator.Equals, existingTutor.SubjectTutorId)
+                                .Update();
+                        }
+                    }
+                }
 
                 return Ok(new { success = true, message = "Application approved successfully" });
             }
@@ -279,26 +352,5 @@ namespace Sen381Backend.Controllers
         public string? Notes { get; set; }
     }
 
-    public class TutorApplicationDto
-    {
-        public int ApplicationId { get; set; }
-        public int UserId { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string? PhoneNum { get; set; }
-        public string? StudentNo { get; set; }
-        public string? Major { get; set; }
-        public int? YearOfStudy { get; set; }
-        public int CompletedSessions { get; set; }
-        public int? MinRequiredGrade { get; set; }
-        public string? ProfilePicturePath { get; set; }
-        public string? TranscriptPath { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public DateTime? ReviewedAt { get; set; }
-        public int? ReviewedBy { get; set; }
-        public string? ReviewNotes { get; set; }
-    }
 }
 

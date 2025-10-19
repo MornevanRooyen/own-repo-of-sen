@@ -1,0 +1,1336 @@
+@page "/tutoring-session/{sessionId:int}"
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject Frontend.Services.AuthService AuthService
+@inject Microsoft.AspNetCore.SignalR.Client.HubConnection HubConnection
+
+<PageTitle>Tutoring Session - @sessionDetails?.Title</PageTitle>
+
+@if (sessionDetails == null)
+{
+    <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Loading session...</p>
+    </div>
+}
+else
+{
+    <div class="session-room">
+        <!-- Session Header -->
+        <header class="session-header">
+            <div class="session-info">
+                <h1 class="session-title">@sessionDetails.Title</h1>
+                <div class="session-meta">
+                    <span class="session-date">@sessionDetails.SessionDate.ToString("dddd, MMMM dd, yyyy at HH:mm")</span>
+                    <span class="session-duration">@FormatDuration(sessionDetails.DurationMinutes)</span>
+                </div>
+            </div>
+            <div class="session-actions">
+                @if (canCompleteSession)
+                {
+                    <button class="btn btn-primary" @onclick="CompleteSession" disabled="@isCompleting">
+                        @(isCompleting ? "Completing..." : "Complete Session")
+                    </button>
+                }
+                <button class="btn btn-secondary" @onclick="LeaveSession">Leave Session</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="session-content">
+            <!-- Video/Audio Section -->
+            <div class="media-section">
+                <div class="video-container">
+                    <video id="localVideo" autoplay muted playsinline></video>
+                    <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
+                    <div class="video-placeholder" id="videoPlaceholder">
+                        <div class="placeholder-content">
+                            <div class="placeholder-icon">📹</div>
+                            <p>Camera initializing...</p>
+                        </div>
+                    </div>
+                    <div class="video-controls">
+                        <button class="control-btn @(isVideoEnabled ? "active" : "")" @onclick="ToggleVideo">
+                            <span class="icon">📹</span>
+                            @(isVideoEnabled ? "Video On" : "Video Off")
+                        </button>
+                        <button class="control-btn @(isAudioEnabled ? "active" : "")" @onclick="ToggleAudio">
+                            <span class="icon">🎤</span>
+                            @(isAudioEnabled ? "Audio On" : "Audio Off")
+                        </button>
+                        <button class="control-btn @(isScreenSharing ? "active" : "")" @onclick="ToggleScreenShare">
+                            <span class="icon">📺</span>
+                            @(isScreenSharing ? "Stop Share" : "Share Screen")
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat and Resources Section -->
+            <div class="chat-section">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <h3>Chat & Resources</h3>
+                    <div class="chat-tabs">
+                        <button class="chat-tab @(activeChatTab == "messages" ? "active" : "")" @onclick="@(() => SetActiveChatTab("messages"))">
+                            Messages (@newMessagesCount)
+                        </button>
+                        <button class="chat-tab @(activeChatTab == "resources" ? "active" : "")" @onclick="@(() => SetActiveChatTab("resources"))">
+                            Resources (@resources.Count)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Content -->
+                <div class="chat-content">
+                    @if (activeChatTab == "messages")
+                    {
+                        <!-- Messages -->
+                        <div class="messages-container" @ref="messagesContainer">
+                            @foreach (var message in chatMessages)
+                            {
+                                <div class="message @(message.IsFromCurrentUser ? "own-message" : "other-message")">
+                                    <div class="message-header">
+                                        <span class="sender-name">@message.SenderName</span>
+                                        <span class="message-time">@message.Timestamp.ToString("HH:mm")</span>
+                                    </div>
+                                    <div class="message-content">
+                                        @if (message.IsFile)
+                                        {
+                                            <div class="file-message">
+                                                <span class="file-icon">📎</span>
+                                                <span class="file-name">@message.Content</span>
+                                                <button class="btn btn-small" @onclick="() => DownloadFile(message.FileId ?? 0)" disabled="@(message.FileId == null)">
+                                                    Download
+                                                </button>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            @message.Content
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            @if (!chatMessages.Any())
+                            {
+                                <div class="empty-chat">
+                                    <p>No messages yet. Start the conversation!</p>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Message Input -->
+                        <div class="message-input">
+                            <input type="text" 
+                                   class="message-textbox" 
+                                   placeholder="Type a message..."
+                                   @bind="newMessage" 
+                                   @onkeypress="OnMessageKeyPress" />
+                            <button class="btn btn-primary" @onclick="SendMessage" disabled="@(string.IsNullOrWhiteSpace(newMessage) || isSendingMessage)">
+                                @(isSendingMessage ? "Sending..." : "Send")
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Resources -->
+                        <div class="resources-container">
+                            <div class="upload-area" @onclick="TriggerFileUpload" @ondragover="OnDragOver" @ondrop="OnFileDrop">
+                                <div class="upload-content">
+                                    <span class="upload-icon">📁</span>
+                                    <p>Click to upload or drag files here</p>
+                                    <small>Supports PDF, DOC, DOCX, PPT, PPTX, images</small>
+                                </div>
+                                <input type="file" 
+                                       id="fileUpload" 
+                                       multiple 
+                                       accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.gif"
+                                       @onchange="OnFileUpload" 
+                                       style="display: none;" />
+                            </div>
+
+                            @if (resources.Any())
+                            {
+                                <div class="resources-list">
+                                    @foreach (var resource in resources)
+                                    {
+                                        <div class="resource-item">
+                                            <div class="resource-info">
+                                                <span class="resource-icon">@GetFileIcon(resource.FileName)</span>
+                                                <div class="resource-details">
+                                                    <span class="resource-name">@resource.FileName</span>
+                                                    <span class="resource-size">@FormatFileSize(resource.FileSize)</span>
+                                                    <span class="resource-uploader">Uploaded by @resource.UploadedBy</span>
+                                                </div>
+                                            </div>
+                                            <div class="resource-actions">
+                                                <button class="btn btn-small" @onclick="() => DownloadResource(resource.FileId)">
+                                                    Download
+                                                </button>
+                                                @if (resource.UploadedBy == currentUser?.StudentNo)
+                                                {
+                                                    <button class="btn btn-small btn-danger" @onclick="() => DeleteResource(resource.FileId)">
+                                                        Delete
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="empty-resources">
+                                    <p>No resources uploaded yet.</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        gap: 20px;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #1B998B;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .session-room {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background: #f5f7fb;
+    }
+
+    .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .session-info h1 {
+        margin: 0 0 8px 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .session-meta {
+        display: flex;
+        gap: 16px;
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+
+    .session-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .session-content {
+        display: flex;
+        flex: 1;
+        gap: 20px;
+        padding: 20px;
+        overflow: hidden;
+    }
+
+    .media-section {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .video-container {
+        position: relative;
+        flex: 1;
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #localVideo, #remoteVideo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .video-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #1a1a1a;
+        color: #666;
+        z-index: 1;
+    }
+
+    .placeholder-content {
+        text-align: center;
+    }
+
+    .placeholder-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+
+    .placeholder-content p {
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .video-controls {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 12px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 12px;
+        border-radius: 24px;
+    }
+
+    .control-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: #374151;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .control-btn:hover {
+        background: #4b5563;
+    }
+
+    .control-btn.active {
+        background: #1B998B;
+    }
+
+    .control-btn.active:hover {
+        background: #0f766e;
+    }
+
+    .chat-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f9fafb;
+    }
+
+    .chat-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .chat-tabs {
+        display: flex;
+        gap: 8px;
+    }
+
+    .chat-tab {
+        padding: 6px 12px;
+        background: transparent;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: #6b7280;
+        transition: all 0.2s ease;
+    }
+
+    .chat-tab:hover {
+        background: #f3f4f6;
+    }
+
+    .chat-tab.active {
+        background: #1B998B;
+        color: white;
+        border-color: #1B998B;
+    }
+
+    .chat-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .messages-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .message {
+        max-width: 80%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: #f3f4f6;
+    }
+
+    .message.own-message {
+        align-self: flex-end;
+        background: #1B998B;
+        color: white;
+    }
+
+    .message.other-message {
+        align-self: flex-start;
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+        font-size: 0.8rem;
+        opacity: 0.8;
+    }
+
+    .message-content {
+        word-wrap: break-word;
+    }
+
+    .file-message {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .file-icon {
+        font-size: 1.2rem;
+    }
+
+    .empty-chat, .empty-resources {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #6b7280;
+    }
+
+    .message-input {
+        display: flex;
+        gap: 12px;
+        padding: 16px;
+        border-top: 1px solid #e5e7eb;
+        background: #f9fafb;
+    }
+
+    .message-textbox {
+        flex: 1;
+        padding: 10px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+    .message-textbox:focus {
+        border-color: #1B998B;
+    }
+
+    .resources-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .upload-area {
+        margin: 16px;
+        padding: 40px;
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #f9fafb;
+    }
+
+    .upload-area:hover {
+        border-color: #1B998B;
+        background: #f0fdfa;
+    }
+
+    .upload-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .upload-icon {
+        font-size: 2rem;
+        opacity: 0.6;
+    }
+
+    .resources-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+    }
+
+    .resource-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: #f9fafb;
+    }
+
+    .resource-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .resource-icon {
+        font-size: 1.5rem;
+    }
+
+    .resource-details {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .resource-name {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .resource-size, .resource-uploader {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    .resource-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background: #1B998B;
+        color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background: #0f766e;
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+        background: #4b5563;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+        background: #dc2626;
+    }
+
+    .btn-small {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    @@media (max-width: 768px) {
+        .session-content {
+            flex-direction: column;
+        }
+        
+        .session-header {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        
+        .session-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+</style>
+
+@code {
+    [Parameter] public int SessionId { get; set; }
+
+    private Frontend.Services.BookingSessionVM? sessionDetails;
+    private Frontend.Services.CurrentUser? currentUser;
+    private bool canCompleteSession = false;
+    private bool isCompleting = false;
+
+    // Media controls
+    private bool isVideoEnabled = true;
+    private bool isAudioEnabled = true;
+    private bool isScreenSharing = false;
+
+    // Chat
+    private string activeChatTab = "messages";
+    private List<ChatMessage> chatMessages = new();
+    private string newMessage = "";
+    private int newMessagesCount = 0;
+    private ElementReference messagesContainer;
+
+    // Resources
+    private List<SessionResource> resources = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Get current user
+            var uid = await JS.InvokeAsync<string>("sessionStorage.getItem", "userId");
+            if (string.IsNullOrEmpty(uid) || !int.TryParse(uid, out int userId))
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            currentUser = await AuthService.GetCurrentUserAsync();
+            if (currentUser == null)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            // Load session details
+            await LoadSessionDetails();
+
+            // Initialize SignalR connection
+            await InitializeSignalR();
+
+            // Initialize media
+            await InitializeMedia();
+
+            // Load chat messages
+            await LoadChatMessages();
+
+            // Set up SignalR message handling
+            await SetupSignalRHandlers();
+
+            // Load resources
+            await LoadResources();
+
+            // Start real-time updates
+            await StartRealTimeUpdates();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing session room: {ex.Message}");
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Set up cleanup on page unload
+            await JS.InvokeVoidAsync("eval", @"
+                window.addEventListener('beforeunload', function() {
+                    if (window.cleanupMedia) {
+                        window.cleanupMedia();
+                    }
+                });
+            ");
+        }
+    }
+
+    private async Task LoadSessionDetails()
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Loading session details for SessionId: {SessionId}");
+            
+            var response = await Http.GetFromJsonAsync<Frontend.Services.BookingSessionVM>($"https://localhost:7228/api/bookingsession/{SessionId}");
+            if (response != null)
+            {
+                sessionDetails = response;
+                Console.WriteLine($"[TutoringSessionRoom] Session details loaded: {response.Title}");
+                
+                // Check if current user can complete the session (only the student who created it)
+                canCompleteSession = sessionDetails.StudentId == currentUser?.UserId;
+                Console.WriteLine($"[TutoringSessionRoom] Can complete session: {canCompleteSession}");
+            }
+            else
+            {
+                Console.WriteLine($"[TutoringSessionRoom] No session details returned from API");
+            }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] HTTP error loading session details: {httpEx.Message}");
+            if (httpEx.Message.Contains("404"))
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Session {SessionId} not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error loading session details: {ex.Message}");
+        }
+    }
+
+    private async Task InitializeSignalR()
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Initializing live messaging...");
+            
+            // Set up the SignalR functions for JavaScript
+            await JS.InvokeVoidAsync("setSignalRFunctions", DotNetObjectReference.Create(this));
+            
+            // Start polling for live chat messages and session status
+            _ = Task.Run(async () =>
+            {
+                while (!sessionCompleted)
+                {
+                    try
+                    {
+                        await Task.Delay(2000); // Poll every 2 seconds
+                        await LoadChatMessages();
+                        await CheckSessionStatus();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[TutoringSessionRoom] Error in polling: {ex.Message}");
+                        await Task.Delay(5000); // Wait longer on error
+                    }
+                }
+            });
+            
+            Console.WriteLine($"[TutoringSessionRoom] Live messaging initialized with polling");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error initializing live messaging: {ex.Message}");
+        }
+    }
+
+    private async Task SetupSignalRHandlers()
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Setting up live messaging handlers...");
+            
+            // Live messaging is handled by polling in InitializeSignalR
+            // WebRTC signaling will be implemented separately
+            
+            Console.WriteLine($"[TutoringSessionRoom] Live messaging handlers set up successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error setting up live messaging handlers: {ex.Message}");
+        }
+    }
+
+    // Basic session methods (without SignalR for now)
+    [JSInvokable]
+    public async Task SendOffer(string targetConnectionId, object offer)
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] WebRTC offer ready for {targetConnectionId}");
+            // For now, we'll implement a simple peer-to-peer connection
+            // The JavaScript will handle the actual WebRTC signaling
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error with offer: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task SendAnswer(string targetConnectionId, object answer)
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] WebRTC answer ready for {targetConnectionId}");
+            // For now, we'll implement a simple peer-to-peer connection
+            // The JavaScript will handle the actual WebRTC signaling
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error with answer: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task SendIceCandidate(string targetConnectionId, object candidate)
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] WebRTC ICE candidate ready for {targetConnectionId}");
+            // For now, we'll implement a simple peer-to-peer connection
+            // The JavaScript will handle the actual WebRTC signaling
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error with ICE candidate: {ex.Message}");
+        }
+    }
+
+    private async Task InitializeMedia()
+    {
+        try
+        {
+            Console.WriteLine("[TutoringSessionRoom] Starting media initialization...");
+            
+            // Ensure session details are loaded first
+            if (sessionDetails == null)
+            {
+                Console.WriteLine("[TutoringSessionRoom] Session details not loaded yet, waiting...");
+                await Task.Delay(1000); // Wait longer for session details to load
+            }
+            
+            // Wait for Blazor to render the DOM after session details are loaded
+            Console.WriteLine("[TutoringSessionRoom] Waiting for DOM to be ready...");
+            await Task.Delay(1000);
+            
+            // Force a state change to ensure DOM is updated
+            StateHasChanged();
+            await Task.Delay(500);
+            
+            Console.WriteLine("[TutoringSessionRoom] Calling JavaScript media initialization...");
+            
+            // Initialize WebRTC for video/audio with DOM ready check
+            await JS.InvokeVoidAsync("initializeMediaWhenReady");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error initializing media: {ex.Message}");
+        }
+    }
+
+    private async Task LoadChatMessages()
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Loading chat messages for SessionId: {SessionId}");
+            
+            // Load existing chat messages for this session
+            var response = await Http.GetFromJsonAsync<List<ChatMessage>>($"https://localhost:7228/api/sessions/{SessionId}/messages");
+            if (response != null)
+            {
+                // Map the IsFromCurrentUser property for each message
+                foreach (var message in response)
+                {
+                    message.IsFromCurrentUser = message.SenderId == currentUser?.UserId;
+                }
+                
+                // Only update if we have new messages to avoid unnecessary UI updates
+                if (chatMessages.Count != response.Count)
+                {
+                    chatMessages = response;
+                    Console.WriteLine($"[TutoringSessionRoom] Loaded {response.Count} chat messages");
+                    await InvokeAsync(StateHasChanged);
+                    await ScrollToBottom();
+                }
+            }
+            else
+            {
+                Console.WriteLine($"[TutoringSessionRoom] No chat messages returned from API");
+            }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] HTTP error loading chat messages: {httpEx.Message}");
+            if (httpEx.Message.Contains("404"))
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Chat messages endpoint not found for session {SessionId}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error loading chat messages: {ex.Message}");
+        }
+    }
+
+    private async Task LoadResources()
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Loading resources for SessionId: {SessionId}");
+            
+            // Load resources for this session
+            var response = await Http.GetFromJsonAsync<List<SessionResource>>($"https://localhost:7228/api/sessions/{SessionId}/resources");
+            if (response != null)
+            {
+                resources = response;
+                Console.WriteLine($"[TutoringSessionRoom] Loaded {response.Count} resources");
+            }
+            else
+            {
+                Console.WriteLine($"[TutoringSessionRoom] No resources returned from API");
+            }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] HTTP error loading resources: {httpEx.Message}");
+            if (httpEx.Message.Contains("404"))
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Resources endpoint not found for session {SessionId}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error loading resources: {ex.Message}");
+        }
+    }
+
+    private async Task StartRealTimeUpdates()
+    {
+        // Set up SignalR or polling for real-time updates
+        // This would handle new messages, resource uploads, etc.
+    }
+
+    // Media Controls
+    private async Task ToggleVideo()
+    {
+        isVideoEnabled = !isVideoEnabled;
+        await JS.InvokeVoidAsync("toggleVideo", isVideoEnabled);
+    }
+
+    private async Task ToggleAudio()
+    {
+        isAudioEnabled = !isAudioEnabled;
+        await JS.InvokeVoidAsync("toggleAudio", isAudioEnabled);
+    }
+
+    private async Task ToggleScreenShare()
+    {
+        isScreenSharing = !isScreenSharing;
+        await JS.InvokeVoidAsync("toggleScreenShare", isScreenSharing);
+    }
+
+    // Chat Functions
+    private void SetActiveChatTab(string tab)
+    {
+        activeChatTab = tab;
+        newMessagesCount = 0; // Reset count when switching tabs
+    }
+
+    private bool isSendingMessage = false;
+    private bool sessionCompleted = false;
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(newMessage) || isSendingMessage)
+            return;
+
+        isSendingMessage = true;
+        var messageToSend = newMessage; // Store the message before clearing
+
+        try
+        {
+            var message = new ChatMessage
+            {
+                SessionId = SessionId,
+                SenderId = currentUser!.UserId,
+                SenderName = currentUser.StudentNo ?? "Unknown User",
+                Content = messageToSend,
+                CreatedAt = DateTime.UtcNow,
+                IsFromCurrentUser = true
+            };
+
+            Console.WriteLine($"[TutoringSessionRoom] Sending message: {message.Content}");
+            
+            // Clear the input field immediately to prevent double submission
+            newMessage = "";
+            await InvokeAsync(StateHasChanged);
+            
+            var response = await Http.PostAsJsonAsync($"https://localhost:7228/api/sessions/{SessionId}/messages", message);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Message sent successfully");
+                // Message will appear automatically via polling
+            }
+            else
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Failed to send message: {response.StatusCode}");
+                // Restore the message if sending failed
+                newMessage = messageToSend;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending message: {ex.Message}");
+            // Restore the message if sending failed
+            newMessage = messageToSend;
+            await InvokeAsync(StateHasChanged);
+        }
+        finally
+        {
+            isSendingMessage = false;
+        }
+    }
+
+    private async Task OnMessageKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendMessage();
+        }
+    }
+
+    private async Task ScrollToBottom()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("scrollToBottom", messagesContainer);
+        }
+        catch { }
+    }
+
+    private async Task SendSystemMessage(string message)
+    {
+        try
+        {
+            // Use the current user's ID instead of 0 to avoid foreign key constraint violation
+            var systemMessage = new ChatMessage
+            {
+                SessionId = SessionId,
+                SenderId = currentUser?.UserId ?? 1, // Use current user ID or fallback to 1
+                SenderName = "System",
+                Content = message,
+                CreatedAt = DateTime.UtcNow,
+                IsFromCurrentUser = false
+            };
+
+            Console.WriteLine($"[TutoringSessionRoom] Sending system message: {message}");
+            
+            var response = await Http.PostAsJsonAsync($"https://localhost:7228/api/sessions/{SessionId}/messages", systemMessage);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[TutoringSessionRoom] System message sent successfully");
+            }
+            else
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Failed to send system message: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending system message: {ex.Message}");
+        }
+    }
+
+    private async Task CheckSessionStatus()
+    {
+        try
+        {
+            // Check if the session has been completed
+            var response = await Http.GetFromJsonAsync<Frontend.Services.BookingSessionVM>($"https://localhost:7228/api/bookingsession/{SessionId}");
+            
+            if (response != null && response.Status == "completed")
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Session {SessionId} has been completed");
+                sessionCompleted = true; // Stop polling
+                
+                // Show notification to the other participant
+                await JS.InvokeVoidAsync("alert", "This tutoring session has been completed by the session creator. The session will end now.");
+                
+                // Clean up media streams
+                await JS.InvokeVoidAsync("cleanupMedia");
+                
+                // Navigate back to dashboard
+                NavigationManager.NavigateTo("/dashboard");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Don't log this error frequently as it might be expected
+            Console.WriteLine($"[TutoringSessionRoom] Error checking session status: {ex.Message}");
+        }
+    }
+
+    // File Upload Functions
+    private async Task TriggerFileUpload()
+    {
+        await JS.InvokeVoidAsync("clickFileUpload");
+    }
+
+    private async Task OnDragOver(DragEventArgs e)
+    {
+        // Prevent default drag behavior
+    }
+
+    private async Task OnFileDrop(DragEventArgs e)
+    {
+        // Handle file drop
+    }
+
+    private async Task OnFileUpload(ChangeEventArgs e)
+    {
+        // Handle file upload
+        Console.WriteLine("File upload triggered");
+    }
+
+    private async Task DownloadFile(int fileId)
+    {
+        // Implement file download
+        Console.WriteLine($"Downloading file {fileId}");
+    }
+
+    private async Task DownloadResource(int resourceId)
+    {
+        // Implement resource download
+        Console.WriteLine($"Downloading resource {resourceId}");
+    }
+
+    private async Task DeleteResource(int resourceId)
+    {
+        try
+        {
+            await Http.DeleteAsync($"https://localhost:7228/api/sessions/{SessionId}/resources/{resourceId}");
+            resources.RemoveAll(r => r.FileId == resourceId);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting resource: {ex.Message}");
+        }
+    }
+
+    // Session Management
+    private async Task CompleteSession()
+    {
+        if (isCompleting)
+            return;
+
+        // Show confirmation dialog
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to complete this tutoring session? This will end the session for both participants and save the session details.");
+        
+        if (!confirmed)
+            return;
+
+        try
+        {
+            isCompleting = true;
+            sessionCompleted = true; // Stop polling
+            
+            Console.WriteLine($"[TutoringSessionRoom] Completing session {SessionId}...");
+            
+            // Update session status to completed
+            var response = await Http.PutAsync($"https://localhost:7228/api/bookingsession/{SessionId}/complete", null);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Session {SessionId} completed successfully");
+                
+                // Send a system message to notify other participants
+                await SendSystemMessage("Session completed by the session creator. The session will end shortly.");
+                
+                // Show success message
+                await JS.InvokeVoidAsync("alert", "Session completed successfully! Session details have been saved to your profile.");
+                
+                // Clean up media streams
+                await JS.InvokeVoidAsync("cleanupMedia");
+                
+                // Navigate back to dashboard
+                NavigationManager.NavigateTo("/dashboard");
+            }
+            else
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Failed to complete session: {response.StatusCode}");
+                await JS.InvokeVoidAsync("alert", "Failed to complete session. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error completing session: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", "An error occurred while completing the session. Please try again.");
+        }
+        finally
+        {
+            isCompleting = false;
+        }
+    }
+
+    private async Task LeaveSession()
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Leaving session...");
+            // Live messaging polling will stop automatically when component is disposed
+            // WebRTC cleanup handled by JavaScript
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error leaving session: {ex.Message}");
+        }
+
+        // Clean up media streams
+        await JS.InvokeVoidAsync("cleanupMedia");
+        
+        // Navigate back to dashboard
+        NavigationManager.NavigateTo("/dashboard");
+    }
+
+    // Helper Functions
+    private static string FormatDuration(int durationMinutes)
+    {
+        if (durationMinutes < 60)
+        {
+            return $"{durationMinutes} min{(durationMinutes == 1 ? "" : "s")}";
+        }
+        else
+        {
+            var hours = durationMinutes / 60;
+            var remainingMinutes = durationMinutes % 60;
+            if (remainingMinutes == 0)
+            {
+                return $"{hours} hr{(hours == 1 ? "" : "s")}";
+            }
+            else
+            {
+                return $"{hours}h {remainingMinutes}m";
+            }
+        }
+    }
+
+    private static string GetFileIcon(string fileName)
+    {
+        var extension = Path.GetExtension(fileName).ToLower();
+        return extension switch
+        {
+            ".pdf" => "📄",
+            ".doc" or ".docx" => "📝",
+            ".ppt" or ".pptx" => "📊",
+            ".jpg" or ".jpeg" or ".png" or ".gif" => "🖼️",
+            _ => "📎"
+        };
+    }
+
+    private static string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
+    }
+
+    // Data Models
+    public class ChatMessage
+    {
+        public int MessageId { get; set; }
+        public int SessionId { get; set; }
+        public int SenderId { get; set; }
+        public string SenderName { get; set; } = "";
+        public string Content { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
+        public bool IsFile { get; set; }
+        public int? FileId { get; set; }
+        public bool IsFromCurrentUser { get; set; }
+        
+        // Property for backward compatibility
+        public DateTime Timestamp => CreatedAt;
+    }
+
+    public class SessionResource
+    {
+        public int FileId { get; set; }
+        public string FileName { get; set; } = "";
+        public long FileSize { get; set; }
+        public string UploadedBy { get; set; } = "";
+        public DateTime UploadedAt { get; set; }
+    }
+}

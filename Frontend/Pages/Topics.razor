@@ -17,7 +17,7 @@
         <!-- Header: title left, search right -->
         <div class="header-row">
             <h1 class="title">
-                <span class="code">BUM 281</span>
+                <span class="code">@(currentSubject?.SubjectCode?.ToUpper() ?? "SUBJECT")</span>
                 <span class="divider">•</span>
                 <span class="label">Topics</span>
             </h1>
@@ -27,8 +27,6 @@
         </div>
 
 
-            <!-- center slot -->
-            <h1 class="title">@(currentSubject?.SubjectCode?.ToUpper() ?? "SUBJECT") TOPICS</h1>
 
             <!-- right slot -->
             <label class="search">
@@ -323,7 +321,8 @@ private List<TopicVM> topics = new();
                 Major = currentUser.Program,
                 YearOfStudy = !string.IsNullOrEmpty(currentUser.Year) && int.TryParse(currentUser.Year, out int year) ? year : null,
                 MinRequiredGrade = 65,
-                TranscriptPath = transcriptPath
+                TranscriptPath = transcriptPath,
+                SubjectId = currentSubjectId ?? 0
             };
 
             var result = await TutorAppService.SubmitApplicationAsync(applicationInput);

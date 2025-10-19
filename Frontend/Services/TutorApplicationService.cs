@@ -37,8 +37,34 @@ namespace Frontend.Services
         {
             try
             {
-                var response = await _httpClient.GetFromJsonAsync<List<TutorApplicationVM>>("api/tutorapplication/pending");
-                return response ?? new List<TutorApplicationVM>();
+                var response = await _httpClient.GetFromJsonAsync<List<TutorApplicationDto>>("api/tutorapplication/pending");
+                if (response == null) return new List<TutorApplicationVM>();
+
+                // Map DTOs to VMs
+                return response.Select(dto => new TutorApplicationVM
+                {
+                    ApplicationId = dto.ApplicationId,
+                    UserId = dto.UserId,
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                    Email = dto.Email,
+                    PhoneNum = dto.PhoneNum,
+                    StudentNo = dto.StudentNo,
+                    Major = dto.Major,
+                    YearOfStudy = dto.YearOfStudy,
+                    CompletedSessions = dto.CompletedSessions,
+                    MinRequiredGrade = dto.MinRequiredGrade,
+                    ProfilePicturePath = dto.ProfilePicturePath,
+                    TranscriptPath = dto.TranscriptPath,
+                    Status = dto.Status,
+                    CreatedAt = dto.CreatedAt,
+                    ReviewedAt = dto.ReviewedAt,
+                    ReviewedBy = dto.ReviewedBy,
+                    ReviewNotes = dto.ReviewNotes,
+                    SubjectId = dto.SubjectId,
+                    SubjectCode = dto.SubjectCode,
+                    SubjectName = dto.SubjectName
+                }).ToList();
             }
             catch (Exception ex)
             {
@@ -101,6 +127,7 @@ namespace Frontend.Services
         public int? YearOfStudy { get; set; }
         public int? MinRequiredGrade { get; set; }
         public string? TranscriptPath { get; set; }
+        public int SubjectId { get; set; }
     }
 
     public class TutorApplicationResponse
@@ -130,6 +157,9 @@ namespace Frontend.Services
         public DateTime? ReviewedAt { get; set; }
         public int? ReviewedBy { get; set; }
         public string? ReviewNotes { get; set; }
+        public int? SubjectId { get; set; }
+        public string? SubjectCode { get; set; }
+        public string? SubjectName { get; set; }
     }
 
     public class ApplicationStatusResponse
@@ -139,6 +169,31 @@ namespace Frontend.Services
         public DateTime? CreatedAt { get; set; }
         public DateTime? ReviewedAt { get; set; }
         public string? ReviewNotes { get; set; }
+    }
+
+    public class TutorApplicationDto
+    {
+        public int ApplicationId { get; set; }
+        public int UserId { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? PhoneNum { get; set; }
+        public string? StudentNo { get; set; }
+        public string? Major { get; set; }
+        public int? YearOfStudy { get; set; }
+        public int CompletedSessions { get; set; }
+        public int? MinRequiredGrade { get; set; }
+        public string? ProfilePicturePath { get; set; }
+        public string? TranscriptPath { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+        public DateTime? ReviewedAt { get; set; }
+        public int? ReviewedBy { get; set; }
+        public string? ReviewNotes { get; set; }
+        public int? SubjectId { get; set; }
+        public string? SubjectCode { get; set; }
+        public string? SubjectName { get; set; }
     }
 }
 

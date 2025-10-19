@@ -3,9 +3,12 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using System.Net.Http.Json
 @using System.Globalization
+@using Frontend.Services
 @inject HttpClient Http
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
+@inject AuthService AuthService
+@inject CalendarService CalendarService
 
 <PageTitle>Dashboard | CampusLearn</PageTitle>
 
@@ -154,7 +157,13 @@
                             <ul class="cal-events">
                                 @foreach (var ev in cell.Events)
                                 {
-                                    <li class="cal-event" title="@ev.Title" @onclick:stopPropagation="true" @onclick='() => OpenEditEvent(ev)'>
+                                    <li class="cal-event @(ev.Title.StartsWith("📚") ? "booking-event" : "")" title="@ev.Title" @onclick:stopPropagation="true" @onclick='() => OpenEventModal(ev)'>
+                                        @if (ev.Title.StartsWith("📚") && ev.Id.HasValue && CanDeleteBookingEvent(ev.Id.Value))
+                                        {
+                                            <button class="cal-delete cal-delete-left" @onclick:stopPropagation="true" @onclick='() => DeleteBookingEvent(ev.Id.Value)' title="Delete booking session">
+                                                ×
+                                            </button>
+                                        }
                                         <span class="cal-ico" aria-hidden="true"></span>
                                         <span class="cal-title">@ev.Title</span>
                                     </li>
@@ -237,8 +246,8 @@
         </div>
 
         <footer class="modal-foot">
-            <button class="btn-plain" @onclick="CloseNewEvent">Cancel</button>
-            <button class="btn-save" @onclick="SaveNewEvent">Save</button>
+            <button class="btn btn-secondary" @onclick="CloseNewEvent">Cancel</button>
+            <button class="btn btn-primary" @onclick="SaveNewEvent">Save</button>
         </footer>
     </div>
 }
@@ -295,9 +304,56 @@
             </div>
         </div>
         <footer class="modal-foot">
-            <button class="btn-plain" @onclick="DeleteEditingEvent">Delete</button>
-            <button class="btn-plain" @onclick="CloseEditEvent">Cancel</button>
-            <button class="btn-save" @onclick="async () => await SaveEditedEvent()">Save</button>
+            <button class="btn btn-danger" @onclick="DeleteEditingEvent">Delete</button>
+            <button class="btn btn-secondary" @onclick="CloseEditEvent">Cancel</button>
+            <button class="btn btn-primary" @onclick="async () => await SaveEditedEvent()">Save</button>
+        </footer>
+    </div>
+}
+
+@* ===== Tutoring Event Details Modal ===== *@
+@if (ShowTutoringEvent)
+{
+    <div class="modal-backdrop" @onclick="CloseTutoringEvent"></div>
+    <div role="dialog" aria-modal="true" class="modal">
+        <header class="modal-head">
+            <h3>Tutoring Session</h3>
+            <button class="modal-x" @onclick="CloseTutoringEvent" aria-label="Close">×</button>
+        </header>
+
+        <div class="modal-body">
+            @if (SelectedTutoringEvent != null)
+            {
+                <div class="tutoring-details">
+                    <div class="field-row">
+                        <label class="label">Session Title</label>
+                        <div class="tutoring-info">@SelectedTutoringEvent.Title</div>
+                    </div>
+                    
+                    <div class="field-row">
+                        <label class="label">Date & Time</label>
+                        <div class="tutoring-info">@(SelectedTutoringEvent.StartTime?.ToString("dddd, MMMM dd, yyyy 'at' HH:mm") ?? SelectedTutoringEvent.Date.ToString("dddd, MMMM dd, yyyy"))</div>
+                    </div>
+                    
+                    <div class="field-row">
+                        <label class="label">Duration</label>
+                        <div class="tutoring-info">@FormatDuration(SelectedTutoringEvent.DurationMinutes)</div>
+                    </div>
+                    
+                    @if (SelectedTutoringEvent.EndTime.HasValue)
+                    {
+                        <div class="field-row">
+                            <label class="label">End Time</label>
+                            <div class="tutoring-info">@SelectedTutoringEvent.EndTime.Value.ToString("HH:mm")</div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <footer class="modal-foot">
+            <button class="btn btn-secondary" @onclick="CloseTutoringEvent">Cancel</button>
+            <button class="btn btn-primary" @onclick="JoinRoom">Join Room</button>
         </footer>
     </div>
 }
@@ -654,6 +710,45 @@
         padding: 10px 10px 16px
     }
 
+    .booking-event {
+        background-color: #e3f2fd;
+        border-left: 3px solid #2196f3;
+    }
+
+    .cal-delete {
+        background: #f44336;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .cal-delete:hover {
+        opacity: 1;
+        background: #d32f2f;
+    }
+
+    .cal-delete-left {
+        margin-right: 8px;
+        margin-left: 0;
+    }
+
+    .cal-event {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
     .cal-toolbar {
         display: grid;
         grid-template-columns: 1fr auto 1fr;
@@ -942,6 +1037,22 @@
         background: color-mix(in oklab, var(--rose) 85%, black);
     }
 
+    /* Tutoring event details */
+    .tutoring-details {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .tutoring-info {
+        padding: 8px 12px;
+        background: var(--panel-tint);
+        border: 1px solid var(--panel-ring);
+        border-radius: 6px;
+        font-weight: 500;
+        color: var(--ink);
+    }
+
     /* Clara floating bubble */
     .clara-fab {
         position: fixed;
@@ -1015,7 +1126,7 @@
     {
         try
         {
-            var uid = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
+            var uid = await JS.InvokeAsync<string>("sessionStorage.getItem", "userId");
             if (string.IsNullOrEmpty(uid) || !int.TryParse(uid, out int userId))
             { NavigationManager.NavigateTo("/login"); return; }
 
@@ -1038,6 +1149,9 @@
 
             // Load notifications
             await LoadNotifications(userId);
+
+            // Load calendar events (booking sessions)
+            await LoadCalendarEvents();
         }
         catch { StudentName = "User"; UserRole = "Student"; }
     }
@@ -1088,65 +1202,13 @@
 
                     Notifications = grouped;
 
-                    // ==== MOCK NOTIFICATIONS (DELETE AFTER TESTING) ====
-                    if (Notifications.Count == 0)
-                    {
-                        Notifications = new List<NotificationItem>
-                        {
-                            new NotificationItem {
-                                SenderName = "ClaraTea",
-                                Body = "<strong>ClaraTea</strong> found 2 new tutors for you to message.",
-                                TimeAgo = "just now",
-                                RoleString = "Clara",
-                                Type = "system"
-                            },
-                            new NotificationItem {
-                                SenderName = "Taylor Smith",
-                                Body = "<strong>Taylor Smith</strong> accepted your session request.",
-                                TimeAgo = "5 mins ago",
-                                RoleString = "Tutor",
-                                Type = "chat_message"
-                            },
-                            new NotificationItem {
-                                SenderName = "OliveOil Rodriguez",
-                                Body = "<strong>OliveOil Rodriguez</strong> replied to your post in BUM381 forum.",
-                                TimeAgo = "1 hr ago",
-                                RoleString = "Student",
-                                Type = "forum_reply"
-                            }
-                        };
-                    }
                 }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"⚠️ Error loading notifications: {ex.Message}");
-            // ==== MOCK NOTIFICATIONS (DELETE AFTER TESTING) ====
-            Notifications = new List<NotificationItem>
-            {
-                new NotificationItem {
-                    SenderName = "ClaraTea",
-                    Body = "<strong>ClaraTea</strong> found 2 new tutors for you to message.",
-                    TimeAgo = "just now",
-                    RoleString = "Clara",
-                    Type = "system"
-                },
-                new NotificationItem {
-                    SenderName = "Taylor Smith",
-                    Body = "<strong>Taylor Smith</strong> accepted your session request.",
-                    TimeAgo = "5 mins ago",
-                    RoleString = "Tutor",
-                    Type = "chat_message"
-                },
-                new NotificationItem {
-                    SenderName = "OliveOil Rodriguez",
-                    Body = "<strong>OliveOil Rodriguez</strong> replied to your post in BUM381 forum.",
-                    TimeAgo = "1 hr ago",
-                    RoleString = "Student",
-                    Type = "forum_reply"
-                }
-            };
+            Notifications = new List<NotificationItem>(); // Empty list on error
         }
     }
 
@@ -1248,11 +1310,20 @@
     private readonly string[] WeekdayNames = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
     private List<CalCell> CalendarCells = new();
 
-    public class CalEvent { public int? Id { get; set; } public string Title { get; set; } = ""; public DateTime Date { get; set; } }
+    public class CalEvent { 
+        public int? Id { get; set; } 
+        public string Title { get; set; } = ""; 
+        public DateTime Date { get; set; } 
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public int? DurationMinutes { get; set; }
+        public int? BookingId { get; set; } // For tutoring sessions
+    }
     public class CalCell { public DateTime Date { get; set; } public bool InMonth { get; set; } public List<CalEvent> Events { get; set; } = new(); }
 
     private List<CalEvent> AllEvents = new()
     {
+        // Static events (keep existing functionality)
         new CalEvent{ Title="Project Task 2", Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 6) },
         new CalEvent{ Title="Assignment 5",  Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 2) },
         new CalEvent{ Title="Class Test 4",  Date=new DateTime(DateTime.Today.Year, DateTime.Today.Month, 3) },
@@ -1267,11 +1338,6 @@
     private int PickerYear;
     private int[] YearPickerOptions = Enumerable.Range(DateTime.Today.Year - 1, 7).ToArray(); // last year to +5 years
 
-    protected override void OnInitialized()
-    {
-        SyncPickers();
-        BuildCalendar();
-    }
 
     private void SyncPickers()
     {
@@ -1300,6 +1366,85 @@
         SyncPickers();
         BuildCalendar();
         _ = Task.Run(async () => { await Task.Delay(300); _slideDir = 0; StateHasChanged(); });
+    }
+
+    private async Task LoadCalendarEvents()
+    {
+        try
+        {
+            if (CurrentUserId > 0)
+            {
+                var calendarEvents = await CalendarService.GetUserCalendarEventsAsync(CurrentUserId);
+                
+                // Remove any existing calendar events from AllEvents (those with 📚 emoji)
+                AllEvents.RemoveAll(e => e.Title.StartsWith("📚"));
+                
+                // Convert calendar events to CalEvent format and add to AllEvents
+                foreach (var evt in calendarEvents)
+                {
+                    var durationMinutes = (int)(evt.EndTime - evt.StartTime).TotalMinutes;
+                    AllEvents.Add(new CalEvent
+                    {
+                        Id = evt.EventId,
+                        Title = $"📚 {evt.Title}", // Add book emoji to distinguish booking sessions
+                        Date = evt.StartTime.Date,
+                        StartTime = evt.StartTime,
+                        EndTime = evt.EndTime,
+                        DurationMinutes = durationMinutes,
+                        BookingId = evt.BookingId // Store the BookingId for tutoring sessions
+                    });
+                }
+                
+                // Rebuild calendar to show the new events
+                BuildCalendar();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading calendar events: {ex.Message}");
+        }
+    }
+
+    private bool CanDeleteBookingEvent(int eventId)
+    {
+        // For now, allow deletion for all booking events
+        // In a more sophisticated implementation, we could check if the current user is the student who created the booking
+        return true;
+    }
+
+    private async Task DeleteBookingEvent(int eventId)
+    {
+        try
+        {
+            var confirmed = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this booking session? This will remove it from both your calendar and the other person's calendar.");
+            if (confirmed)
+            {
+                Console.WriteLine($"Attempting to delete calendar event {eventId} for user {CurrentUserId}");
+                
+                var success = await CalendarService.DeleteCalendarEventAsync(eventId, CurrentUserId);
+                Console.WriteLine($"Delete result: {success}");
+                
+                if (success)
+                {
+                    // Remove the event from AllEvents and rebuild calendar
+                    var removedCount = AllEvents.RemoveAll(e => e.Id == eventId);
+                    Console.WriteLine($"Removed {removedCount} events from local AllEvents list");
+                    
+                    BuildCalendar();
+                    StateHasChanged();
+                    await JS.InvokeVoidAsync("alert", "Booking session deleted successfully!");
+                }
+                else
+                {
+                    await JS.InvokeVoidAsync("alert", "Failed to delete booking session. Please try again.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting booking event: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", "Error deleting booking session. Please try again.");
+        }
     }
 
     private void OnPickerChanged()
@@ -1364,7 +1509,7 @@
 
         try
         {
-            var uidStr = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
+            var uidStr = await JS.InvokeAsync<string>("sessionStorage.getItem", "userId");
             if (!int.TryParse(uidStr, out int userId)) { return; }
 
             var payload = new { UserId = userId, Title = NewEventTitle.Trim(), WhenAt = when, DurationMinutes = 60 };
@@ -1421,9 +1566,9 @@
             .Select(e => new SessionItem
             {
                 Title = e.Title,
-                When = e.Date,
-                Duration = "1 hr",
-                TimeUntil = FormatTimeUntil(e.Date)
+                When = e.StartTime ?? e.Date,
+                Duration = FormatDuration(e.DurationMinutes),
+                TimeUntil = FormatTimeUntil(e.StartTime ?? e.Date)
             })
             .ToList();
     }
@@ -1437,11 +1582,54 @@
         return $"{Math.Floor(span.TotalDays)} days";
     }
 
+    private static string FormatDuration(int? durationMinutes)
+    {
+        if (durationMinutes == null) return "1 hr"; // Default fallback
+        
+        var minutes = durationMinutes.Value;
+        if (minutes < 60)
+        {
+            return $"{minutes} min{(minutes == 1 ? "" : "s")}";
+        }
+        else
+        {
+            var hours = minutes / 60;
+            var remainingMinutes = minutes % 60;
+            if (remainingMinutes == 0)
+            {
+                return $"{hours} hr{(hours == 1 ? "" : "s")}";
+            }
+            else
+            {
+                return $"{hours}h {remainingMinutes}m";
+            }
+        }
+    }
+
     // Edit/Delete state & handlers
     private bool ShowEditEvent = false;
     private CalEvent? EditingEvent;
     private string EditTitle = string.Empty;
+
+    // Tutoring event modal state & handlers
+    private bool ShowTutoringEvent = false;
+    private CalEvent? SelectedTutoringEvent;
     private int EditDay, EditMonth, EditYear, EditHour, EditMinute;
+
+    private void OpenEventModal(CalEvent ev)
+    {
+        if (ev.Title.StartsWith("📚"))
+        {
+            // Open tutoring event modal
+            SelectedTutoringEvent = ev;
+            ShowTutoringEvent = true;
+        }
+        else
+        {
+            // Open regular edit event modal
+            OpenEditEvent(ev);
+        }
+    }
 
     private void OpenEditEvent(CalEvent ev)
     {
@@ -1486,5 +1674,26 @@
             ShowEditEvent = false;
             BuildCalendar();
         }
+    }
+
+    // Tutoring event modal methods
+    private void CloseTutoringEvent()
+    {
+        ShowTutoringEvent = false;
+        SelectedTutoringEvent = null;
+    }
+
+    private void JoinRoom()
+    {
+        if (SelectedTutoringEvent?.BookingId.HasValue == true)
+        {
+            // Navigate to the tutoring session room using BookingId
+            NavigationManager.NavigateTo($"/tutoring-session/{SelectedTutoringEvent.BookingId.Value}");
+        }
+        else
+        {
+            Console.WriteLine("[Dashboard] JoinRoom: No BookingId found for selected tutoring event");
+        }
+        CloseTutoringEvent();
     }
 }

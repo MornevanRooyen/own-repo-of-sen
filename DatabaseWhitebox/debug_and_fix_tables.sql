@@ -153,3 +153,4 @@ SELECT 'Subjects table created successfully' as status, COUNT(*) as subject_coun
 SELECT 'Topics table created successfully' as status, COUNT(*) as topic_count FROM topics;
 
 
+

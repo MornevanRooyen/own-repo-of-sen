@@ -1,10 +1,14 @@
 ﻿@page "/topichub/tutors"
 @layout TopicHubLayout
+@using Frontend.Services
 @inject NavigationManager Nav
+@inject SubjectTutorService SubjectTutorService
+@inject SubjectService SubjectService
+@inject AuthService AuthService
 
 <section class="tutors-scope">
     <div class="head-row">
-        <h1 class="title"><span class="code">BUM 281</span> • <span class="emph">Tutors</span></h1>
+        <h1 class="title"><span class="code">@(currentSubject?.SubjectCode?.ToUpper() ?? "SUBJECT")</span> • <span class="emph">Tutors</span></h1>
 
         <label class="search">
             <svg class="icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -21,19 +25,26 @@
             <div class="tutor-card" @onclick="@(() => OpenProfile(t))">
                 <div class="row-top">
                     <div class="avatar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+                        @if (!string.IsNullOrWhiteSpace(t.ProfilePicturePath))
+                        {
+                            <img src="@t.ProfilePicturePath" alt="@t.FullName" />
+                        }
+                        else
+                        {
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        }
                     </div>
                     <div class="who">
-                        <div class="name" title="@t.Name">@t.Name</div>
-                        <div class="meta"><span class="role">Tutor</span> • @ShortenFollowers(t.Followers)</div>
+                        <div class="name" title="@t.FullName">@t.FullName</div>
+                        <div class="meta"><span class="role">Tutor</span> • @t.SubjectName</div>
                     </div>
                 </div>
 
                 <div class="row-bottom" @onclick:stopPropagation="true">
-                    <span class="pill">@t.Cluster</span>
+                    <span class="pill">@t.SubjectCode</span>
                     <button class="follow @(t.Following ? "on" : "off")" @onclick="@(() => ToggleFollow(t))">
                         @(t.Following ? "Following" : "Follow")
                     </button>
@@ -45,46 +56,76 @@
 
 @code {
     private string query = "";
+    private List<SubjectTutorVM> tutors = new();
+    private SubjectVM? currentSubject;
+    private int? currentSubjectId;
 
-    private class TutorVM
+    protected override async Task OnInitializedAsync()
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = "";
-        public int Followers { get; set; }
-        public string Cluster { get; set; } = "";
-        public bool Following { get; set; }
-        public string ProfileRoute => $"/tutorprofile/{Id}";
+        // Get subject ID from query parameters
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        var queryString = uri.Query;
+        
+        if (!string.IsNullOrEmpty(queryString) && queryString.Contains("subjectId="))
+        {
+            try
+            {
+                var cleanQuery = queryString.TrimStart('?');
+                var subjectIdParam = cleanQuery.Split('&')
+                    .FirstOrDefault(p => p.StartsWith("subjectId="))
+                    ?.Split('=')[1];
+                
+                if (!string.IsNullOrEmpty(subjectIdParam) && int.TryParse(subjectIdParam, out int subjectId))
+                {
+                    currentSubjectId = subjectId;
+                    await LoadSubjectAndTutors();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Tutors] Error parsing subjectId from URL: {ex.Message}");
+            }
+        }
     }
 
-    private List<TutorVM> tutors = new()
+    private async Task LoadSubjectAndTutors()
     {
-        new TutorVM{ Id=1, Name="Kanye East",       Followers=3,         Cluster="Business Mgmt", Following=false },
-        new TutorVM{ Id=2, Name="Taylor Swift",     Followers=13_000_000,Cluster="Microeconomics",Following=true  },
-        new TutorVM{ Id=3, Name="Gracie Abrahams",  Followers=2_000_000, Cluster="Project Mgmt",  Following=true  },
-        new TutorVM{ Id=4, Name="Luzuko D",         Followers=1200,      Cluster="Data Structures",Following=false },
-    };
+        if (currentSubjectId == null) return;
+        
+        try
+        {
+            // Load subject details
+            currentSubject = await SubjectService.GetSubjectByIdAsync(currentSubjectId.Value);
+            
+            // Get current user ID for following status
+            var currentUser = await AuthService.GetCurrentUserAsync();
+            int? currentUserId = currentUser?.UserId;
+            
+            // Load tutors for this subject with following status
+            tutors = await SubjectTutorService.GetTutorsForSubjectAsync(currentSubjectId.Value, currentUserId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Tutors] Error loading subject and tutors: {ex.Message}");
+            tutors = new List<SubjectTutorVM>();
+        }
+    }
 
-    private IEnumerable<TutorVM> Filtered =>
+    private IEnumerable<SubjectTutorVM> Filtered =>
         string.IsNullOrWhiteSpace(query)
             ? tutors
             : tutors.Where(t =>
-                t.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                t.Cluster.Contains(query, StringComparison.OrdinalIgnoreCase));
+                t.FullName.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                t.SubjectName.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                t.SubjectCode.Contains(query, StringComparison.OrdinalIgnoreCase));
 
-    private void ToggleFollow(TutorVM t)
+    private void ToggleFollow(SubjectTutorVM t)
     {
         t.Following = !t.Following;
-        // (later: call API, update count, etc.)
+        // TODO: Implement follow/unfollow API call
     }
 
-    private void OpenProfile(TutorVM t) => Nav.NavigateTo(t.ProfileRoute);
-
-    private static string ShortenFollowers(int n)
-    {
-        if (n >= 1_000_000) return $"{n / 1_000_000.0:0.#}M followers";
-        if (n >= 1_000) return $"{n / 1_000.0:0.#}k followers";
-        return $"{n} follower" + (n == 1 ? "" : "s");
-    }
+    private void OpenProfile(SubjectTutorVM t) => Nav.NavigateTo(t.ProfileRoute);
 }
 
 <style>
@@ -182,6 +223,13 @@
             width: 28px;
             height: 28px;
             stroke-width: 1.8
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 999px;
         }
 
     .who {

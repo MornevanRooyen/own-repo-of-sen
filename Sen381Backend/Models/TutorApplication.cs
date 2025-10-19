@@ -61,6 +61,9 @@ namespace Sen381Backend.Models
 
         [Column("review_notes")]
         public string? ReviewNotes { get; set; }
+
+        [Column("subject_id")]
+        public int? SubjectId { get; set; }
     }
 
     public class TutorApplicationInput
@@ -72,6 +75,7 @@ namespace Sen381Backend.Models
         public int? YearOfStudy { get; set; }
         public int? MinRequiredGrade { get; set; }
         public string? TranscriptPath { get; set; }
+        public int SubjectId { get; set; }
     }
 
     public class TutorApplicationResponse
@@ -79,5 +83,30 @@ namespace Sen381Backend.Models
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
         public int? ApplicationId { get; set; }
+    }
+
+    public class TutorApplicationDto
+    {
+        public int ApplicationId { get; set; }
+        public int UserId { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? PhoneNum { get; set; }
+        public string? StudentNo { get; set; }
+        public string? Major { get; set; }
+        public int? YearOfStudy { get; set; }
+        public int CompletedSessions { get; set; }
+        public int? MinRequiredGrade { get; set; }
+        public string? ProfilePicturePath { get; set; }
+        public string? TranscriptPath { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+        public DateTime? ReviewedAt { get; set; }
+        public int? ReviewedBy { get; set; }
+        public string? ReviewNotes { get; set; }
+        public int? SubjectId { get; set; }
+        public string? SubjectCode { get; set; }
+        public string? SubjectName { get; set; }
     }
 }

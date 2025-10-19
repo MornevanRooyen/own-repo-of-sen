@@ -80,13 +80,13 @@
             {
                 Role = UserRole.Student;
                 IsAdmin = false;
-                await _js.InvokeVoidAsync("localStorage.setItem", "role", "student");
+                await _js.InvokeVoidAsync("sessionStorage.setItem", "role", "student");
             }
             else
             {
                 Role = UserRole.Admin;
                 IsAdmin = true;
-                await _js.InvokeVoidAsync("localStorage.setItem", "role", "admin");
+                await _js.InvokeVoidAsync("sessionStorage.setItem", "role", "admin");
             }
             Console.WriteLine($"[Navigation] TEST: Toggled role to {Role}, IsAdmin: {IsAdmin}");
             StateHasChanged();

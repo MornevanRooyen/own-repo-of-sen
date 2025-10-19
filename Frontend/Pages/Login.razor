@@ -288,18 +288,18 @@
             Message = "✅ Login successful!";
             isSuccess = true;
 
-            await JS.InvokeVoidAsync("localStorage.setItem", "userId", result["userId"]?.ToString() ?? "");
-            await JS.InvokeVoidAsync("localStorage.setItem", "email", result["email"]?.ToString() ?? "");
-            await JS.InvokeVoidAsync("localStorage.setItem", "role", result["role"]?.ToString() ?? "");
-            await JS.InvokeVoidAsync("localStorage.setItem", "isLoggedIn", "true");
+            await JS.InvokeVoidAsync("sessionStorage.setItem", "userId", result["userId"]?.ToString() ?? "");
+            await JS.InvokeVoidAsync("sessionStorage.setItem", "email", result["email"]?.ToString() ?? "");
+            await JS.InvokeVoidAsync("sessionStorage.setItem", "role", result["role"]?.ToString() ?? "");
+            await JS.InvokeVoidAsync("sessionStorage.setItem", "isLoggedIn", "true");
 
             var accessToken = result.ContainsKey("accessToken") ? result["accessToken"]?.ToString() : null;
             var refreshToken = result.ContainsKey("refreshToken") ? result["refreshToken"]?.ToString() : null;
 
             if (!string.IsNullOrWhiteSpace(accessToken))
-                await JS.InvokeVoidAsync("localStorage.setItem", "accessToken", accessToken);
+                await JS.InvokeVoidAsync("sessionStorage.setItem", "accessToken", accessToken);
             if (!string.IsNullOrWhiteSpace(refreshToken))
-                await JS.InvokeVoidAsync("localStorage.setItem", "refreshToken", refreshToken);
+                await JS.InvokeVoidAsync("sessionStorage.setItem", "refreshToken", refreshToken);
 
             await SupabaseService.InitializeAsync();
 

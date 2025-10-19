@@ -1,5 +1,214 @@
 [
   {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "GetBookingSession",
+    "RelativePath": "api/BookingSession/{bookingId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bookingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "CompleteSession",
+    "RelativePath": "api/BookingSession/{bookingId}/complete",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bookingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "UpdateBookingStatus",
+    "RelativePath": "api/BookingSession/{bookingId}/status",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bookingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "Sen381Backend.Controllers.UpdateStatusRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "CreateBookingSession",
+    "RelativePath": "api/BookingSession/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "input",
+        "Type": "Sen381Backend.Models.BookingSessionInput",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "GetAllBookingSessions",
+    "RelativePath": "api/BookingSession/debug/all",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "GetAllSessionsDebug",
+    "RelativePath": "api/BookingSession/debug/all-sessions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "CheckDatabase",
+    "RelativePath": "api/BookingSession/debug/check-db",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "CompleteSessionDebug",
+    "RelativePath": "api/BookingSession/debug/complete-session/{bookingId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bookingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "CreateTestBookingSession",
+    "RelativePath": "api/BookingSession/debug/create-test",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "CreateTestSessionForBothUsers",
+    "RelativePath": "api/BookingSession/debug/create-test-session",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.BookingSessionController",
+    "Method": "GetUserBookings",
+    "RelativePath": "api/BookingSession/user/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.CalendarController",
+    "Method": "DeleteCalendarEvent",
+    "RelativePath": "api/Calendar/{eventId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "eventId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.CalendarController",
+    "Method": "GetUserCalendarEvents",
+    "RelativePath": "api/Calendar/user/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.CalendarController",
+    "Method": "GetUpcomingEvents",
+    "RelativePath": "api/Calendar/user/{userId}/upcoming",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "days",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Sen381Backend.Controllers.ChatController",
     "Method": "CreateSession",
     "RelativePath": "api/Chat/create-session",
@@ -599,6 +808,80 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Sen381Backend.Controllers.SessionController",
+    "Method": "GetSessionMessages",
+    "RelativePath": "api/sessions/{sessionId}/messages",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SessionController",
+    "Method": "PostSessionMessage",
+    "RelativePath": "api/sessions/{sessionId}/messages",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "messageDto",
+        "Type": "Sen381Backend.Models.SessionMessageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SessionController",
+    "Method": "GetSessionResources",
+    "RelativePath": "api/sessions/{sessionId}/resources",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SessionController",
+    "Method": "DeleteSessionResource",
+    "RelativePath": "api/sessions/{sessionId}/resources/{resourceId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "resourceId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Sen381Backend.Controllers.SubjectController",
     "Method": "GetAllSubjects",
     "RelativePath": "api/Subject",
@@ -693,6 +976,175 @@
       {
         "Name": "dto",
         "Type": "Sen381Backend.Controllers.ToggleActiveDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectSubscriptionController",
+    "Method": "GetSubscriptionStatus",
+    "RelativePath": "api/SubjectSubscription/status/{userId}/{subjectId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "subjectId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectSubscriptionController",
+    "Method": "GetSubscribersForSubject",
+    "RelativePath": "api/SubjectSubscription/subject/{subjectId}/subscribers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subjectId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectSubscriptionController",
+    "Method": "SubscribeToSubject",
+    "RelativePath": "api/SubjectSubscription/subscribe",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Sen381Backend.Models.SubscriptionRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectSubscriptionController",
+    "Method": "UnsubscribeFromSubject",
+    "RelativePath": "api/SubjectSubscription/unsubscribe",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Sen381Backend.Models.SubscriptionRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectSubscriptionController",
+    "Method": "GetUserSubscriptions",
+    "RelativePath": "api/SubjectSubscription/user/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectTutorController",
+    "Method": "DeactivateTutor",
+    "RelativePath": "api/SubjectTutor/{subjectTutorId}/deactivate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subjectTutorId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectTutorController",
+    "Method": "CheckTutorStatus",
+    "RelativePath": "api/SubjectTutor/check/{userId}/{subjectId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "subjectId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectTutorController",
+    "Method": "CleanupTutorData",
+    "RelativePath": "api/SubjectTutor/cleanup",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectTutorController",
+    "Method": "GetTutorsForSubject",
+    "RelativePath": "api/SubjectTutor/subject/{subjectId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subjectId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "currentUserId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Sen381Backend.Controllers.SubjectTutorController",
+    "Method": "GetSubjectsForTutor",
+    "RelativePath": "api/SubjectTutor/user/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],

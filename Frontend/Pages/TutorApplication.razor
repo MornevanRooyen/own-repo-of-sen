@@ -70,6 +70,11 @@
                                     <span class="pill">Year @app.YearOfStudy</span>
                                     ;
                                 }
+                                @if (!string.IsNullOrWhiteSpace(app.SubjectCode))
+                                {
+                                    <span class="pill subject-pill">@app.SubjectCode</span>
+                                    ;
+                                }
                             </p>
                             <p class="card__id">ID: @(app.StudentNo ?? app.UserId.ToString())</p>
                         </div>
@@ -93,6 +98,11 @@
                                 <li><b>Min. required grade:</b> @app.MinRequiredGrade%</li>
                                 ;
                             }
+                            @if (!string.IsNullOrWhiteSpace(app.SubjectName))
+                            {
+                                <li><b>Applying to tutor:</b> @app.SubjectName (@app.SubjectCode)</li>
+                                ;
+                            }
                             @if (!string.IsNullOrWhiteSpace(app.TranscriptPath))
                             {
                                 <li>
@@ -107,8 +117,8 @@
                     </div>
 
                     <footer class="foot">
-                        <time datetime="@app.CreatedAt.ToString("O")">
-                            Applied @app.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                        <time datetime="@(app.CreatedAt?.ToString("O") ?? "")">
+                            Applied @(app.CreatedAt?.ToLocalTime().ToString("dd MMM yyyy, HH:mm") ?? "Unknown")
                         </time>
                     </footer>
                 </article>
@@ -120,7 +130,7 @@
 @code {
     private string Search = string.Empty;
     private string MajorFilter = string.Empty;
-    private List<TutorApplicationVM> Items = new();
+    private List<Frontend.Services.TutorApplicationVM> Items = new();
     private bool IsLoading = true;
     private string? ErrorMessage = null;
 
@@ -135,23 +145,7 @@
         {
             IsLoading = true;
             var applications = await TutorAppService.GetPendingApplicationsAsync();
-            Items = applications.Select(app => new TutorApplicationVM
-            {
-                ApplicationId = app.ApplicationId,
-                UserId = app.UserId,
-                FirstName = app.FirstName,
-                LastName = app.LastName,
-                Email = app.Email,
-                PhoneNum = app.PhoneNum,
-                StudentNo = app.StudentNo,
-                Major = app.Major,
-                YearOfStudy = app.YearOfStudy,
-                CompletedSessions = app.CompletedSessions,
-                MinRequiredGrade = app.MinRequiredGrade,
-                ProfilePicturePath = app.ProfilePicturePath,
-                TranscriptPath = app.TranscriptPath,
-                CreatedAt = app.CreatedAt ?? DateTime.UtcNow
-            }).ToList();
+            Items = applications;
             ErrorMessage = null;
         }
         catch (Exception ex)
@@ -171,7 +165,7 @@
            .Distinct(StringComparer.OrdinalIgnoreCase)
            .OrderBy(m => m)!;
 
-    private IEnumerable<TutorApplicationVM> Filtered =>
+    private IEnumerable<Frontend.Services.TutorApplicationVM> Filtered =>
       Items.Where(i =>
         (string.IsNullOrWhiteSpace(Search) ||
           ($"{i.FirstName} {i.LastName} {i.Email} {i.StudentNo}".Contains(Search, StringComparison.OrdinalIgnoreCase))) &&
@@ -244,23 +238,6 @@
         return $"data:image/svg+xml;utf8,{svg}";
     }
 
-    private class TutorApplicationVM
-    {
-        public int ApplicationId { get; set; }
-        public int UserId { get; set; }
-        public string FirstName { get; set; } = "";
-        public string LastName { get; set; } = "";
-        public string? Email { get; set; }
-        public string? PhoneNum { get; set; }
-        public string? StudentNo { get; set; }
-        public string? Major { get; set; }
-        public int? YearOfStudy { get; set; }
-        public int CompletedSessions { get; set; }
-        public int? MinRequiredGrade { get; set; }
-        public string? ProfilePicturePath { get; set; }
-        public string? TranscriptPath { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
 
     private async Task ViewTranscript(string transcriptPath)
     {
@@ -512,5 +489,11 @@
 
     .transcript-link:hover {
         color: #158a7a;
+    }
+
+    .subject-pill {
+        background: #4338CA !important;
+        color: #fff !important;
+        border-color: #3730A3 !important;
     }
 </style>

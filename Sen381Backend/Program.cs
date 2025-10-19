@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sen381.Data_Access;
 using Sen381.Business.Services;
+using Sen381Backend.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,9 @@ builder.Services.AddScoped<IUserService, UserService>();   // ✅ FIX
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<SubjectService>();
 builder.Services.AddScoped<TopicService>();
+
+// SignalR for real-time communication
+builder.Services.AddSignalR();
 
 // CORS for your WASM app (adjust ports if needed)
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -46,4 +50,8 @@ app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 app.MapControllers();
+
+// Map SignalR hub
+app.MapHub<TutoringSessionHub>("/tutoringSessionHub");
+
 app.Run();

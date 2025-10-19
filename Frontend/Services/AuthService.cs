@@ -15,13 +15,13 @@ namespace Frontend.Services
 
         public async Task<bool> IsUserLoggedInAsync()
         {
-            var result = await _js.InvokeAsync<string>("localStorage.getItem", "isLoggedIn");
+            var result = await _js.InvokeAsync<string>("sessionStorage.getItem", "isLoggedIn");
             return result == "true";
         }
 
         public async Task<int?> GetCurrentUserIdAsync()
         {
-            var idString = await _js.InvokeAsync<string>("localStorage.getItem", "userId");
+            var idString = await _js.InvokeAsync<string>("sessionStorage.getItem", "userId");
             if (int.TryParse(idString, out int id))
                 return id;
             return null;
@@ -29,13 +29,13 @@ namespace Frontend.Services
 
         public async Task<string?> GetCurrentUserRoleAsync()
         {
-            var role = await _js.InvokeAsync<string>("localStorage.getItem", "role");
+            var role = await _js.InvokeAsync<string>("sessionStorage.getItem", "role");
             return string.IsNullOrWhiteSpace(role) ? null : role;
         }
 
         public async Task LogoutAsync()
         {
-            await _js.InvokeVoidAsync("localStorage.clear");
+            await _js.InvokeVoidAsync("sessionStorage.clear");
         }
 
         public async Task<CurrentUser?> GetCurrentUserAsync()
@@ -46,15 +46,15 @@ namespace Frontend.Services
                 if (userId == null) return null;
 
                 var userRole = await GetCurrentUserRoleAsync();
-                Console.WriteLine($"[AuthService] Retrieved role from localStorage: '{userRole}'");
+                Console.WriteLine($"[AuthService] Retrieved role from sessionStorage: '{userRole}'");
                 
                 return new CurrentUser
                 {
                     UserId = userId.Value,
-                    PhoneNum = await _js.InvokeAsync<string>("localStorage.getItem", "phoneNum"),
-                    StudentNo = await _js.InvokeAsync<string>("localStorage.getItem", "studentNo"),
-                    Program = await _js.InvokeAsync<string>("localStorage.getItem", "program"),
-                    Year = await _js.InvokeAsync<string>("localStorage.getItem", "year"),
+                    PhoneNum = await _js.InvokeAsync<string>("sessionStorage.getItem", "phoneNum"),
+                    StudentNo = await _js.InvokeAsync<string>("sessionStorage.getItem", "studentNo"),
+                    Program = await _js.InvokeAsync<string>("sessionStorage.getItem", "program"),
+                    Year = await _js.InvokeAsync<string>("sessionStorage.getItem", "year"),
                     Role = userRole
                 };
             }

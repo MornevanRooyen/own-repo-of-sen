@@ -1,0 +1,865 @@
+@page "/subjects/{subjectId:int}/subscribers"
+@using Frontend.Services
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.JSInterop
+@inject SubjectService SubjectService
+@inject SubjectSubscriptionService SubscriptionService
+@inject BookingSessionService BookingSessionService
+@inject AuthService AuthService
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<PageTitle>Subscribers | @(currentSubject?.SubjectCode ?? "Subject") | CampusLearn</PageTitle>
+
+<main class="subscribers-scope">
+    <div class="container page-inner">
+        <!-- Header -->
+        <div class="header-row">
+            <h1 class="title">
+                <span class="code">@(currentSubject?.SubjectCode?.ToUpper() ?? "SUBJECT")</span>
+                <span class="divider">•</span>
+                <span class="label">Subscribers</span>
+            </h1>
+            
+            <button class="btn btn-secondary" @onclick="GoBack">
+                ← Back to Profile
+            </button>
+        </div>
+
+        <!-- Subject Info -->
+        @if (currentSubject != null)
+        {
+            <div class="subject-info">
+                <h2>@currentSubject.Name</h2>
+                <p class="subject-details">Year @currentSubject.Year • @GetCluster(currentSubject.SubjectCode)</p>
+            </div>
+        }
+
+        <!-- Subscribers List -->
+        <section class="subscribers-section">
+            <div class="subscribers-header">
+                <h3>@(subscribers.Count) Subscriber@(subscribers.Count != 1 ? "s" : "")</h3>
+                
+                @if (!string.IsNullOrWhiteSpace(SearchQuery))
+                {
+                    <p class="search-results">Showing results for "@SearchQuery"</p>
+                }
+            </div>
+
+            @if (isLoading)
+            {
+                <div class="loading">Loading subscribers...</div>
+            }
+            else if (FilteredSubscribers.Any())
+            {
+                <div class="subscribers-grid">
+                    @foreach (var subscriber in FilteredSubscribers)
+                    {
+                        <div class="subscriber-card" @onclick="@(() => ViewProfile(subscriber.UserId))">
+                            <div class="subscriber-avatar">
+                                @if (!string.IsNullOrWhiteSpace(subscriber.ProfilePicturePath))
+                                {
+                                    <img src="@subscriber.ProfilePicturePath" alt="@subscriber.FullName" />
+                                }
+                                else
+                                {
+                                    <div class="avatar-placeholder">
+                                        @subscriber.FirstName.Substring(0, 1).ToUpper()
+                                    </div>
+                                }
+                            </div>
+                            
+                            <div class="subscriber-info">
+                                <h4 class="subscriber-name">@subscriber.FullName</h4>
+                                <p class="subscriber-email">@subscriber.Email</p>
+                                <p class="subscriber-meta">
+                                    Subscribed @FormatDate(subscriber.SubscribedAt)
+                                </p>
+                            </div>
+                            
+                            <div class="subscriber-actions">
+                                <button class="btn btn-primary small" @onclick="@(() => OpenBookingModal(subscriber))" @onclick:stopPropagation="true">
+                                    Book session
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <p>No subscribers found for this subject.</p>
+                    @if (!string.IsNullOrWhiteSpace(SearchQuery))
+                    {
+                        <p>Try adjusting your search terms.</p>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</main>
+
+<!-- Booking Session Modal -->
+@if (showBookingModal)
+{
+    <div class="modal-overlay" @onclick="CloseBookingModal">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3>Book Session with @selectedSubscriber?.FullName</h3>
+                <button class="close-button" @onclick="CloseBookingModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <EditForm Model="@bookingRequest" OnValidSubmit="SubmitBooking">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="form-group">
+                        <label for="title">Session Title *</label>
+                        <input type="text" id="title" @bind="bookingRequest.Title" class="form-input" placeholder="e.g., Math Help Session" style="display: block; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;" />
+                        <ValidationMessage TValue="string" For="@(() => bookingRequest.Title)" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description (Optional)</label>
+                        <textarea id="description" @bind="bookingRequest.Description" class="form-textarea" placeholder="What topics will you cover?" rows="3" style="display: block; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; min-height: 80px; margin-bottom: 10px;"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sessionDate">Date *</label>
+                            <input type="date" id="sessionDate" @bind="bookingRequest.SessionDate" 
+                                   @bind:after="ValidateDate"
+                                   min="@DateTime.Now.ToString("yyyy-MM-dd")" 
+                                   class="form-input" 
+                                   style="display: block; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;" />
+                            <ValidationMessage TValue="DateTime?" For="@(() => bookingRequest.SessionDate)" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="sessionTime">Time *</label>
+                            <input type="time" id="sessionTime" @bind="bookingRequest.SessionTime" 
+                                   @bind:after="ValidateTime"
+                                   class="form-input" 
+                                   style="display: block; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;" />
+                            <ValidationMessage TValue="TimeOnly?" For="@(() => bookingRequest.SessionTime)" />
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duration">Duration *</label>
+                        <select id="duration" @bind="bookingRequest.Duration" class="form-select" style="display: block; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;">
+                            <option value="">Select duration</option>
+                            <option value="30">30 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="90">1.5 hours</option>
+                            <option value="120">2 hours</option>
+                        </select>
+                        <ValidationMessage TValue="int" For="@(() => bookingRequest.Duration)" />
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseBookingModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                            @if (isSubmitting)
+                            {
+                                <span>Booking...</span>
+                            }
+                            else
+                            {
+                                <span>Send Booking</span>
+                            }
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int SubjectId { get; set; }
+
+    private SubjectVM? currentSubject;
+    private List<SubscriberVM> subscribers = new();
+    private bool isLoading = true;
+    private string SearchQuery { get; set; } = string.Empty;
+    
+    // Booking modal variables
+    private bool showBookingModal = false;
+    private SubscriberVM? selectedSubscriber;
+    private BookingRequest bookingRequest = new();
+    private bool isSubmitting = false;
+
+    private List<SubscriberVM> FilteredSubscribers =>
+        string.IsNullOrWhiteSpace(SearchQuery)
+            ? subscribers
+            : subscribers.Where(s => 
+                s.FullName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ||
+                s.Email.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)
+              ).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSubjectAndSubscribers();
+    }
+
+    private async Task LoadSubjectAndSubscribers()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // Load subject details
+            currentSubject = await SubjectService.GetSubjectByIdAsync(SubjectId);
+            
+            // Load subscribers
+            subscribers = await SubscriptionService.GetSubscribersForSubjectAsync(SubjectId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SubjectSubscribers] Error loading data: {ex.Message}");
+            subscribers = new List<SubscriberVM>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void GoBack()
+    {
+        Nav.NavigateTo("/studentprofile"); // Go back to profile page
+    }
+
+    private void ViewProfile(int userId)
+    {
+        Nav.NavigateTo($"/studentprofile/{userId}");
+    }
+
+    private async void OpenBookingModal(SubscriberVM subscriber)
+    {
+        selectedSubscriber = subscriber;
+        
+        // Get current user ID
+        var currentUser = await AuthService.GetCurrentUserAsync();
+        if (currentUser == null)
+        {
+            await JS.InvokeVoidAsync("alert", "Error: Current user not found. Please log in.");
+            return;
+        }
+        
+        bookingRequest = new BookingRequest
+        {
+            TutorId = subscriber.UserId,
+            StudentId = currentUser.UserId, // Set the current user as the student
+            SubjectId = SubjectId
+        };
+        showBookingModal = true;
+    }
+
+    private void CloseBookingModal()
+    {
+        showBookingModal = false;
+        selectedSubscriber = null;
+        bookingRequest = new BookingRequest();
+        isSubmitting = false;
+    }
+
+    private void ValidateDate()
+    {
+        if (bookingRequest.SessionDate.HasValue)
+        {
+            var selectedDate = bookingRequest.SessionDate.Value.Date;
+            var today = DateTime.Today;
+            
+            if (selectedDate < today)
+            {
+                bookingRequest.SessionDate = today;
+                JS.InvokeVoidAsync("alert", "You cannot select a date in the past. Date has been reset to today.");
+            }
+        }
+    }
+
+    private void ValidateTime()
+    {
+        if (bookingRequest.SessionDate.HasValue && bookingRequest.SessionTime.HasValue)
+        {
+            var selectedDate = bookingRequest.SessionDate.Value.Date;
+            var selectedTime = bookingRequest.SessionTime.Value.ToTimeSpan();
+            var selectedDateTime = selectedDate.Add(selectedTime);
+            var now = DateTime.Now;
+            
+            if (selectedDateTime <= now)
+            {
+                // If selecting today with a past time, suggest a time 1 hour from now
+                if (selectedDate == DateTime.Today)
+                {
+                    var suggestedTime = TimeOnly.FromTimeSpan(now.AddHours(1).TimeOfDay);
+                    bookingRequest.SessionTime = suggestedTime;
+                    JS.InvokeVoidAsync("alert", "You cannot select a time in the past. Time has been adjusted to 1 hour from now.");
+                }
+                else
+                {
+                    // For future dates, just clear the time
+                    bookingRequest.SessionTime = null;
+                    JS.InvokeVoidAsync("alert", "You cannot select a time in the past. Please select a valid time.");
+                }
+            }
+        }
+    }
+
+    private async Task SubmitBooking()
+    {
+        if (selectedSubscriber == null) return;
+        
+        // Final validation before submission
+        if (!ValidateBookingData())
+        {
+            return;
+        }
+        
+        isSubmitting = true;
+        try
+        {
+            var response = await BookingSessionService.CreateBookingSessionAsync(bookingRequest);
+            
+            if (response.Success)
+            {
+                // Show success message
+                await JS.InvokeVoidAsync("alert", $"Booking request sent to {selectedSubscriber.FullName}!");
+                
+                CloseBookingModal();
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", $"Error: {response.Message}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error submitting booking: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", "Error sending booking request. Please try again.");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private bool ValidateBookingData()
+    {
+        // Check if date is in the past
+        if (bookingRequest.SessionDate.HasValue && bookingRequest.SessionDate.Value.Date < DateTime.Today)
+        {
+            JS.InvokeVoidAsync("alert", "Please select a date that is today or in the future.");
+            return false;
+        }
+
+        // Check if selecting today but time is in the past
+        if (bookingRequest.SessionDate.HasValue && bookingRequest.SessionTime.HasValue)
+        {
+            var selectedDate = bookingRequest.SessionDate.Value.Date;
+            var selectedTime = bookingRequest.SessionTime.Value.ToTimeSpan();
+            var selectedDateTime = selectedDate.Add(selectedTime);
+            
+            if (selectedDateTime <= DateTime.Now)
+            {
+                JS.InvokeVoidAsync("alert", "Please select a time that is in the future.");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static string GetCluster(string subjectCode) => subjectCode.ToUpper() switch
+    {
+        var code when code.StartsWith("BUM") || code.StartsWith("BUS") || code.StartsWith("MGT") || code.StartsWith("MKT") => "Business",
+        var code when code.StartsWith("CS") || code.StartsWith("IT") || code.StartsWith("SWE") || code.StartsWith("INF") => "Computing",
+        var code when code.StartsWith("MTH") || code.StartsWith("STA") || code.StartsWith("CAL") || code.StartsWith("STAT") => "Quant",
+        var code when code.StartsWith("LAW") || code.StartsWith("LEG") => "Law",
+        _ => "General"
+    };
+
+    private string FormatDate(DateTime? date)
+    {
+        if (date == null) return "Unknown";
+        return date.Value.ToString("MMM dd, yyyy");
+    }
+
+
+}
+
+<style>
+    .subscribers-scope {
+        min-height: 100vh;
+        background: var(--bg);
+        padding: 20px 0;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .code {
+        color: var(--accent);
+    }
+
+    .divider {
+        color: var(--muted);
+    }
+
+    .label {
+        color: var(--ink);
+    }
+
+    .subject-info {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .subject-info h2 {
+        margin: 0 0 8px 0;
+        color: var(--ink);
+        font-size: 1.5rem;
+    }
+
+    .subject-details {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1rem;
+    }
+
+    .subscribers-section {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        padding: 24px;
+    }
+
+    .subscribers-header {
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--ring);
+    }
+
+    .subscribers-header h3 {
+        margin: 0 0 8px 0;
+        color: var(--ink);
+        font-size: 1.25rem;
+    }
+
+    .search-results {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: var(--muted);
+    }
+
+    .subscribers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .subscriber-card {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .subscriber-card:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow);
+        transform: translateY(-2px);
+    }
+
+    .subscriber-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .subscriber-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: var(--accent);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    .subscriber-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .subscriber-name {
+        margin: 0 0 4px 0;
+        color: var(--ink);
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .subscriber-email {
+        margin: 0 0 4px 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+
+    .subscriber-meta {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+    }
+
+    .subscriber-actions {
+        flex-shrink: 0;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--muted);
+    }
+
+    .empty-state p {
+        margin: 8px 0;
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #3B82F6;
+        color: white;
+        border-color: #3B82F6;
+    }
+
+    .btn-primary:hover {
+        background: #2563EB;
+        border-color: #2563EB;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: #6B7280;
+        border-color: rgba(0,0,0,.10);
+    }
+
+    .btn-secondary:hover {
+        background: #F3F4F6;
+        color: #1F2937;
+    }
+
+    .btn.small {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    :root {
+        --bg: #F2F3F5;
+        --panel: #FFFFFF;
+        --ink: #1F2937;
+        --muted: #6B7280;
+        --ring: rgba(0,0,0,.10);
+        --shadow: 0 8px 22px rgba(0,0,0,.06);
+        --accent: #3B82F6;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--ring);
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        color: var(--ink);
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .close-button:hover {
+        background: var(--ring);
+        color: var(--ink);
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--ink);
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--ring);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    /* Specific styling for Blazor input components */
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+        width: 100% !important;
+        padding: 10px 12px !important;
+        border: 1px solid var(--ring) !important;
+        border-radius: 8px !important;
+        font-size: 14px !important;
+        transition: all 0.2s ease !important;
+        background: white !important;
+        box-sizing: border-box !important;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    input[type="time"]:focus,
+    select:focus,
+    textarea:focus {
+        outline: none !important;
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    /* Ensure form elements are visible */
+    .modal-body input,
+    .modal-body select,
+    .modal-body textarea {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        min-height: 40px !important;
+    }
+
+    /* Fallback for any hidden elements */
+    .modal-body * {
+        display: revert !important;
+    }
+
+    /* Date/Time validation styling */
+    input[type="date"]:invalid,
+    input[type="time"]:invalid {
+        border-color: #DC2626 !important;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+    }
+
+    input[type="date"]:valid,
+    input[type="time"]:valid {
+        border-color: #10B981 !important;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--ring);
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn-primary {
+        background: #3B82F6;
+        color: white;
+        border-color: #3B82F6;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background: #2563EB;
+        border-color: #2563EB;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: #6B7280;
+        border-color: rgba(0,0,0,.10);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+        background: #F3F4F6;
+        color: #1F2937;
+    }
+
+    .validation-message {
+        color: #DC2626;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    @@media screen and (max-width: 640px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .modal-content {
+            width: 95%;
+            margin: 20px;
+        }
+        
+        .modal-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
