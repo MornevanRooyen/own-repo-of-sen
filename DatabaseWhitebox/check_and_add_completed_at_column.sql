@@ -29,3 +29,4 @@ SELECT column_name, data_type, is_nullable, column_default
 FROM information_schema.columns 
 WHERE table_name = 'booking_sessions' 
 ORDER BY ordinal_position;
+

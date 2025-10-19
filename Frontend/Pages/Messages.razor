@@ -8,6 +8,8 @@
 @inject IJSRuntime JS
 @inject AuthService AuthService
 @inject NavigationManager NavigationManager
+@inject MessagingService MessagingService
+@implements IAsyncDisposable
 
 <link rel="stylesheet" href="css/messages.css" />
 
@@ -569,10 +571,10 @@
                         var isOutgoing = (msg.SenderId == CurrentUserId);
                         bool isAttachment = msg.MessageText != null && msg.MessageText.StartsWith("ATTACH|");
                         
-                        // Debug logging for message text
-                        if (msg.MessageText != null && msg.MessageText.StartsWith("ATTACH"))
+                        // Debug logging for message text (only log once per message and only for new messages)
+                        if (msg.MessageText != null && msg.MessageText.StartsWith("ATTACH") && msg.SentAt > DateTime.Now.AddMinutes(-1))
                         {
-                            Console.WriteLine($"[Messages] Raw attachment message: {msg.MessageText}");
+                            Console.WriteLine($"[Messages] Processing attachment message ID {msg.Id}: {msg.MessageText.Substring(0, Math.Min(50, msg.MessageText.Length))}...");
                         }
 
                         string? attachType = null;
@@ -588,8 +590,11 @@
                                 attachUrl = parts.Length > 2 ? parts[2] : null;
                                 attachName = parts.Length > 3 ? parts[3] : null;
                                 
-                                // Debug logging
-                                Console.WriteLine($"[Messages] Attachment found - Type: {attachType}, URL: {attachUrl}, Name: {attachName}");
+                                // Debug logging (only for new messages)
+                                if (msg.SentAt > DateTime.Now.AddMinutes(-1))
+                                {
+                                    Console.WriteLine($"[Messages] Attachment found - Type: {attachType}, URL: {attachUrl?.Substring(0, Math.Min(50, attachUrl?.Length ?? 0))}..., Name: {attachName}");
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -695,6 +700,11 @@
     private string selectedFileName;
     private string selectedFileType;
 
+    // SignalR connection for live messaging
+    private bool _isConnected = false;
+    private Timer? _fallbackTimer;
+    private int _lastMessageCount = 0;
+
     protected override async Task OnInitializedAsync()
     {
         bool isLoggedIn = await AuthService.IsUserLoggedInAsync();
@@ -706,6 +716,7 @@
 
         CurrentUserId = (await AuthService.GetCurrentUserIdAsync()) ?? 0;
         await LoadFollowedUsers();
+        await InitializeSignalR();
     }
 
     private async Task LoadFollowedUsers()
@@ -728,11 +739,15 @@
             SelectedUser = user;
             Console.WriteLine($"[Messages] Loading conversation with user {user.Id}");
 
-            ConversationMessages = await Http.GetFromJsonAsync<List<DirectMessage>>($"api/Messaging/conversation/{CurrentUserId}/{user.Id}");
-            Console.WriteLine($"[Messages] Loaded {ConversationMessages?.Count ?? 0} messages");
+            // Always load fresh messages from the API to ensure we have the latest
+            var freshMessages = await Http.GetFromJsonAsync<List<DirectMessage>>($"api/Messaging/conversation/{CurrentUserId}/{user.Id}");
+            ConversationMessages = freshMessages ?? new List<DirectMessage>();
+            _lastMessageCount = ConversationMessages.Count; // Set initial count for polling
+            Console.WriteLine($"[Messages] Loaded {ConversationMessages.Count} messages");
 
             await Http.PutAsync($"api/Messaging/mark-read/{user.Id}/{CurrentUserId}", null);
             await ScrollToBottom();
+            StateHasChanged(); // Ensure UI updates
         }
         catch (Exception ex)
         {
@@ -793,23 +808,14 @@
 
             if (response.IsSuccessStatusCode)
             {
-                ConversationMessages ??= new List<DirectMessage>();
-                ConversationMessages.Add(new DirectMessage
-                {
-                    SenderId = CurrentUserId,
-                    ReceiverId = SelectedUser.Id,
-                    MessageText = textToSend,
-                    SentAt = DateTime.Now,
-                    IsRead = false
-                });
-
+                // Clear the input fields
                 NewMessageText = string.Empty;
                 selectedFile = null;
                 selectedFileName = null;
                 selectedFileType = null;
 
-                await ScrollToBottom();
-                Console.WriteLine("✅ [Messages] Message sent successfully");
+                // The message will be received via SignalR and added to the conversation
+                Console.WriteLine("✅ [Messages] Message sent successfully - will be received via SignalR");
             }
             else
             {
@@ -826,6 +832,174 @@
         finally
         {
             isSending = false;
+        }
+    }
+
+    // SignalR Methods
+    private async Task InitializeSignalR()
+    {
+        try
+        {
+            Console.WriteLine($"[Messages] Initializing SignalR for user {CurrentUserId}");
+            
+            // Subscribe to message received events
+            MessagingService.MessageReceived += OnMessageReceived;
+            
+            // Start the messaging service
+            await MessagingService.StartAsync();
+            
+            // Check connection status
+            Console.WriteLine($"[Messages] SignalR connection state: {MessagingService.ConnectionState}");
+            Console.WriteLine($"[Messages] SignalR is connected: {MessagingService.IsConnected}");
+            
+            if (MessagingService.IsConnected)
+            {
+                // Join the messaging hub for this user
+                await MessagingService.JoinMessagingAsync(CurrentUserId.ToString());
+                _isConnected = true;
+                Console.WriteLine("[Messages] SignalR connection established successfully");
+            }
+            else
+            {
+                Console.WriteLine("[Messages] SignalR connection failed - will use fallback polling");
+                _isConnected = false;
+                StartFallbackPolling();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Messages] Error initializing SignalR: {ex.Message}");
+            Console.WriteLine($"[Messages] Stack trace: {ex.StackTrace}");
+            _isConnected = false;
+            StartFallbackPolling();
+        }
+    }
+
+    private async void OnMessageReceived(DirectMessage message)
+    {
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                Console.WriteLine($"[Messages] Received live message: {message.MessageText}");
+                
+                // Check if this message is for the current user
+                if (message.SenderId == CurrentUserId || message.ReceiverId == CurrentUserId)
+                {
+                    Console.WriteLine($"[Messages] Processing message from {message.SenderId} to {message.ReceiverId}, CurrentUserId: {CurrentUserId}");
+                    
+                    // Add to current conversation if it matches
+                    if (SelectedUser != null && 
+                        ((message.SenderId == CurrentUserId && message.ReceiverId == SelectedUser.Id) ||
+                         (message.SenderId == SelectedUser.Id && message.ReceiverId == CurrentUserId)))
+                    {
+                        Console.WriteLine($"[Messages] Adding message to current conversation with {SelectedUser.FirstName}");
+                        ConversationMessages ??= new List<DirectMessage>();
+                        
+                        // Check if message already exists to avoid duplicates
+                        if (!ConversationMessages.Any(m => m.Id == message.Id))
+                        {
+                            ConversationMessages.Add(message);
+                            Console.WriteLine($"[Messages] Message added to conversation. Total messages: {ConversationMessages.Count}");
+                            await ScrollToBottom();
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[Messages] Message already exists in conversation, skipping");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[Messages] Message not for current conversation. SelectedUser: {SelectedUser?.FirstName}");
+                    }
+                    
+                    // Update the conversation list to show the latest message
+                    await UpdateConversationList(message);
+                    
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Messages] Error handling live message: {ex.Message}");
+            }
+        });
+    }
+
+    private async Task UpdateConversationList(DirectMessage message)
+    {
+        try
+        {
+            // Find the other user in the conversation
+            var otherUserId = message.SenderId == CurrentUserId ? message.ReceiverId : message.SenderId;
+            
+            // Find the user in the followed users list and update their last message
+            if (FollowedUsers != null)
+            {
+                var user = FollowedUsers.FirstOrDefault(u => u.Id == otherUserId);
+                if (user != null)
+                {
+                    // Update the user's last message info (this will be reflected in the UI)
+                    // The UI already shows the last message from the conversation data
+                    Console.WriteLine($"[Messages] Updated conversation list for user {user.FirstName} {user.LastName}");
+                }
+            }
+            
+            // If we're not currently viewing this conversation, we might want to refresh the conversation list
+            // to show the latest message preview in the sidebar
+            if (SelectedUser?.Id != otherUserId)
+            {
+                // Optionally refresh the conversation list to show latest messages
+                // This ensures the sidebar shows the most recent message
+                Console.WriteLine($"[Messages] New message from different user, updating sidebar");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Messages] Error updating conversation list: {ex.Message}");
+        }
+    }
+
+    private void StartFallbackPolling()
+    {
+        Console.WriteLine("[Messages] Starting fallback polling every 3 seconds");
+        _fallbackTimer = new Timer(async _ => await PollForNewMessages(), null, TimeSpan.Zero, TimeSpan.FromSeconds(3));
+    }
+
+    private async Task PollForNewMessages()
+    {
+        try
+        {
+            if (SelectedUser == null) return;
+
+            var currentMessages = await Http.GetFromJsonAsync<List<DirectMessage>>($"api/Messaging/conversation/{CurrentUserId}/{SelectedUser.Id}");
+            if (currentMessages != null && currentMessages.Count > _lastMessageCount)
+            {
+                Console.WriteLine($"[Messages] Polling detected {currentMessages.Count - _lastMessageCount} new messages");
+                ConversationMessages = currentMessages;
+                _lastMessageCount = currentMessages.Count;
+                await InvokeAsync(StateHasChanged);
+                await ScrollToBottom();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Messages] Error polling for messages: {ex.Message}");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _fallbackTimer?.Dispose();
+        
+        if (MessagingService is not null)
+        {
+            if (_isConnected)
+            {
+                // Unsubscribe from events
+                MessagingService.MessageReceived -= OnMessageReceived;
+                await MessagingService.LeaveMessagingAsync(CurrentUserId.ToString());
+            }
         }
     }
 

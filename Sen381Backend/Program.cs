@@ -10,7 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Sen381Backend API", Version = "v1" });
+});
 
 // Supabase service as a singleton (parameterless ctor reads appsettings.json)
 builder.Services.AddSingleton<SupaBaseAuthService>();
@@ -51,7 +54,8 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 app.MapControllers();
 
-// Map SignalR hub
+// Map SignalR hubs
 app.MapHub<TutoringSessionHub>("/tutoringSessionHub");
+app.MapHub<MessagingHub>("/messagingHub");
 
 app.Run();

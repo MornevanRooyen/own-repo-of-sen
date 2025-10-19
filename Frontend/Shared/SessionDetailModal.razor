@@ -1,0 +1,527 @@
+@using Frontend.Models
+@using Frontend.Services
+@using System.Net.Http
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")" @onclick="CloseModal">
+    <div class="modal-content" @onclick:stopPropagation="true">
+        <div class="modal-header">
+            <h2>Session Details: @Session?.Title</h2>
+            <button class="close-btn" @onclick="CloseModal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            @if (Session != null)
+            {
+                <div class="session-info">
+                    <div class="info-row">
+                        <span class="label">Date:</span>
+                        <span class="value">@Session.SessionDate.ToString("dddd, MMMM dd, yyyy")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Time:</span>
+                        <span class="value">@Session.SessionDate.ToString("HH:mm") - @Session.SessionDate.AddMinutes(Session.DurationMinutes).ToString("HH:mm")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Duration:</span>
+                        <span class="value">@FormatSessionDuration(Session.DurationMinutes)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="value status @Session.Status.ToLower()">@Session.Status</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Session.Description))
+                    {
+                        <div class="info-row">
+                            <span class="label">Description:</span>
+                            <span class="value">@Session.Description</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="tabs">
+                    <button class="tab @(activeTab == "chat" ? "active" : "")" @onclick="@(() => SetActiveTab("chat"))">
+                        Chat History (@Messages.Count)
+                    </button>
+                    <button class="tab @(activeTab == "resources" ? "active" : "")" @onclick="@(() => SetActiveTab("resources"))">
+                        Resources (@Resources.Count)
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    @if (activeTab == "chat")
+                    {
+                        <div class="chat-container">
+                            @if (isLoadingMessages)
+                            {
+                                <div class="loading">Loading chat history...</div>
+                            }
+                            else if (Messages.Count == 0)
+                            {
+                                <div class="empty-state">
+                                    <p>No messages in this session.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="messages-list">
+                                    @foreach (var message in Messages)
+                                    {
+                                        <div class="message @(message.IsFile ? "file-message" : "text-message")">
+                                            <div class="message-header">
+                                                <span class="sender">@message.SenderName</span>
+                                                <span class="timestamp">@message.CreatedAt.ToString("HH:mm")</span>
+                                            </div>
+                                            <div class="message-content">
+                                                @if (message.IsFile)
+                                                {
+                                                    <div class="file-content">
+                                                        <span class="file-icon">📎</span>
+                                                        <span class="file-name">@message.Content</span>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span>@message.Content</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                    else if (activeTab == "resources")
+                    {
+                        <div class="resources-container">
+                            @if (isLoadingResources)
+                            {
+                                <div class="loading">Loading resources...</div>
+                            }
+                            else if (Resources.Count == 0)
+                            {
+                                <div class="empty-state">
+                                    <p>No resources shared in this session.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="resources-list">
+                                    @foreach (var resource in Resources)
+                                    {
+                                        <div class="resource-item">
+                                            <div class="resource-info">
+                                                <span class="file-icon">📄</span>
+                                                <div class="resource-details">
+                                                    <span class="resource-name">@resource.FileName</span>
+                                                    <span class="resource-meta">@FormatFileSize(resource.FileSizeBytes) • @resource.UploadedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                                                </div>
+                                            </div>
+                                            <button class="download-btn" @onclick="() => DownloadResource(resource)">
+                                                Download
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public BookingSessionVM? Session { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private string activeTab = "chat";
+    private List<SessionMessageDto> Messages = new();
+    private List<SessionResource> Resources = new();
+    private bool isLoadingMessages = false;
+    private bool isLoadingResources = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible && Session != null)
+        {
+            await LoadSessionData();
+        }
+    }
+
+    private async Task LoadSessionData()
+    {
+        await LoadMessages();
+        await LoadResources();
+    }
+
+    private async Task LoadMessages()
+    {
+        if (Session == null) return;
+
+        isLoadingMessages = true;
+        try
+        {
+            var response = await Http.GetFromJsonAsync<List<SessionMessageDto>>($"api/sessions/{Session.BookingId}/messages");
+            Messages = response ?? new List<SessionMessageDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading messages: {ex.Message}");
+            Messages = new List<SessionMessageDto>();
+        }
+        finally
+        {
+            isLoadingMessages = false;
+        }
+    }
+
+    private async Task LoadResources()
+    {
+        if (Session == null) return;
+
+        isLoadingResources = true;
+        try
+        {
+            var response = await Http.GetFromJsonAsync<List<SessionResource>>($"api/sessions/{Session.BookingId}/resources");
+            Resources = response ?? new List<SessionResource>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading resources: {ex.Message}");
+            Resources = new List<SessionResource>();
+        }
+        finally
+        {
+            isLoadingResources = false;
+        }
+    }
+
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+    }
+
+    private async Task CloseModal()
+    {
+        await OnClose.InvokeAsync();
+    }
+
+    private string FormatSessionDuration(int minutes)
+    {
+        if (minutes < 60)
+            return $"{minutes} min";
+        
+        int hours = minutes / 60;
+        int remainingMinutes = minutes % 60;
+        
+        if (remainingMinutes == 0)
+            return $"{hours} hr";
+        
+        return $"{hours} hr {remainingMinutes} min";
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024)
+            return $"{bytes} B";
+        
+        if (bytes < 1024 * 1024)
+            return $"{bytes / 1024.0:F1} KB";
+        
+        if (bytes < 1024 * 1024 * 1024)
+            return $"{bytes / (1024.0 * 1024.0):F1} MB";
+        
+        return $"{bytes / (1024.0 * 1024.0 * 1024.0):F1} GB";
+    }
+
+    private async Task DownloadResource(SessionResource resource)
+    {
+        try
+        {
+            // Implement download logic here
+            await JS.InvokeVoidAsync("alert", $"Downloading {resource.FileName}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error downloading resource: {ex.Message}");
+        }
+    }
+}
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 80vh;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f9fafb;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6b7280;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .close-btn:hover {
+        color: #374151;
+        background-color: #f3f4f6;
+    }
+
+    .modal-body {
+        padding: 24px;
+        max-height: calc(80vh - 80px);
+        overflow-y: auto;
+    }
+
+    .session-info {
+        margin-bottom: 24px;
+        padding: 16px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .info-row {
+        display: flex;
+        margin-bottom: 8px;
+    }
+
+    .info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .label {
+        font-weight: 600;
+        color: #374151;
+        min-width: 80px;
+        margin-right: 12px;
+    }
+
+    .value {
+        color: #6b7280;
+    }
+
+    .status {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status.completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .tabs {
+        display: flex;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 20px;
+    }
+
+    .tab {
+        background: none;
+        border: none;
+        padding: 12px 20px;
+        cursor: pointer;
+        font-weight: 500;
+        color: #6b7280;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .tab.active {
+        color: #3b82f6;
+        border-bottom-color: #3b82f6;
+    }
+
+    .tab:hover:not(.active) {
+        color: #374151;
+        background: #f9fafb;
+    }
+
+    .tab-content {
+        min-height: 300px;
+    }
+
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        color: #6b7280;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #6b7280;
+    }
+
+    .messages-list {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+    }
+
+    .message {
+        margin-bottom: 16px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+    }
+
+    .message:last-child {
+        margin-bottom: 0;
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+    }
+
+    .sender {
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+    }
+
+    .timestamp {
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+
+    .message-content {
+        color: #4b5563;
+    }
+
+    .file-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .file-icon {
+        font-size: 1.2rem;
+    }
+
+    .file-name {
+        font-weight: 500;
+        color: #3b82f6;
+    }
+
+    .resources-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .resource-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: #f8fafc;
+    }
+
+    .resource-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .resource-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .resource-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .resource-name {
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .resource-meta {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .download-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .download-btn:hover {
+        background: #2563eb;
+    }
+</style>

@@ -24,3 +24,4 @@ SELECT COUNT(*) as remaining_session_resources FROM session_resources;
 
 -- Reset the sequence for booking_id to start from 1 again
 SELECT setval('booking_sessions_booking_id_seq', 1, false);
+

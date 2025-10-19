@@ -3,6 +3,9 @@
   "WorkspaceRootPath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{108D1F18-A8E9-43D8-9453-8B871603743A}|..\\Sen381Backend\\Sen381Backend.csproj|c:\\sen381 github repo\\own repo\\own-repo-of-sen\\sen381backend\\hubs\\messaginghub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{BBC9AC06-2447-4672-B438-03D6A0E233A7}|Sen381.csproj|c:\\sen381 github repo\\own repo\\own-repo-of-sen\\sen381\\business\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{BBC9AC06-2447-4672-B438-03D6A0E233A7}|Sen381.csproj|solutionrelative:business\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -55,6 +58,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "MessagingHub.cs",
+              "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381Backend\\Hubs\\MessagingHub.cs",
+              "RelativeDocumentMoniker": "..\\Sen381Backend\\Hubs\\MessagingHub.cs",
+              "ToolTip": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381Backend\\Hubs\\MessagingHub.cs",
+              "RelativeToolTip": "..\\Sen381Backend\\Hubs\\MessagingHub.cs",
+              "ViewState": "AgIAADUAAAAAAAAAAAAgwCMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-19T17:02:53.985Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "User.cs",
               "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\Business\\Models\\User.cs",
               "RelativeDocumentMoniker": "Business\\Models\\User.cs",
@@ -67,7 +83,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "clarabot.js",
               "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\wwwroot\\js\\clarabot.js",
               "RelativeDocumentMoniker": "..\\..\\own-repo-of-sen381\\Frontend\\wwwroot\\js\\clarabot.js",
@@ -75,12 +91,11 @@
               "RelativeToolTip": "..\\..\\own-repo-of-sen381\\Frontend\\wwwroot\\js\\clarabot.js",
               "ViewState": "AgIAAAQAAAAAAAAAAAAuwB0AAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2025-10-17T11:43:00.243Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-17T11:43:00.243Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Chatbot.razor",
               "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\Pages\\Chatbot.razor",
               "RelativeDocumentMoniker": "..\\..\\own-repo-of-sen381\\Frontend\\Pages\\Chatbot.razor",
@@ -92,7 +107,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "index.html",
               "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Frontend\\wwwroot\\index.html",
               "RelativeDocumentMoniker": "..\\..\\own-repo-of-sen381\\Frontend\\wwwroot\\index.html",
@@ -104,7 +119,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "AdminProfile.razor",
               "DocumentMoniker": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Frontend\\Pages\\AdminProfile.razor",
               "RelativeDocumentMoniker": "..\\Frontend\\Pages\\AdminProfile.razor",

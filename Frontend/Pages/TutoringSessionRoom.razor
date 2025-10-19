@@ -140,7 +140,7 @@ else
                     {
                         <!-- Resources -->
                         <div class="resources-container">
-                            <div class="upload-area" @onclick="TriggerFileUpload" @ondragover="OnDragOver" @ondrop="OnFileDrop">
+                            <div class="upload-area @(isUploadButtonDisabled ? "disabled" : "")" @onclick="TriggerFileUpload" @ondragover="OnDragOver" @ondrop="OnFileDrop">
                                 <div class="upload-content">
                                     <span class="upload-icon">📁</span>
                                     <p>Click to upload or drag files here</p>
@@ -164,15 +164,15 @@ else
                                                 <span class="resource-icon">@GetFileIcon(resource.FileName)</span>
                                                 <div class="resource-details">
                                                     <span class="resource-name">@resource.FileName</span>
-                                                    <span class="resource-size">@FormatFileSize(resource.FileSize)</span>
-                                                    <span class="resource-uploader">Uploaded by @resource.UploadedBy</span>
+                                                    <span class="resource-size">@FormatFileSize(resource.FileSizeBytes)</span>
+                                                    <span class="resource-uploader">Uploaded by User @resource.UploaderId</span>
                                                 </div>
                                             </div>
                                             <div class="resource-actions">
                                                 <button class="btn btn-small" @onclick="() => DownloadResource(resource.FileId)">
                                                     Download
                                                 </button>
-                                                @if (resource.UploadedBy == currentUser?.StudentNo)
+                                                @if (resource.UploaderId == currentUser?.UserId)
                                                 {
                                                     <button class="btn btn-small btn-danger" @onclick="() => DeleteResource(resource.FileId)">
                                                         Delete
@@ -515,6 +515,18 @@ else
         background: #f0fdfa;
     }
 
+    .upload-area.drag-over {
+        border-color: #1B998B;
+        background: #f0fdfa;
+        border-style: solid;
+    }
+
+    .upload-area.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
     .upload-content {
         display: flex;
         flex-direction: column;
@@ -691,6 +703,9 @@ else
 
             // Initialize media
             await InitializeMedia();
+
+            // Initialize file upload functionality
+            await JS.InvokeVoidAsync("initializeFileUpload");
 
             // Load chat messages
             await LoadChatMessages();
@@ -948,10 +963,20 @@ else
             {
                 resources = response;
                 Console.WriteLine($"[TutoringSessionRoom] Loaded {response.Count} resources");
+                
+                // Log each resource for debugging
+                foreach (var resource in resources)
+                {
+                    Console.WriteLine($"[TutoringSessionRoom] Resource: {resource.FileName} (ID: {resource.FileId}, Size: {resource.FileSizeBytes} bytes)");
+                }
+                
+                // Force UI update
+                StateHasChanged();
             }
             else
             {
-                Console.WriteLine($"[TutoringSessionRoom] No resources returned from API");
+                Console.WriteLine($"[TutoringSessionRoom] No resources returned from API (response is null)");
+                resources = new List<SessionResource>();
             }
         }
         catch (HttpRequestException httpEx)
@@ -961,10 +986,13 @@ else
             {
                 Console.WriteLine($"[TutoringSessionRoom] Resources endpoint not found for session {SessionId}");
             }
+            resources = new List<SessionResource>();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[TutoringSessionRoom] Error loading resources: {ex.Message}");
+            Console.WriteLine($"[TutoringSessionRoom] Stack trace: {ex.StackTrace}");
+            resources = new List<SessionResource>();
         }
     }
 
@@ -1138,9 +1166,23 @@ else
     }
 
     // File Upload Functions
+    private bool isUploadButtonDisabled = false;
+    
     private async Task TriggerFileUpload()
     {
-        await JS.InvokeVoidAsync("clickFileUpload");
+        if (isUploadButtonDisabled) return;
+        
+        isUploadButtonDisabled = true;
+        try
+        {
+            await OnFileUpload(new ChangeEventArgs());
+        }
+        finally
+        {
+            // Re-enable the button after a short delay
+            await Task.Delay(1000);
+            isUploadButtonDisabled = false;
+        }
     }
 
     private async Task OnDragOver(DragEventArgs e)
@@ -1155,20 +1197,99 @@ else
 
     private async Task OnFileUpload(ChangeEventArgs e)
     {
-        // Handle file upload
-        Console.WriteLine("File upload triggered");
+        try
+        {
+            Console.WriteLine("[TutoringSessionRoom] File upload triggered");
+            
+            // Use JavaScript to handle the file upload since Blazor's InputFile doesn't work well with our current setup
+            var result = await JS.InvokeAsync<string>("uploadFileToSession", SessionId, currentUser?.UserId.ToString() ?? "unknown");
+            
+            Console.WriteLine($"[TutoringSessionRoom] File upload result: {result}");
+            
+            if (result == "success")
+            {
+                Console.WriteLine("[TutoringSessionRoom] File uploaded successfully via JavaScript");
+                // Reload resources to show the new file
+                await LoadResources();
+                StateHasChanged();
+                await JS.InvokeVoidAsync("alert", "File uploaded successfully!");
+            }
+            else if (result == "error")
+            {
+                Console.WriteLine("[TutoringSessionRoom] File upload failed via JavaScript");
+                await JS.InvokeVoidAsync("alert", "File upload failed. Please try again.");
+            }
+            else if (result == "busy")
+            {
+                Console.WriteLine("[TutoringSessionRoom] File upload already in progress");
+                // Don't show error for busy state, just ignore
+            }
+            else if (result == "timeout")
+            {
+                Console.WriteLine("[TutoringSessionRoom] File upload timed out");
+                await JS.InvokeVoidAsync("alert", "File upload timed out. Please try again.");
+            }
+            else if (result == "cancelled")
+            {
+                Console.WriteLine("[TutoringSessionRoom] File upload cancelled by user");
+                // Don't show any message for cancellation
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error in OnFileUpload: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", $"Error uploading file: {ex.Message}");
+        }
     }
 
     private async Task DownloadFile(int fileId)
     {
-        // Implement file download
-        Console.WriteLine($"Downloading file {fileId}");
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Downloading file {fileId}");
+            
+            // Find the resource to get the file path
+            var resource = resources.FirstOrDefault(r => r.FileId == fileId);
+            if (resource != null)
+            {
+                // Open the file URL in a new tab
+                await JS.InvokeVoidAsync("open", resource.FilePath, "_blank");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "File not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error downloading file: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", $"Error downloading file: {ex.Message}");
+        }
     }
 
     private async Task DownloadResource(int resourceId)
     {
-        // Implement resource download
-        Console.WriteLine($"Downloading resource {resourceId}");
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Downloading resource {resourceId}");
+            
+            // Find the resource to get the file path
+            var resource = resources.FirstOrDefault(r => r.FileId == resourceId);
+            if (resource != null)
+            {
+                // Open the file URL in a new tab
+                await JS.InvokeVoidAsync("open", resource.FilePath, "_blank");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "Resource not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error downloading resource: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", $"Error downloading resource: {ex.Message}");
+        }
     }
 
     private async Task DeleteResource(int resourceId)
@@ -1328,9 +1449,16 @@ else
     public class SessionResource
     {
         public int FileId { get; set; }
+        public int SessionId { get; set; }
+        public int UploaderId { get; set; }
         public string FileName { get; set; } = "";
-        public long FileSize { get; set; }
-        public string UploadedBy { get; set; } = "";
+        public string FileType { get; set; } = "";
+        public long FileSizeBytes { get; set; }
+        public string FilePath { get; set; } = "";
         public DateTime UploadedAt { get; set; }
+        
+        // Computed properties for display
+        public long FileSize => FileSizeBytes;
+        public string UploadedBy => UploaderId.ToString();
     }
 }

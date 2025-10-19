@@ -1,4 +1,6 @@
 ﻿@page "/admin/analytics"
+@using Frontend.Services
+@inject AnalyticsService AnalyticsService
 
 <PageTitle>Admin · Analytics</PageTitle>
 
@@ -10,23 +12,23 @@
         </div>
 
         <div class="actions">
-            <select class="filter" @bind="Days">
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
-                <option value="90">Last 90 days</option>
-            </select>
+                   <select class="filter" @onchange="OnDaysChanged">
+                       <option value="7" selected="@(Days == 7)">Last 7 days</option>
+                       <option value="30" selected="@(Days == 30)">Last 30 days</option>
+                       <option value="90" selected="@(Days == 90)">Last 90 days</option>
+                   </select>
 
-            <select class="filter" @bind="Bucket">
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-            </select>
+                   <select class="filter" @onchange="OnBucketChanged">
+                       <option value="daily" selected="@(Bucket == "daily")">Daily</option>
+                       <option value="weekly" selected="@(Bucket == "weekly")">Weekly</option>
+                   </select>
 
-            <!-- bind via string proxy so empty option is safe -->
-            <select class="filter" @bind="SelectedSubjectIdStr">
+                   <!-- bind via string proxy so empty option is safe -->
+                   <select class="filter" @onchange="OnSubjectChanged">
                 <option value="">All subjects</option>
                 @foreach (var s in Subjects)
                 {
-                    <option value="@s.SubjectId">@s.SubjectCode — @s.Name</option>
+                    <option value="@s.SubjectId">@s.SubjectCode — @s.SubjectName</option>
                 }
             </select>
         </div>
@@ -34,26 +36,52 @@
 
     <!-- KPI tiles -->
     <section class="tiles">
-        <article class="tile">
-            <div class="tile__label">Sessions</div>
-            <div class="tile__value">@TotalSessions</div>
-            <div class="tile__sub">in selected range</div>
-        </article>
-        <article class="tile">
-            <div class="tile__label">Unique students</div>
-            <div class="tile__value">@UniqueStudents</div>
-            <div class="tile__sub">distinct student accounts</div>
-        </article>
-        <article class="tile">
-            <div class="tile__label">Active tutors</div>
-            <div class="tile__value">@ActiveTutors</div>
-            <div class="tile__sub">tutors with ≥1 session</div>
-        </article>
-        <article class="tile">
-            <div class="tile__label">Repeat students</div>
-            <div class="tile__value">@($"{RepeatStudentsPct:0}%")</div>
-            <div class="tile__sub">had ≥2 sessions with same tutor</div>
-        </article>
+        @if (IsLoading)
+        {
+            <article class="tile">
+                <div class="tile__label">Loading...</div>
+                <div class="tile__value">...</div>
+                <div class="tile__sub">Please wait</div>
+            </article>
+        }
+        else
+        {
+            <article class="tile">
+                <div class="tile__label">Sessions</div>
+                <div class="tile__value">@Overview.TotalSessions</div>
+                <div class="tile__sub">in selected range</div>
+            </article>
+                   <article class="tile">
+                       <div class="tile__label">Active students</div>
+                       <div class="tile__value">@Overview.UniqueStudents</div>
+                       <div class="tile__sub">students with completed sessions</div>
+                   </article>
+            <article class="tile">
+                <div class="tile__label">Active tutors</div>
+                <div class="tile__value">@Overview.ActiveTutors</div>
+                <div class="tile__sub">tutors with ≥1 session</div>
+            </article>
+            <article class="tile">
+                <div class="tile__label">Repeat students</div>
+                <div class="tile__value">@($"{Overview.RepeatStudentsPct:0}%")</div>
+                <div class="tile__sub">had ≥2 sessions with same tutor</div>
+            </article>
+            
+            @if (SelectedSubjectId.HasValue && Overview.TotalSubscribers > 0)
+            {
+                <article class="tile">
+                    <div class="tile__label">Total subscribers</div>
+                    <div class="tile__value">@Overview.TotalSubscribers</div>
+                    <div class="tile__sub">subscribed to this subject</div>
+                </article>
+                
+                <article class="tile">
+                    <div class="tile__label">Engagement rate</div>
+                    <div class="tile__value">@($"{Overview.EngagementRate:0}%")</div>
+                    <div class="tile__sub">subscribers with completed sessions</div>
+                </article>
+            }
+        }
     </section>
 
     <!-- Charts row -->
@@ -80,9 +108,10 @@
                     <g class="labels y">
                         @{
                             var steps = 4;
+                            var maxValue = MaxSessionsOverTime;
                             for (int i = 0; i <= steps; i++)
                             {
-                                var val = (int)Math.Round(MaxSessions * i / (double)steps);
+                                var val = (int)Math.Round(maxValue * i / (double)steps);
                                 var y = 220 - (i * 40);
                                 @SvgText(10, y, val.ToString(), "alignment-baseline='middle'")
                                 ;
@@ -93,13 +122,13 @@
                     <!-- x labels -->
                     <g class="labels x">
                         @{
-                            if (Series.Count > 0)
+                            if (SessionsOverTime.Count > 0)
                             {
-                                var span = Series.Count - 1;
-                                for (int i = 0; i < Series.Count; i += Math.Max(1, span / 6))
+                                var span = SessionsOverTime.Count - 1;
+                                for (int i = 0; i < SessionsOverTime.Count; i += Math.Max(1, span / 6))
                                 {
                                     var x = 50 + (650.0 * i / Math.Max(1, span));
-                                    var d = Series[i].Date.ToLocalTime().ToString("dd MMM");
+                                    var d = SessionsOverTime[i].Date.ToLocalTime().ToString("dd MMM");
                                     @SvgText(x, 245, d, "text-anchor='middle'")
                                     ;
                                 }
@@ -108,11 +137,11 @@
                     </g>
 
                     <!-- line & dots -->
-                    <polyline class="line" points="@LinePoints" />
+                    <polyline class="line" points="@LinePointsOverTime" />
                     <g class="dots">
-                        @for (int i = 0; i < Series.Count; i++)
+                        @for (int i = 0; i < SessionsOverTime.Count; i++)
                         {
-                            var p = PointAt(i);
+                            var p = PointAtOverTime(i);
                             <circle cx="@p.x" cy="@p.y" r="2.8"></circle>
                         }
                     </g>
@@ -223,227 +252,119 @@
     private int Days { get; set; } = 30;
     private string Bucket { get; set; } = "daily"; // or "weekly"
 
-    private long? SelectedSubjectId { get; set; } = null;
-    private string SelectedSubjectIdStr
+           private int? SelectedSubjectId { get; set; } = null;
+
+    // --------- Dynamic data ---------
+    private List<SubjectData> Subjects = new();
+    private AnalyticsOverview Overview = new();
+    private List<SessionsOverTimeData> SessionsOverTime = new();
+    private List<SubjectShareData> SubjectShare = new();
+    private List<TutorsBySubjectData> TutorsBySubject = new();
+    private List<UtilizationData> Utilization = new();
+    
+    private bool IsLoading = true;
+
+    protected override async Task OnInitializedAsync()
     {
-        get => SelectedSubjectId?.ToString() ?? "";
-        set => SelectedSubjectId = long.TryParse(value, out var v) ? v : (long?)null;
+        await LoadData();
     }
 
-    // --------- Sample data ---------
-    private List<SubjectVM> Subjects = new()
-  {
-    new(1, "SEN 381", "Software Engineering"),
-    new(2, "Thermo 244", "Thermodynamics"),
-    new(3, "DB 372", "Databases"),
-    new(4, "ENGM 242", "Engineering Mechanics"),
-    new(5, "Calc 101", "Calculus I")
-  };
-
-    private List<SessionRow> AllSessions = new();
-
-    protected override void OnInitialized()
+    private async Task LoadData()
     {
-        // Generate deterministic demo data for 30 days
-        var rand = new Random(42);
+        IsLoading = true;
+        StateHasChanged();
 
-        var tutorsBySubject = new Dictionary<long, long[]>
+        try
         {
-            [1] = new long[] { 201, 202, 203 },
-            [2] = new long[] { 204, 205 },
-            [3] = new long[] { 201, 203, 205 },
-            [4] = new long[] { 206 },
-            [5] = new long[] { 207 }
-        };
+            // Load subjects first
+            Subjects = await AnalyticsService.GetSubjectsAsync();
+            
+            // Load all analytics data in parallel
+            var overviewTask = AnalyticsService.GetOverviewAsync(Days, SelectedSubjectId);
+            var sessionsTask = AnalyticsService.GetSessionsOverTimeAsync(Days, Bucket, SelectedSubjectId);
+            var shareTask = AnalyticsService.GetSubjectShareAsync(Days, SelectedSubjectId);
+            var tutorsTask = AnalyticsService.GetTutorsBySubjectAsync(Days, SelectedSubjectId);
+            var utilizationTask = AnalyticsService.GetUtilizationAsync(Days, SelectedSubjectId);
 
-        var students = Enumerable.Range(1001, 42).Select(i => (long)i).ToArray();
-        var subjectWeights = new (long id, int w)[] { (1, 35), (3, 25), (2, 20), (4, 12), (5, 8) };
-        int totalW = subjectWeights.Sum(t => t.w);
+            await Task.WhenAll(overviewTask, sessionsTask, shareTask, tutorsTask, utilizationTask);
 
-        long PickSubject(int r)
-        {
-            int acc = 0;
-            foreach (var t in subjectWeights)
-            {
-                acc += t.w;
-                if (r < acc) return t.id;
-            }
-            return subjectWeights[^1].id;
+            Overview = await overviewTask;
+            SessionsOverTime = await sessionsTask;
+            SubjectShare = await shareTask;
+            TutorsBySubject = await tutorsTask;
+            Utilization = await utilizationTask;
         }
-
-        var start = DateTime.UtcNow.Date.AddDays(-29);
-        var dailyCounts = new int[] { 9, 12, 14, 10, 13, 16, 20, 15, 18, 12, 14, 13, 12, 17, 21, 19, 18, 16, 14, 13, 12, 11, 15, 17, 14, 16, 18, 20, 22, 19 };
-
-        var lastTutorForStudent = new Dictionary<long, long>();
-
-        for (int d = 0; d < dailyCounts.Length; d++)
+        catch (Exception ex)
         {
-            var date = start.AddDays(d).AddHours(rand.Next(8, 20));
-
-            for (int n = 0; n < dailyCounts[d]; n++)
-            {
-                long subjectId = PickSubject(rand.Next(totalW));
-                var student = students[rand.Next(students.Length)];
-
-                // reuse tutors sometimes to create "repeat" behaviour
-                long tutor;
-                if (lastTutorForStudent.TryGetValue(student, out var prev) && rand.NextDouble() < 0.45)
-                    tutor = prev;
-                else
-                {
-                    var pool = tutorsBySubject[subjectId];
-                    tutor = pool[rand.Next(pool.Length)];
-                    lastTutorForStudent[student] = tutor;
-                }
-
-                AllSessions.Add(new SessionRow(date, subjectId, tutor, student));
-            }
+            Console.WriteLine($"[Analytics] Error loading data: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 
-    // --------- Derived data ---------
-    private IEnumerable<SessionRow> SessionsFiltered =>
-      AllSessions.Where(s =>
-        s.CreatedAt >= DateTime.UtcNow.Date.AddDays(-Days + 1) &&
-        (SelectedSubjectId is null || s.SubjectId == SelectedSubjectId));
+           private async Task OnDaysChanged(ChangeEventArgs e)
+           {
+               if (int.TryParse(e.Value?.ToString(), out var days))
+               {
+                   Days = days;
+                   await LoadData();
+               }
+           }
 
-    private List<PointItem> Series
-    {
-        get
-        {
-            var groups = Bucket == "weekly"
-              ? SessionsFiltered
-                  .GroupBy(s => StartOfWeek(s.CreatedAt))
-                  .OrderBy(g => g.Key)
-                  .Select(g => new PointItem(g.Key, g.Count()))
-              : SessionsFiltered
-                  .GroupBy(s => s.CreatedAt.Date)
-                  .OrderBy(g => g.Key)
-                  .Select(g => new PointItem(g.Key, g.Count()));
+           private async Task OnBucketChanged(ChangeEventArgs e)
+           {
+               var bucket = e.Value?.ToString();
+               if (!string.IsNullOrEmpty(bucket))
+               {
+                   Bucket = bucket;
+                   await LoadData();
+               }
+           }
 
-            return groups.ToList();
-        }
-    }
+           private async Task OnSubjectChanged(ChangeEventArgs e)
+           {
+               var subjectIdStr = e.Value?.ToString();
+               SelectedSubjectId = string.IsNullOrEmpty(subjectIdStr) ? null : (int.TryParse(subjectIdStr, out var id) ? id : null);
+               await LoadData();
+           }
 
-    private int MaxSessions => Math.Max(4, (Series.Count == 0 ? 0 : Series.Max(p => p.Value)));
+    // --------- Helper methods for charts ---------
+    private int MaxSessionsOverTime => Math.Max(4, (SessionsOverTime.Count == 0 ? 0 : SessionsOverTime.Max(p => p.Value)));
     private string RangeTitle => $"Last {Days} days";
     private string BucketTitle => Bucket == "weekly" ? "Weekly" : "Daily";
-
-    private int TotalSessions => SessionsFiltered.Count();
-    private int UniqueStudents => SessionsFiltered.Select(s => s.StudentId).Distinct().Count();
-    private int ActiveTutors => SessionsFiltered.Select(s => s.TutorId).Distinct().Count();
-
-    private double RepeatStudentsPct
-    {
-        get
-        {
-            var perTutor = SessionsFiltered
-              .GroupBy(s => new { s.TutorId, s.StudentId })
-              .Select(g => new { g.Key.TutorId, g.Key.StudentId, Count = g.Count() });
-
-            var repeatStudents = perTutor.Where(x => x.Count >= 2).Select(x => x.StudentId).Distinct().Count();
-            if (UniqueStudents == 0) return 0;
-            return 100.0 * repeatStudents / UniqueStudents;
-        }
-    }
-
-    // Subject share for donut
-    private List<ShareSeg> SubjectShare
-    {
-        get
-        {
-            var bySubject = SessionsFiltered
-              .GroupBy(s => s.SubjectId)
-              .Select(g => new { SubjectId = g.Key, Count = g.Count() })
-              .OrderByDescending(x => x.Count)
-              .ToList();
-
-            var total = Math.Max(1, bySubject.Sum(x => x.Count));
-            var palette = new[] { "#1B998B", "#2A6FFF", "#AD1F54", "#F2B705", "#4A4E69" };
-
-            var list = new List<ShareSeg>();
-            for (int i = 0; i < bySubject.Count; i++)
-            {
-                var subj = Subjects.First(s => s.SubjectId == bySubject[i].SubjectId);
-                list.Add(new ShareSeg($"{subj.SubjectCode}", Math.Round(100.0 * bySubject[i].Count / total, 1), palette[i % palette.Length]));
-            }
-            return list;
-        }
-    }
-
-    // Bars: active tutors by subject
-    private List<BarRow> TutorsBySubject
-    {
-        get
-        {
-            var data = SessionsFiltered
-              .GroupBy(s => s.SubjectId)
-              .Select(g => new
-              {
-                  SubjectId = g.Key,
-                  Tutors = g.Select(x => x.TutorId).Distinct().Count()
-              })
-              .OrderByDescending(x => x.Tutors)
-              .ToList();
-
-            var max = Math.Max(1, data.Max(x => x.Tutors));
-            return data.Select(x =>
-            {
-                var subj = Subjects.First(s => s.SubjectId == x.SubjectId);
-                return new BarRow($"{subj.SubjectCode}", x.Tutors, 100.0 * x.Tutors / max);
-            }).ToList();
-        }
-    }
-
-    // Utilization table
-    private List<UtilRow> Utilization
-    {
-        get
-        {
-            var sessions = SessionsFiltered
-              .GroupBy(s => s.SubjectId)
-              .Select(g => new { SubjectId = g.Key, Sessions = g.Count(), Tutors = g.Select(x => x.TutorId).Distinct().Count() })
-              .OrderByDescending(x => x.Sessions)
-              .ToList();
-
-            return sessions.Select(x =>
-            {
-                var subj = Subjects.First(s => s.SubjectId == x.SubjectId);
-                var util = x.Tutors == 0 ? 0 : (double)x.Sessions / x.Tutors;
-                return new UtilRow($"{subj.SubjectCode}", x.Sessions, x.Tutors, util);
-            }).ToList();
-        }
-    }
 
     // --------- SVG helpers (fix for Razor <text>) ---------
     private MarkupString SvgText(double x, double y, string content, string extraAttrs = "")
       => new MarkupString($"<text x='{x:F0}' y='{y:F0}' {extraAttrs}>{System.Net.WebUtility.HtmlEncode(content)}</text>");
 
-    private string LinePoints
+    private string LinePointsOverTime
     {
         get
         {
-            if (Series.Count == 0) return string.Empty;
-            var span = Math.Max(1, Series.Count - 1);
-            var max = Math.Max(1, Series.Max(p => p.Value));
+            if (SessionsOverTime.Count == 0) return string.Empty;
+            var span = Math.Max(1, SessionsOverTime.Count - 1);
+            var max = Math.Max(1, SessionsOverTime.Max(p => p.Value));
             var pts = new List<string>();
-            for (int i = 0; i < Series.Count; i++)
+            for (int i = 0; i < SessionsOverTime.Count; i++)
             {
                 var x = 50 + (650.0 * i / span);
-                var y = 220 - (180.0 * Series[i].Value / max);
+                var y = 220 - (180.0 * SessionsOverTime[i].Value / max);
                 pts.Add($"{x:F1},{y:F1}");
             }
             return string.Join(" ", pts);
         }
     }
 
-    private (double x, double y) PointAt(int i)
+    private (double x, double y) PointAtOverTime(int i)
     {
-        if (Series.Count == 0) return (0, 0);
-        var span = Math.Max(1, Series.Count - 1);
-        var max = Math.Max(1, Series.Max(p => p.Value));
+        if (SessionsOverTime.Count == 0) return (0, 0);
+        var span = Math.Max(1, SessionsOverTime.Count - 1);
+        var max = Math.Max(1, SessionsOverTime.Max(p => p.Value));
         var x = 50 + (650.0 * i / span);
-        var y = 220 - (180.0 * Series[i].Value / max);
+        var y = 220 - (180.0 * SessionsOverTime[i].Value / max);
         return (x, y);
     }
 
@@ -453,14 +374,6 @@
         int diff = (7 + (int)d.DayOfWeek - (int)DayOfWeek.Monday) % 7;
         return d.AddDays(-diff);
     }
-
-    // --------- Models ---------
-    private record SubjectVM(long SubjectId, string SubjectCode, string Name);
-    private record SessionRow(DateTime CreatedAt, long SubjectId, long TutorId, long StudentId);
-    private record PointItem(DateTime Date, int Value);
-    private record ShareSeg(string Label, double Pct, string Color);
-    private record BarRow(string Label, int Value, double Width);
-    private record UtilRow(string Label, int Sessions, int Tutors, double Util);
 }
 
 <style>

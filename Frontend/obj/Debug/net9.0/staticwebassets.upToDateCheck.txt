@@ -15,6 +15,7 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\wwwroot\lib\bootstrap\di
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css
+C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\wwwroot\SEN381Frontend.Client.styles.css
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
 C:\Sen381 github repo\own repo\own-repo-of-sen\Frontend\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css
@@ -124,4 +125,5 @@ wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 wwwroot\sample-data\weather.json
+wwwroot\SEN381Frontend.Client.styles.css
 wwwroot\svgs\glitter-2-svgrepo-com.svg

@@ -727,11 +727,11 @@ namespace Sen381Backend.Controllers
         return 1; // Replace with actual current user ID
     }
 
-    private async Task UpdateCalendarEventsForCompletedSession(Supabase.Client client, int bookingId)
+    private async Task RemoveCalendarEventsForCompletedSession(Supabase.Client client, int bookingId)
     {
         try
         {
-            Console.WriteLine($"[BookingSessionController] Updating calendar events for completed session {bookingId}");
+            Console.WriteLine($"[BookingSessionController] Removing calendar events for completed session {bookingId}");
             
             // Find all calendar events for this booking
             var calendarEventsResponse = await client
@@ -742,23 +742,22 @@ namespace Sen381Backend.Controllers
             var calendarEvents = calendarEventsResponse.Models.ToList();
             Console.WriteLine($"[BookingSessionController] Found {calendarEvents.Count} calendar events for booking {bookingId}");
 
-            // Update each calendar event to show completed status
+            // Delete each calendar event since the session is completed
             foreach (var calendarEvent in calendarEvents)
             {
-                calendarEvent.Title = $"✅ {calendarEvent.Title}"; // Add checkmark to indicate completed
-                calendarEvent.UpdatedAt = DateTime.UtcNow;
-
                 await client
                     .From<CalendarEvent>()
                     .Filter("event_id", Operator.Equals, calendarEvent.EventId)
-                    .Update(calendarEvent);
+                    .Delete();
 
-                Console.WriteLine($"[BookingSessionController] Updated calendar event {calendarEvent.EventId} for completed session");
+                Console.WriteLine($"[BookingSessionController] Deleted calendar event {calendarEvent.EventId} for completed session");
             }
+
+            Console.WriteLine($"[BookingSessionController] Successfully removed {calendarEvents.Count} calendar events for completed session {bookingId}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[BookingSessionController] Error updating calendar events for completed session: {ex.Message}");
+            Console.WriteLine($"[BookingSessionController] Error removing calendar events for completed session: {ex.Message}");
         }
     }
 
@@ -796,8 +795,8 @@ namespace Sen381Backend.Controllers
 
                 Console.WriteLine($"[BookingSessionController] Session {bookingId} completed successfully for Student {booking.StudentId} and Tutor {booking.TutorId}");
 
-                // Update calendar events to reflect completed status
-                await UpdateCalendarEventsForCompletedSession(client, bookingId);
+                // Remove calendar events for completed session
+                await RemoveCalendarEventsForCompletedSession(client, bookingId);
 
                 return Ok(new BookingResponse 
                 { 

@@ -3,6 +3,9 @@
 @using Sen381.Business.Models
 @using Sen381.Business.Services
 @using Sen381.Data_Access
+@using Frontend.Models
+@using Frontend.Services
+@using Frontend.Shared
 @inject SupaBaseAuthService SupabaseService
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
@@ -185,7 +188,23 @@ else if (activeTab == "sessions")
     <main class="sessions-main">
         <section class="card">
             <h2 class="card-hd">Tutoring Sessions</h2>
-            @if (attendedSessions == null || !attendedSessions.Any())
+            
+            <!-- Session Filter -->
+            <div class="session-filter">
+                <div class="filter-buttons">
+                    <button class="filter-btn @(sessionFilter == "all" ? "active" : "")" @onclick="@(() => SetSessionFilter("all"))">
+                        All Sessions
+                    </button>
+                    <button class="filter-btn @(sessionFilter == "created" ? "active" : "")" @onclick="@(() => SetSessionFilter("created"))">
+                        Invited
+                    </button>
+                    <button class="filter-btn @(sessionFilter == "invited" ? "active" : "")" @onclick="@(() => SetSessionFilter("invited"))">
+                        Created
+                    </button>
+                </div>
+            </div>
+            
+            @if (filteredSessions == null || !filteredSessions.Any())
             {
                 <div class="empty-state">
                     <p class="muted">No tutoring sessions attended yet.</p>
@@ -196,9 +215,9 @@ else if (activeTab == "sessions")
             else
             {
                 <div class="sessions-list">
-                    @foreach (var session in attendedSessions)
+                    @foreach (var session in filteredSessions)
                     {
-                        <div class="session-card">
+                        <div class="session-card clickable" @onclick="() => ViewSessionDetails(session)">
                             <div class="session-header">
                                 <h3 class="session-title">@session.Title</h3>
                                 <span class="session-status @session.Status.ToLower()">@session.Status</span>
@@ -225,16 +244,19 @@ else if (activeTab == "sessions")
                                     @if (session.TutorId == currentUser?.Id)
                                     {
                                         <div class="participant">
-                                            <strong>Student:</strong> @session.StudentFullName
+                                            <strong>Participant:</strong> @session.StudentFullName
                                         </div>
                                     }
                                     else
                                     {
                                         <div class="participant">
-                                            <strong>Tutor:</strong> @session.TutorFullName
+                                            <strong>Participant:</strong> @session.TutorFullName
                                         </div>
                                     }
                                 </div>
+                            </div>
+                            <div class="session-hint">
+                                <span class="hint-text">Click to view chat history and resources</span>
                             </div>
                         </div>
                     }
@@ -242,6 +264,9 @@ else if (activeTab == "sessions")
             }
         </section>
     </main>
+    
+    <!-- Session Detail Modal -->
+    <SessionDetailModal Session="selectedSession" IsVisible="showSessionModal" OnClose="CloseSessionModal" />
 }
 else
 {
@@ -620,6 +645,28 @@ else
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         border-color: var(--accent);
+    }
+
+    .session-card.clickable {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .session-card.clickable:hover {
+        background: #f8fafc;
+    }
+
+    .session-hint {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+    }
+
+    .hint-text {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-style: italic;
     }
 
     .session-header {
@@ -1879,6 +1926,8 @@ else
     private int followingCount = 0;
     private List<Frontend.Services.SubjectVM>? tutorSubjects = null;
     private List<Frontend.Services.BookingSessionVM>? attendedSessions = null;
+    private List<Frontend.Services.BookingSessionVM>? filteredSessions = null;
+    private string sessionFilter = "all"; // "all", "created", "invited"
 
     protected override async Task OnParametersSetAsync()
     {
@@ -2073,6 +2122,52 @@ else
     private void SetPreferencesTab() => SetActiveTab("preferences");
     private void SetNoodleTab() => SetActiveTab("noodle");
 
+    // ===== Session Filter Management =====
+    private void SetSessionFilter(string filter)
+    {
+        sessionFilter = filter;
+        ApplySessionFilter();
+        StateHasChanged();
+    }
+
+    private void ApplySessionFilter()
+    {
+        if (attendedSessions == null)
+        {
+            filteredSessions = null;
+            return;
+        }
+
+        Console.WriteLine($"[StudentProfile] Applying filter '{sessionFilter}' for user {currentUser?.Id}");
+        Console.WriteLine($"[StudentProfile] Total sessions: {attendedSessions.Count}");
+
+        switch (sessionFilter)
+        {
+            case "created":
+                // Sessions where the current user is the tutor (they created the session)
+                filteredSessions = attendedSessions.Where(s => s.TutorId == currentUser?.Id).ToList();
+                Console.WriteLine($"[StudentProfile] Created sessions (TutorId={currentUser?.Id}): {filteredSessions.Count}");
+                break;
+            case "invited":
+                // Sessions where the current user is the student (they were invited to the session)
+                filteredSessions = attendedSessions.Where(s => s.StudentId == currentUser?.Id).ToList();
+                Console.WriteLine($"[StudentProfile] Invited sessions (StudentId={currentUser?.Id}): {filteredSessions.Count}");
+                break;
+            case "all":
+            default:
+                // All sessions
+                filteredSessions = attendedSessions.ToList();
+                Console.WriteLine($"[StudentProfile] All sessions: {filteredSessions.Count}");
+                break;
+        }
+
+        // Debug: Log session details
+        foreach (var session in attendedSessions)
+        {
+            Console.WriteLine($"[StudentProfile] Session {session.BookingId}: TutorId={session.TutorId}, StudentId={session.StudentId}, CurrentUser={currentUser?.Id}");
+        }
+    }
+
     // ===== Sessions Management =====
     private async Task LoadAttendedSessions()
     {
@@ -2103,6 +2198,9 @@ else
                     {
                         Console.WriteLine($"[StudentProfile] Completed Session {session.BookingId}: Status = '{session.Status}', Title = '{session.Title}', CompletedAt = {session.CompletedAt}");
                     }
+                    
+                    // Apply the current filter
+                    ApplySessionFilter();
                     
                     // Force UI update
                     await InvokeAsync(StateHasChanged);
@@ -2208,4 +2306,59 @@ else
     {
         public int Count { get; set; }
     }
+
+    // Session Detail Modal functionality
+    private bool showSessionModal = false;
+    private BookingSessionVM? selectedSession = null;
+
+    private void ViewSessionDetails(BookingSessionVM session)
+    {
+        selectedSession = session;
+        showSessionModal = true;
+        StateHasChanged();
+    }
+
+    private async Task CloseSessionModal()
+    {
+        showSessionModal = false;
+        selectedSession = null;
+        StateHasChanged();
+    }
 }
+
+<style>
+    .session-filter {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 8px 16px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        color: #666;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+        border-color: #007bff;
+        color: #007bff;
+    }
+
+    .filter-btn.active {
+        background: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+</style>

@@ -30,10 +30,14 @@ builder.Services.AddScoped<Frontend.Services.SubjectSubscriptionService>();
 builder.Services.AddScoped<Frontend.Services.BookingSessionService>();
 builder.Services.AddScoped<Frontend.Services.CalendarService>();
 builder.Services.AddScoped<Frontend.Services.TopicService>();
+builder.Services.AddScoped<Frontend.Services.AnalyticsService>();
 
 // SignalR for real-time communication
 builder.Services.AddScoped(sp => new HubConnectionBuilder()
     .WithUrl("https://localhost:7228/tutoringSessionHub")
     .Build());
+
+// SignalR for messaging
+builder.Services.AddScoped<Frontend.Services.MessagingService>();
 
 await builder.Build().RunAsync();

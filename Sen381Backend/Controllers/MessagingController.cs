@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Sen381.Business.Models;
 using Sen381.Business.Services;
 using Sen381.Data_Access;
+using Sen381Backend.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +18,13 @@ namespace Sen381Backend.Controllers
     {
         private readonly SupaBaseAuthService _supabase;
         private readonly NotificationService _notificationService;
+        private readonly IHubContext<MessagingHub> _hubContext;
 
-        public MessagingController(SupaBaseAuthService supabase, NotificationService notificationService)
+        public MessagingController(SupaBaseAuthService supabase, NotificationService notificationService, IHubContext<MessagingHub> hubContext)
         {
             _supabase = supabase;
             _notificationService = notificationService;
+            _hubContext = hubContext;
         }
 
         // =============================
@@ -85,8 +89,24 @@ namespace Sen381Backend.Controllers
                 
                 await _notificationService.CreateNotificationAsync(notification);
 
-                Console.WriteLine($"✅ Message sent successfully with notification");
-                return Ok(new { success = true, message = "Message sent successfully" });
+                // Broadcast the message to both users via SignalR
+                var messageDto = new
+                {
+                    MessageId = response.Models.FirstOrDefault()?.Id,
+                    SenderId = request.SenderId,
+                    ReceiverId = request.ReceiverId,
+                    MessageText = request.MessageText,
+                    SentAt = DateTime.UtcNow,
+                    IsRead = false,
+                    SenderName = senderName
+                };
+
+                // Send to both users
+                await _hubContext.Clients.Group($"user_{request.SenderId}").SendAsync("ReceiveMessage", messageDto);
+                await _hubContext.Clients.Group($"user_{request.ReceiverId}").SendAsync("ReceiveMessage", messageDto);
+
+                Console.WriteLine($"✅ Message sent successfully with notification and SignalR broadcast");
+                return Ok(new { success = true, message = "Message sent successfully", data = messageDto });
             }
             catch (Exception ex)
             {

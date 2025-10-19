@@ -69,3 +69,4 @@ COMMENT ON VIEW booking_sessions_details IS 'View of booking sessions with user 
 -- Grant necessary permissions to the authenticated role
 GRANT SELECT, INSERT, UPDATE, DELETE ON booking_sessions TO authenticated;
 GRANT SELECT ON booking_sessions_details TO authenticated;
+

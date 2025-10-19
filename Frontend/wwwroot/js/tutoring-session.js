@@ -541,3 +541,185 @@ window.initializeMediaWhenReady = async function() {
     console.log('[TutoringSession] Initializing media when DOM is ready...');
     await window.initializeMedia();
 };
+
+// File upload functions
+let isFileUploadInProgress = false;
+
+window.uploadFileToSession = async function(sessionId, uploaderId) {
+    try {
+        // Prevent multiple simultaneous uploads
+        if (isFileUploadInProgress) {
+            console.log('[TutoringSession] File upload already in progress, ignoring request');
+            return 'busy';
+        }
+        
+        isFileUploadInProgress = true;
+        console.log('[TutoringSession] Starting file upload for session:', sessionId);
+        
+        // Create file input element if it doesn't exist
+        let fileInput = document.getElementById('fileUpload');
+        if (!fileInput) {
+            fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.id = 'fileUpload';
+            fileInput.style.display = 'none';
+            fileInput.multiple = true;
+            fileInput.accept = '.pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.txt';
+            document.body.appendChild(fileInput);
+        }
+        
+        // Create a promise to handle file selection
+        return new Promise((resolve) => {
+            // Clear any existing event listeners to prevent multiple handlers
+            fileInput.onchange = null;
+            
+            fileInput.onchange = async function(event) {
+                try {
+                    const files = event.target.files;
+                    if (files.length === 0) {
+                        resolve('cancelled');
+                        return;
+                    }
+                    
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        console.log('[TutoringSession] Uploading file:', file.name);
+                        
+                        // Validate file size (10MB limit)
+                        if (file.size > 10 * 1024 * 1024) {
+                            alert(`File '${file.name}' is too large. Maximum size is 10MB.`);
+                            continue;
+                        }
+                        
+                        // Validate file type
+                        const allowedTypes = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'gif', 'txt'];
+                        const fileExtension = file.name.split('.').pop().toLowerCase();
+                        if (!allowedTypes.includes(fileExtension)) {
+                            alert(`File type '${fileExtension}' is not allowed. Supported types: PDF, DOC, DOCX, PPT, PPTX, JPG, PNG, GIF, TXT`);
+                            continue;
+                        }
+                        
+                               // Create FormData
+                               const formData = new FormData();
+                               formData.append('File', file);
+                               formData.append('UploaderId', uploaderId);
+                        
+                        // Upload file
+                        const response = await fetch(`https://localhost:7228/api/sessions/${sessionId}/resources`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (response.ok) {
+                            const result = await response.json();
+                            console.log('[TutoringSession] File uploaded successfully:', result);
+                        } else {
+                            const errorText = await response.text();
+                            console.error('[TutoringSession] Upload failed:', response.status, errorText);
+                            alert(`Failed to upload file '${file.name}': ${response.status}`);
+                        }
+                    }
+                    
+                    resolve('success');
+                } catch (error) {
+                    console.error('[TutoringSession] Error uploading files:', error);
+                    alert('Error uploading files: ' + error.message);
+                    resolve('error');
+                } finally {
+                    // Reset file input and clear the flag
+                    fileInput.value = '';
+                    isFileUploadInProgress = false;
+                }
+            };
+            
+            // Add a timeout to prevent hanging
+            setTimeout(() => {
+                if (isFileUploadInProgress) {
+                    console.log('[TutoringSession] File upload timeout, resetting state');
+                    isFileUploadInProgress = false;
+                    resolve('timeout');
+                }
+            }, 30000); // 30 second timeout
+            
+            // Trigger file selection dialog
+            try {
+                fileInput.click();
+            } catch (error) {
+                console.error('[TutoringSession] Error opening file dialog:', error);
+                isFileUploadInProgress = false;
+                resolve('error');
+            }
+        });
+        
+    } catch (error) {
+        console.error('[TutoringSession] Error in uploadFileToSession:', error);
+        isFileUploadInProgress = false;
+        return 'error';
+    }
+};
+
+// Enhanced file upload with drag and drop
+window.setupFileUpload = function() {
+    const uploadArea = document.querySelector('.upload-area');
+    if (!uploadArea) return;
+    
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    // Highlight drop area when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    // Handle dropped files
+    uploadArea.addEventListener('drop', handleDrop, false);
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    function highlight(e) {
+        uploadArea.classList.add('drag-over');
+    }
+    
+    function unhighlight(e) {
+        uploadArea.classList.remove('drag-over');
+    }
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        console.log('[TutoringSession] Files dropped:', files.length);
+        
+        if (files.length > 0) {
+            // Trigger file upload for each file
+            Array.from(files).forEach(file => {
+                // Simulate file input change event
+                const event = new Event('change');
+                const fileInput = document.getElementById('fileUpload');
+                if (fileInput) {
+                    // Create a new FileList-like object
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    fileInput.files = dataTransfer.files;
+                    fileInput.dispatchEvent(event);
+                }
+            });
+        }
+    }
+};
+
+// Initialize file upload when DOM is ready
+window.initializeFileUpload = function() {
+    console.log('[TutoringSession] Initializing file upload functionality...');
+    window.setupFileUpload();
+};

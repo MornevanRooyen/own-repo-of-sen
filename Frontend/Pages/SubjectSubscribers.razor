@@ -238,14 +238,17 @@
         Nav.NavigateTo($"/studentprofile/{userId}");
     }
 
-    private async void OpenBookingModal(SubscriberVM subscriber)
+    private async Task OpenBookingModal(SubscriberVM subscriber)
     {
+        Console.WriteLine($"[SubjectSubscribers] Opening booking modal for subscriber: {subscriber.FullName}");
+        
         selectedSubscriber = subscriber;
         
         // Get current user ID
         var currentUser = await AuthService.GetCurrentUserAsync();
         if (currentUser == null)
         {
+            Console.WriteLine("[SubjectSubscribers] Error: Current user not found");
             await JS.InvokeVoidAsync("alert", "Error: Current user not found. Please log in.");
             return;
         }
@@ -256,7 +259,10 @@
             StudentId = currentUser.UserId, // Set the current user as the student
             SubjectId = SubjectId
         };
+        
         showBookingModal = true;
+        Console.WriteLine($"[SubjectSubscribers] Modal state set to true, showBookingModal: {showBookingModal}");
+        StateHasChanged();
     }
 
     private void CloseBookingModal()
@@ -265,6 +271,7 @@
         selectedSubscriber = null;
         bookingRequest = new BookingRequest();
         isSubmitting = false;
+        StateHasChanged();
     }
 
     private void ValidateDate()
