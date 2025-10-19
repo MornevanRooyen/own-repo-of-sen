@@ -16,3 +16,4 @@ GRANT USAGE, SELECT ON SEQUENCE booking_sessions_booking_id_seq TO authenticated
 -- Verify the sequence is working
 SELECT nextval('booking_sessions_booking_id_seq') as next_booking_id;
 
+

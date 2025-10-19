@@ -99,6 +99,12 @@ window.initializeMedia = async function() {
             localVideo.onerror = (error) => {
                 console.error('[TutoringSession] Video error:', error);
             };
+
+            localVideo.onplaying = () => {
+                console.log('[TutoringSession] Local video is playing');
+                // Ensure local video is visible
+                localVideo.style.display = 'block';
+            };
         } else {
             console.error('[TutoringSession] localVideo element not found after retries');
             
@@ -118,12 +124,6 @@ window.initializeMedia = async function() {
 
         // Initialize WebRTC peer connection
         await initializePeerConnection();
-
-        // For demo purposes, simulate another user joining after a delay
-        setTimeout(() => {
-            console.log('[TutoringSession] Demo: Simulating another user joining...');
-            simulateRemoteConnection();
-        }, 3000);
 
         console.log('[TutoringSession] Media initialized successfully');
     } catch (error) {
@@ -190,6 +190,22 @@ async function initializePeerConnection() {
         if (remoteVideo && event.streams[0]) {
             remoteVideo.srcObject = event.streams[0];
             remoteVideo.style.display = 'block';
+            
+            // Remove any demo placeholder content
+            const demoPlaceholder = remoteVideo.querySelector('.demo-placeholder');
+            if (demoPlaceholder) {
+                demoPlaceholder.remove();
+            }
+            
+            // Reset video styling
+            remoteVideo.style.backgroundColor = 'transparent';
+            remoteVideo.style.border = 'none';
+            
+            // Add event listener for when remote video starts playing
+            remoteVideo.onplaying = () => {
+                console.log('[TutoringSession] Remote video is playing');
+            };
+            
             console.log('[TutoringSession] Remote video stream started');
         }
     };
@@ -199,18 +215,35 @@ async function initializePeerConnection() {
         if (event.candidate && otherUserConnectionId) {
             console.log('[TutoringSession] Sending ICE candidate');
             // Send ICE candidate via SignalR
-            window.sendIceCandidate(otherUserConnectionId, event.candidate);
+            if (blazorComponent) {
+                blazorComponent.invokeMethodAsync('SendIceCandidate', otherUserConnectionId, event.candidate);
+            }
         }
     };
 
     // Handle connection state changes
     peerConnection.onconnectionstatechange = () => {
         console.log('[TutoringSession] Connection state:', peerConnection.connectionState);
+        if (peerConnection.connectionState === 'connected') {
+            console.log('[TutoringSession] WebRTC connection established successfully!');
+        } else if (peerConnection.connectionState === 'failed') {
+            console.error('[TutoringSession] WebRTC connection failed');
+        }
     };
 
     // Handle ICE connection state changes
     peerConnection.oniceconnectionstatechange = () => {
         console.log('[TutoringSession] ICE connection state:', peerConnection.iceConnectionState);
+        if (peerConnection.iceConnectionState === 'connected') {
+            console.log('[TutoringSession] ICE connection established!');
+        } else if (peerConnection.iceConnectionState === 'failed') {
+            console.error('[TutoringSession] ICE connection failed');
+        }
+    };
+
+    // Handle ICE gathering state changes
+    peerConnection.onicegatheringstatechange = () => {
+        console.log('[TutoringSession] ICE gathering state:', peerConnection.iceGatheringState);
     };
 }
 
@@ -302,17 +335,17 @@ async function stopScreenShare() {
     }
 }
 
-// Simple WebRTC connection setup
+// WebRTC connection setup
 window.setOtherUserConnectionId = function(connectionId) {
-    console.log('[TutoringSession] Setting up WebRTC connection');
+    console.log('[TutoringSession] Setting up WebRTC connection with:', connectionId);
     otherUserConnectionId = connectionId;
     
-    // For demo purposes, we'll simulate a connection
-    // In a real implementation, this would handle the actual WebRTC signaling
-    setTimeout(() => {
-        console.log('[TutoringSession] Simulating remote video connection');
-        simulateRemoteConnection();
-    }, 2000);
+    // If we're the first user to join, we'll be the initiator
+    // The second user will receive our offer
+    if (!isInitiator) {
+        isInitiator = true;
+        console.log('[TutoringSession] Setting as initiator, will create offer when ready');
+    }
 };
 
 window.clearOtherUserConnectionId = function() {
@@ -324,6 +357,7 @@ window.clearOtherUserConnectionId = function() {
     const remoteVideo = document.getElementById('remoteVideo');
     if (remoteVideo) {
         remoteVideo.style.display = 'none';
+        remoteVideo.srcObject = null;
     }
 };
 
@@ -363,7 +397,10 @@ function simulateRemoteConnection() {
 
 // WebRTC signaling functions
 async function createOffer() {
-    if (!peerConnection || !otherUserConnectionId) return;
+    if (!peerConnection || !otherUserConnectionId) {
+        console.log('[TutoringSession] Cannot create offer: peerConnection or otherUserConnectionId not available');
+        return;
+    }
     
     try {
         console.log('[TutoringSession] Creating offer...');
@@ -371,57 +408,176 @@ async function createOffer() {
         await peerConnection.setLocalDescription(offer);
         
         console.log('[TutoringSession] Sending offer to', otherUserConnectionId);
-        window.sendOffer(otherUserConnectionId, offer);
+        if (blazorComponent) {
+            blazorComponent.invokeMethodAsync('SendOffer', otherUserConnectionId, offer);
+        }
     } catch (error) {
         console.error('[TutoringSession] Error creating offer:', error);
     }
 }
 
 window.handleReceiveOffer = async function(offer) {
-    if (!peerConnection) return;
+    if (!peerConnection) {
+        console.log('[TutoringSession] No peer connection available for offer');
+        return;
+    }
     
     try {
         console.log('[TutoringSession] Received offer, creating answer...');
-        await peerConnection.setRemoteDescription(offer);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
         
         console.log('[TutoringSession] Sending answer to', otherUserConnectionId);
-        window.sendAnswer(otherUserConnectionId, answer);
+        if (blazorComponent && otherUserConnectionId) {
+            blazorComponent.invokeMethodAsync('SendAnswer', otherUserConnectionId, answer);
+        }
     } catch (error) {
         console.error('[TutoringSession] Error handling offer:', error);
     }
 };
 
 window.handleReceiveAnswer = async function(answer) {
-    if (!peerConnection) return;
+    if (!peerConnection) {
+        console.log('[TutoringSession] No peer connection available for answer');
+        return;
+    }
     
     try {
         console.log('[TutoringSession] Received answer, setting remote description...');
-        await peerConnection.setRemoteDescription(answer);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
     } catch (error) {
         console.error('[TutoringSession] Error handling answer:', error);
     }
 };
 
 window.handleReceiveIceCandidate = async function(candidate) {
-    if (!peerConnection) return;
+    if (!peerConnection) {
+        console.log('[TutoringSession] No peer connection available for ICE candidate');
+        return;
+    }
     
     try {
         console.log('[TutoringSession] Received ICE candidate, adding to peer connection...');
-        await peerConnection.addIceCandidate(candidate);
+        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     } catch (error) {
         console.error('[TutoringSession] Error handling ICE candidate:', error);
     }
 };
 
-// SignalR message sending functions
+// SignalR connection and WebRTC signaling
 let blazorComponent = null;
+let signalRConnection = null;
+let currentSessionId = null;
 
 window.setSignalRFunctions = function(componentRef) {
     blazorComponent = componentRef;
     console.log('[TutoringSession] SignalR functions set up');
+};
+
+// Initialize SignalR connection
+window.initializeSignalRConnection = async function(sessionId) {
+    try {
+        currentSessionId = sessionId;
+        console.log('[TutoringSession] Initializing SignalR connection for session:', sessionId);
+        
+        // Use the globally loaded SignalR
+        const signalR = window.signalR;
+        
+        // Create connection
+        signalRConnection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:7228/tutoringsessionhub")
+            .build();
+
+        // Set up event handlers
+        signalRConnection.on("UserJoined", (connectionId) => {
+            console.log('[TutoringSession] User joined:', connectionId);
+            if (blazorComponent) {
+                blazorComponent.invokeMethodAsync('HandleUserJoined', connectionId);
+            }
+        });
+
+        signalRConnection.on("UserLeft", (connectionId) => {
+            console.log('[TutoringSession] User left:', connectionId);
+            if (blazorComponent) {
+                blazorComponent.invokeMethodAsync('HandleUserLeft', connectionId);
+            }
+        });
+
+        signalRConnection.on("ReceiveOffer", (fromConnectionId, offer) => {
+            console.log('[TutoringSession] Received offer from:', fromConnectionId);
+            window.handleReceiveOffer(offer);
+        });
+
+        signalRConnection.on("ReceiveAnswer", (fromConnectionId, answer) => {
+            console.log('[TutoringSession] Received answer from:', fromConnectionId);
+            window.handleReceiveAnswer(answer);
+        });
+
+        signalRConnection.on("ReceiveIceCandidate", (fromConnectionId, candidate) => {
+            console.log('[TutoringSession] Received ICE candidate from:', fromConnectionId);
+            window.handleReceiveIceCandidate(candidate);
+        });
+
+        // Start connection
+        await signalRConnection.start();
+        console.log('[TutoringSession] SignalR connection started');
+
+        // Join session
+        await signalRConnection.invoke("JoinSession", sessionId);
+        console.log('[TutoringSession] Joined session:', sessionId);
+
+    } catch (error) {
+        console.error('[TutoringSession] Error initializing SignalR:', error);
+    }
+};
+
+// Send WebRTC signaling messages via SignalR
+window.sendOfferViaSignalR = async function(sessionId, targetConnectionId, offer) {
+    if (signalRConnection) {
+        await signalRConnection.invoke("SendOffer", sessionId, targetConnectionId, offer);
+    }
+};
+
+window.sendAnswerViaSignalR = async function(sessionId, targetConnectionId, answer) {
+    if (signalRConnection) {
+        await signalRConnection.invoke("SendAnswer", sessionId, targetConnectionId, answer);
+    }
+};
+
+window.sendIceCandidateViaSignalR = async function(sessionId, targetConnectionId, candidate) {
+    if (signalRConnection) {
+        await signalRConnection.invoke("SendIceCandidate", sessionId, targetConnectionId, candidate);
+    }
+};
+
+// Handle user joined/left events
+window.handleUserJoined = function(connectionId) {
+    console.log('[TutoringSession] Handling user joined:', connectionId);
+    if (!otherUserConnectionId) {
+        otherUserConnectionId = connectionId;
+        isInitiator = true;
+        console.log('[TutoringSession] Setting as initiator, creating offer...');
+        // Create offer when another user joins
+        setTimeout(() => {
+            createOffer();
+        }, 1000);
+    }
+};
+
+window.handleUserLeft = function(connectionId) {
+    console.log('[TutoringSession] Handling user left:', connectionId);
+    if (otherUserConnectionId === connectionId) {
+        otherUserConnectionId = null;
+        isInitiator = false;
+        // Hide remote video
+        const remoteVideo = document.getElementById('remoteVideo');
+        if (remoteVideo) {
+            remoteVideo.style.display = 'none';
+            remoteVideo.srcObject = null;
+        }
+    }
 };
 
 window.sendOffer = function(targetConnectionId, offer) {
@@ -445,7 +601,7 @@ window.sendIceCandidate = function(targetConnectionId, candidate) {
     }
 };
 
-// Cleanup media streams
+// Cleanup media streams and SignalR connection
 window.cleanupMedia = async function() {
     try {
         console.log('[TutoringSession] Starting media cleanup...');
@@ -467,6 +623,16 @@ window.cleanupMedia = async function() {
             peerConnection = null;
         }
 
+        // Close SignalR connection
+        if (signalRConnection) {
+            console.log('[TutoringSession] Closing SignalR connection...');
+            if (currentSessionId) {
+                await signalRConnection.invoke("LeaveSession", currentSessionId);
+            }
+            await signalRConnection.stop();
+            signalRConnection = null;
+        }
+
         // Clear video elements
         const localVideo = document.getElementById('localVideo');
         if (localVideo) {
@@ -486,6 +652,7 @@ window.cleanupMedia = async function() {
         isVideoEnabled = true;
         isAudioEnabled = true;
         isScreenSharing = false;
+        currentSessionId = null;
 
         console.log('[TutoringSession] Media cleanup completed');
     } catch (error) {
@@ -723,3 +890,48 @@ window.initializeFileUpload = function() {
     console.log('[TutoringSession] Initializing file upload functionality...');
     window.setupFileUpload();
 };
+
+// Debug function to check WebRTC status
+window.debugWebRTCStatus = function() {
+    console.log('[TutoringSession] === WebRTC Debug Status ===');
+    console.log('Local Stream:', localStream ? 'Available' : 'Not available');
+    console.log('Peer Connection:', peerConnection ? 'Available' : 'Not available');
+    console.log('Other User Connection ID:', otherUserConnectionId || 'Not set');
+    console.log('Is Initiator:', isInitiator);
+    console.log('SignalR Connection:', signalRConnection ? 'Connected' : 'Not connected');
+    console.log('Current Session ID:', currentSessionId || 'Not set');
+    
+    if (peerConnection) {
+        console.log('Connection State:', peerConnection.connectionState);
+        console.log('ICE Connection State:', peerConnection.iceConnectionState);
+        console.log('ICE Gathering State:', peerConnection.iceGatheringState);
+    }
+    
+    if (localStream) {
+        const videoTracks = localStream.getVideoTracks();
+        const audioTracks = localStream.getAudioTracks();
+        console.log('Video Tracks:', videoTracks.length);
+        console.log('Audio Tracks:', audioTracks.length);
+        
+        videoTracks.forEach((track, index) => {
+            console.log(`Video Track ${index}:`, {
+                enabled: track.enabled,
+                readyState: track.readyState,
+                label: track.label
+            });
+        });
+        
+        audioTracks.forEach((track, index) => {
+            console.log(`Audio Track ${index}:`, {
+                enabled: track.enabled,
+                readyState: track.readyState,
+                label: track.label
+            });
+        });
+    }
+    
+    console.log('[TutoringSession] === End Debug Status ===');
+};
+
+// Make debug function available globally
+window.debugTutoringSession = window.debugWebRTCStatus;

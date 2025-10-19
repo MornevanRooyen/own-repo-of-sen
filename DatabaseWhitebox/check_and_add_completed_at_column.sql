@@ -30,3 +30,4 @@ FROM information_schema.columns
 WHERE table_name = 'booking_sessions' 
 ORDER BY ordinal_position;
 
+

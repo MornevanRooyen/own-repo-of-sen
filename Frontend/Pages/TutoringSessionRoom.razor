@@ -50,7 +50,8 @@ else
                     <div class="video-placeholder" id="videoPlaceholder">
                         <div class="placeholder-content">
                             <div class="placeholder-icon">📹</div>
-                            <p>Camera initializing...</p>
+                            <p>Waiting for connection...</p>
+                            <small>Your camera will appear here once connected</small>
                         </div>
                     </div>
                     <div class="video-controls">
@@ -286,6 +287,22 @@ else
         width: 100%;
         height: 100%;
         object-fit: cover;
+        border-radius: 12px;
+    }
+
+    #localVideo {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 200px;
+        height: 150px;
+        border: 2px solid #1B998B;
+        z-index: 10;
+    }
+
+    #remoteVideo {
+        width: 100%;
+        height: 100%;
     }
 
     .video-placeholder {
@@ -312,8 +329,15 @@ else
     }
 
     .placeholder-content p {
-        margin: 0;
+        margin: 0 0 8px 0;
         font-size: 16px;
+    }
+
+    .placeholder-content small {
+        display: block;
+        margin: 0;
+        font-size: 12px;
+        opacity: 0.7;
     }
 
     .video-controls {
@@ -780,10 +804,13 @@ else
     {
         try
         {
-            Console.WriteLine($"[TutoringSessionRoom] Initializing live messaging...");
+            Console.WriteLine($"[TutoringSessionRoom] Initializing SignalR connection...");
             
             // Set up the SignalR functions for JavaScript
             await JS.InvokeVoidAsync("setSignalRFunctions", DotNetObjectReference.Create(this));
+            
+            // Initialize SignalR connection for WebRTC signaling
+            await JS.InvokeVoidAsync("initializeSignalRConnection", SessionId.ToString());
             
             // Start polling for live chat messages and session status
             _ = Task.Run(async () =>
@@ -804,11 +831,11 @@ else
                 }
             });
             
-            Console.WriteLine($"[TutoringSessionRoom] Live messaging initialized with polling");
+            Console.WriteLine($"[TutoringSessionRoom] SignalR connection initialized");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[TutoringSessionRoom] Error initializing live messaging: {ex.Message}");
+            Console.WriteLine($"[TutoringSessionRoom] Error initializing SignalR: {ex.Message}");
         }
     }
 
@@ -829,19 +856,18 @@ else
         }
     }
 
-    // Basic session methods (without SignalR for now)
+    // WebRTC Signaling Methods
     [JSInvokable]
     public async Task SendOffer(string targetConnectionId, object offer)
     {
         try
         {
-            Console.WriteLine($"[TutoringSessionRoom] WebRTC offer ready for {targetConnectionId}");
-            // For now, we'll implement a simple peer-to-peer connection
-            // The JavaScript will handle the actual WebRTC signaling
+            Console.WriteLine($"[TutoringSessionRoom] Sending WebRTC offer to {targetConnectionId}");
+            await JS.InvokeVoidAsync("sendOfferViaSignalR", SessionId.ToString(), targetConnectionId, offer);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[TutoringSessionRoom] Error with offer: {ex.Message}");
+            Console.WriteLine($"[TutoringSessionRoom] Error sending offer: {ex.Message}");
         }
     }
 
@@ -850,13 +876,12 @@ else
     {
         try
         {
-            Console.WriteLine($"[TutoringSessionRoom] WebRTC answer ready for {targetConnectionId}");
-            // For now, we'll implement a simple peer-to-peer connection
-            // The JavaScript will handle the actual WebRTC signaling
+            Console.WriteLine($"[TutoringSessionRoom] Sending WebRTC answer to {targetConnectionId}");
+            await JS.InvokeVoidAsync("sendAnswerViaSignalR", SessionId.ToString(), targetConnectionId, answer);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[TutoringSessionRoom] Error with answer: {ex.Message}");
+            Console.WriteLine($"[TutoringSessionRoom] Error sending answer: {ex.Message}");
         }
     }
 
@@ -865,13 +890,40 @@ else
     {
         try
         {
-            Console.WriteLine($"[TutoringSessionRoom] WebRTC ICE candidate ready for {targetConnectionId}");
-            // For now, we'll implement a simple peer-to-peer connection
-            // The JavaScript will handle the actual WebRTC signaling
+            Console.WriteLine($"[TutoringSessionRoom] Sending WebRTC ICE candidate to {targetConnectionId}");
+            await JS.InvokeVoidAsync("sendIceCandidateViaSignalR", SessionId.ToString(), targetConnectionId, candidate);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[TutoringSessionRoom] Error with ICE candidate: {ex.Message}");
+            Console.WriteLine($"[TutoringSessionRoom] Error sending ICE candidate: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task HandleUserJoined(string connectionId)
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] User {connectionId} joined the session");
+            await JS.InvokeVoidAsync("handleUserJoined", connectionId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error handling user joined: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task HandleUserLeft(string connectionId)
+    {
+        try
+        {
+            Console.WriteLine($"[TutoringSessionRoom] User {connectionId} left the session");
+            await JS.InvokeVoidAsync("handleUserLeft", connectionId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TutoringSessionRoom] Error handling user left: {ex.Message}");
         }
     }
 

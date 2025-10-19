@@ -37,7 +37,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("https://localhost:7097", "http://localhost:5097")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials(); // Required for SignalR
     });
 });
 
@@ -55,7 +56,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Map SignalR hubs
-app.MapHub<TutoringSessionHub>("/tutoringSessionHub");
-app.MapHub<MessagingHub>("/messagingHub");
+app.MapHub<TutoringSessionHub>("/tutoringsessionhub");
+app.MapHub<MessagingHub>("/messaginghub");
 
 app.Run();
