@@ -8,3 +8,4 @@ ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP WITH TIME ZONE;
 COMMENT ON COLUMN booking_sessions.completed_at IS 'Timestamp when the tutoring session was completed';
 
 
+

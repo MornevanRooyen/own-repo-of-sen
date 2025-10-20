@@ -26,3 +26,4 @@ SELECT COUNT(*) as remaining_session_resources FROM session_resources;
 SELECT setval('booking_sessions_booking_id_seq', 1, false);
 
 
+

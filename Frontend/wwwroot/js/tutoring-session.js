@@ -416,7 +416,7 @@ async function createOffer() {
     }
 }
 
-window.handleReceiveOffer = async function(offer) {
+window.handleReceiveOffer = async function(fromConnectionId, offer) {
     if (!peerConnection) {
         console.log('[TutoringSession] No peer connection available for offer');
         return;
@@ -424,6 +424,7 @@ window.handleReceiveOffer = async function(offer) {
     
     try {
         console.log('[TutoringSession] Received offer, creating answer...');
+        otherUserConnectionId = fromConnectionId; // remember who to answer
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         
         const answer = await peerConnection.createAnswer();
@@ -438,7 +439,7 @@ window.handleReceiveOffer = async function(offer) {
     }
 };
 
-window.handleReceiveAnswer = async function(answer) {
+window.handleReceiveAnswer = async function(fromConnectionId, answer) {
     if (!peerConnection) {
         console.log('[TutoringSession] No peer connection available for answer');
         return;
@@ -446,13 +447,14 @@ window.handleReceiveAnswer = async function(answer) {
     
     try {
         console.log('[TutoringSession] Received answer, setting remote description...');
+        otherUserConnectionId = otherUserConnectionId || fromConnectionId;
         await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
     } catch (error) {
         console.error('[TutoringSession] Error handling answer:', error);
     }
 };
 
-window.handleReceiveIceCandidate = async function(candidate) {
+window.handleReceiveIceCandidate = async function(fromConnectionId, candidate) {
     if (!peerConnection) {
         console.log('[TutoringSession] No peer connection available for ICE candidate');
         return;
@@ -460,6 +462,7 @@ window.handleReceiveIceCandidate = async function(candidate) {
     
     try {
         console.log('[TutoringSession] Received ICE candidate, adding to peer connection...');
+        otherUserConnectionId = otherUserConnectionId || fromConnectionId;
         await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     } catch (error) {
         console.error('[TutoringSession] Error handling ICE candidate:', error);
@@ -493,6 +496,11 @@ window.initializeSignalRConnection = async function(sessionId) {
         // Set up event handlers
         signalRConnection.on("UserJoined", (connectionId) => {
             console.log('[TutoringSession] User joined:', connectionId);
+            // Ignore our own join event
+            const selfId = signalRConnection.connectionId || signalRConnection.connection?.connectionId;
+            if (connectionId === selfId) {
+                return;
+            }
             if (blazorComponent) {
                 blazorComponent.invokeMethodAsync('HandleUserJoined', connectionId);
             }
@@ -507,17 +515,17 @@ window.initializeSignalRConnection = async function(sessionId) {
 
         signalRConnection.on("ReceiveOffer", (fromConnectionId, offer) => {
             console.log('[TutoringSession] Received offer from:', fromConnectionId);
-            window.handleReceiveOffer(offer);
+            window.handleReceiveOffer(fromConnectionId, offer);
         });
 
         signalRConnection.on("ReceiveAnswer", (fromConnectionId, answer) => {
             console.log('[TutoringSession] Received answer from:', fromConnectionId);
-            window.handleReceiveAnswer(answer);
+            window.handleReceiveAnswer(fromConnectionId, answer);
         });
 
         signalRConnection.on("ReceiveIceCandidate", (fromConnectionId, candidate) => {
             console.log('[TutoringSession] Received ICE candidate from:', fromConnectionId);
-            window.handleReceiveIceCandidate(candidate);
+            window.handleReceiveIceCandidate(fromConnectionId, candidate);
         });
 
         // Start connection

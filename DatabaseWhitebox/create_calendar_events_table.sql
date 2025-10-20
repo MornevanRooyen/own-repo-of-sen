@@ -65,3 +65,4 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON calendar_events TO authenticated;
 GRANT SELECT ON calendar_events_details TO authenticated;
 
 
+

@@ -31,3 +31,4 @@ WHERE table_name = 'booking_sessions'
 ORDER BY ordinal_position;
 
 
+

@@ -762,6 +762,19 @@ else
                     }
                 });
             ");
+
+            // Ensure SignalR and media are initialized after first render
+            try
+            {
+                await JS.InvokeVoidAsync("setSignalRFunctions", DotNetObjectReference.Create(this));
+                await JS.InvokeVoidAsync("initializeSignalRConnection", SessionId.ToString());
+                await JS.InvokeVoidAsync("initializeMediaWhenReady");
+                await JS.InvokeVoidAsync("initializeFileUpload");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[TutoringSessionRoom] Error during firstRender JS init: {ex.Message}");
+            }
         }
     }
 
