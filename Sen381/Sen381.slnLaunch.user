@@ -9,6 +9,10 @@
       {
         "Path": "..\\Sen381Backend\\Sen381Backend.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "Sen381.csproj",
+        "Action": "Start"
       }
     ]
   },

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "968mkEHY9+4=",
+  "dgSpecHash": "+dTwCV/ISwo=",
   "success": true,
-  "projectFilePath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381Backend\\Sen381Backend.csproj",
+  "projectFilePath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Sen381Backend\\Sen381Backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\morne\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.3.0\\microsoft.aspnetcore.authentication.abstractions.2.3.0.nupkg.sha512",
     "C:\\Users\\morne\\.nuget\\packages\\microsoft.aspnetcore.authorization\\2.3.0\\microsoft.aspnetcore.authorization.2.3.0.nupkg.sha512",

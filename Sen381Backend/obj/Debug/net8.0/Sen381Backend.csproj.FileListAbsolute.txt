@@ -182,3 +182,7 @@ C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\Se
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\Sen381Backend.genruntimeconfig.cache
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\ref\Sen381Backend.dll
 C:\Sen381 github repo\own repo\own-repo-of-sen\Sen381Backend\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.Hosting.Abstractions.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Sen381Backend\bin\Debug\net8.0\Microsoft.Extensions.ObjectPool.dll
+C:\Sen381 github repo\own repo\own-repo-of-sen381\Sen381Backend\bin\Debug\net8.0\System.Net.WebSockets.WebSocketProtocol.dll

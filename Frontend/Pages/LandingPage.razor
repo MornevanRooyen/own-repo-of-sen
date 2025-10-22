@@ -1,9 +1,13 @@
 ﻿@page "/"
 @page "/landing"
+@layout NavigationForLanding
 
 <!-- Landing Page — CampusLearn -->
 
 <main class="page">
+    <!-- Page-wide background image (fixed, covers viewport) -->
+    <img class="page-bg" src="images/background.jpg" alt="" aria-hidden="true" />
+
     <div class="container grid">
         <!-- HERO band (full-width, centered content) -->
         <section class="panel hero full-bleed">
@@ -25,18 +29,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- CLARA band (full-width, centered content) -->
-        <section class="panel full-bleed">
-            <div class="band-inner center-block">
-                <ClaraPanel Small="false" />
-            </div>
-        </section>
-    </div>
-
-    <!-- Bottom CTA -->
-    <div class="cta-wrap">
-        <a class="cta" href="/signup">Get Started — it’s free</a>
     </div>
 </main>
 
@@ -45,118 +37,49 @@
 </footer>
 
 <style>
-    /* =========================
-           DESIGN TOKENS
-           ========================= */
     :root {
         --bg: #FFFFFF;
         --nav: #DBE4EE;
-        --accent: #1B998B; /* primary teal */
-        --accent-2: #F17300; /* orange */
+        --accent: #1B998B;
         --ink: #2D3034;
         --panel-bg: #FFFFFF;
-        --panel-ring: color-mix(in oklab, var(--ink) 10%, white);
-        --muted: color-mix(in oklab, var(--ink) 55%, white);
+        --panel-ring: color-mix(in oklab,var(--ink) 10%,white);
+        --muted: color-mix(in oklab,var(--ink) 55%,white);
         --radius: 1.25rem;
         --shadow-1: 0 6px 18px rgba(0,0,0,.06);
         --shadow-2: 0 12px 28px rgba(0,0,0,.08);
-        --container: min(1200px, 92vw);
-        
-        /* Add smooth transitions for all elements */
-        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    /* Dark mode overrides */
-    .dark-mode {
-        --bg: #1a1a1a;
-        --nav: #2d2d2d;
-        --ink: #ffffff;
-        --panel-bg: #2d2d2d;
-        --panel-ring: #404040;
-        --muted: #b3b3b3;
-        --shadow-1: 0 6px 18px rgba(0,0,0,.3);
-        --shadow-2: 0 12px 28px rgba(0,0,0,.4);
-    }
-
-    /* Dark mode specific styles */
-    .dark-mode .tile {
-        background: color-mix(in oklab, var(--accent) 20%, var(--panel-bg));
-        border-color: var(--panel-ring);
-        color: var(--ink);
-    }
-
-    .dark-mode .tile:hover {
-        box-shadow: var(--shadow-2);
-    }
-
-    .dark-mode .tile p {
-        color: var(--muted);
-    }
-
-    .dark-mode .hero.full-bleed {
-        background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 15%, var(--panel-bg)) 0%, var(--panel-bg) 30%);
-    }
-
-    .dark-mode .hero .accent {
-        color: var(--ink);
-        text-shadow: none;
-    }
-
-    @@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap');
-
-    *, *::before, *::after {
-        box-sizing: border-box
-    }
-
-    html, body {
-        height: 100%
-    }
-
-    body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--ink);
-        font-family: "Lexend", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-        line-height: 1.45;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    h1, h2, h3 {
-        font-family: "Outfit", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-        margin: 0 0 .5rem;
-    }
-
-    img, svg {
-        display: block
-    }
-
-    /* NAV (if used elsewhere) */
-    .nav {
-        background: var(--nav);
-        border-bottom: 1px solid var(--panel-ring);
-        position: sticky;
-        top: 0;
-        z-index: 50;
+        --container: min(1200px,92vw)
     }
 
     .container {
         width: var(--container);
         margin-inline: auto;
-        padding-inline: clamp(12px, 3vw, 24px);
+        padding-inline: clamp(12px,3vw,24px)
     }
 
-    /* PAGE LAYOUT */
     .page {
         display: grid;
         grid-template-rows: auto auto 1fr;
         min-height: calc(100dvh - 60px);
+        position: relative
+    }
+
+    .page-bg {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        pointer-events: none;
+        filter: brightness(.9)
     }
 
     .grid {
         display: grid;
-        grid-template-columns: 1fr; /* stacked layout */
-        gap: clamp(16px, 3vw, 28px);
-        padding-block: clamp(18px, 4vw, 36px);
+        grid-template-columns: 1fr;
+        gap: clamp(16px,3vw,28px);
+        padding-block: clamp(18px,4vw,36px)
     }
 
     .panel {
@@ -164,65 +87,63 @@
         border: 1px solid var(--panel-ring);
         border-radius: var(--radius);
         box-shadow: var(--shadow-1);
-        padding: clamp(16px, 2.8vw, 28px);
-        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        padding: clamp(16px,2.8vw,28px)
     }
 
-    /* ---------- FULL-BLEED BANDS ---------- */
     .full-bleed {
         position: relative;
         left: 50%;
         right: 50%;
         margin-left: -50vw;
         margin-right: -50vw;
-        width: 100vw; /* stretch edge-to-edge */
-        border-radius: 0;
-        padding-block: clamp(18px, 4vw, 40px);
+        width: 100vw;
         border: 0;
-        box-shadow: none; /* cleaner band look */
+        border-radius: 0;
+        box-shadow: none;
+        padding-block: clamp(18px,4vw,40px)
     }
 
     .hero.full-bleed {
-        background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 8%, #fff) 0%, #fff 30%);
+        background: none
     }
 
-    /* Inner wrapper that recenters content within the full-bleed */
     .band-inner {
         width: var(--container);
         margin-inline: auto;
-        padding-inline: clamp(12px, 3vw, 24px);
+        padding-inline: clamp(12px,3vw,24px)
     }
 
-    /* ---------- CENTERING ---------- */
     .center-block {
-        text-align: center;
+        text-align: center
     }
 
-    /* Hero heading tweaks */
     .hero h1 {
-        font-size: clamp(28px, 6.5vw, 64px);
+        font-size: clamp(28px,6.5vw,64px);
         font-weight: 800;
+        color: #fff;
+        text-shadow: 0 2px 12px rgba(0,0,0,.35);
+        margin: 0
     }
 
     .hero .accent {
-        color: var(--ink);
-        text-shadow: 0 1px 0 #fff
+        color: #fff;
+        text-shadow: 0 2px 12px rgba(0,0,0,.35)
     }
 
     .lede {
-        color: var(--muted);
-        font-size: clamp(14px, 1.6vw, 18px);
+        color: #fff;
+        font-size: clamp(14px,1.6vw,18px);
         margin: 6px 0 18px;
+        text-shadow: 0 2px 10px rgba(0,0,0,.35)
     }
 
-    /* Tiles: centered grid + centered cards */
     .tiles {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: clamp(12px, 2.2vw, 18px);
-        max-width: 920px; /* comfortable width */
-        margin-inline: auto; /* center the grid block */
-        justify-items: center; /* center each tile */
+        grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+        gap: clamp(12px,2.2vw,18px);
+        max-width: 920px;
+        margin-inline: auto;
+        justify-items: center
     }
 
     .tile {
@@ -230,12 +151,12 @@
         text-decoration: none;
         color: var(--ink);
         text-align: center;
-        background: color-mix(in oklab, var(--accent) 10%, white);
+        background: color-mix(in oklab,var(--accent) 10%,white);
         border: 1px solid var(--panel-ring);
         border-radius: calc(var(--radius) - 4px);
         padding: 16px 18px;
         box-shadow: var(--shadow-1);
-        transition: transform .15s ease, box-shadow .15s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        transition: transform .15s ease, box-shadow .15s ease
     }
 
         .tile:hover {
@@ -254,78 +175,13 @@
             font-size: .95rem
         }
 
-    /* CTA */
-    .cta-wrap {
-        display: flex;
-        justify-content: center;
-        padding: clamp(12px, 3vw, 18px);
-    }
-
-    .cta {
-        display: inline-block;
-        text-decoration: none;
-        text-align: center;
-        font-weight: 700;
-        letter-spacing: 0.3px;
-        font-family: 'Segoe UI', 'Lexend', sans-serif;
-        padding: 14px 28px;
-        border-radius: 999px;
-        min-width: 260px;
-        color: #fff;
-        background: #F17300;
-        border: none;
-        box-shadow: 0 3px 10px rgba(123,108,255,0.4);
-        transition: all .25s ease-in-out;
-        cursor: pointer;
-        animation: cta-pulse 3s infinite ease-in-out;
-    }
-
-        .cta:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, #6c5cff, #48c9ff);
-            box-shadow: 0 6px 16px rgba(90,209,255,0.45);
-        }
-
-        .cta:active {
-            transform: scale(0.97);
-            box-shadow: 0 2px 6px rgba(90,209,255,0.3);
-        }
-
-    @@keyframes cta-pulse {
-        0% {
-            box-shadow: 0 0 0 rgba(90,209,255,.6);
-        }
-
-        70% {
-            box-shadow: 0 0 14px rgba(90,209,255,.4);
-        }
-
-        100% {
-            box-shadow: 0 0 0 rgba(90,209,255,0);
-        }
-    }
-
-    /* FOOTER */
     .foot {
         border-top: 1px solid var(--panel-ring);
-        background: var(--bg);
-        transition: background-color 0.3s ease, border-color 0.3s ease;
+        background: var(--bg)
     }
 
         .foot .container {
             padding-block: 14px;
             color: var(--muted)
         }
-
-    /* Mobile nicety: rounded bands on very small screens */
-    @@media (max-width: 520px) {
-        .full-bleed {
-            border-radius: var(--radius);
-            margin-left: auto;
-            margin-right: auto;
-            left: 0;
-            right: 0;
-            width: auto;
-        }
-    }
 </style>

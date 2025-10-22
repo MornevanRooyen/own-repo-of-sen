@@ -197,7 +197,7 @@
         opacity: .7;
     }
 
-    /* Pinned AI */
+    /* Pinned AI visual (kept but hidden below) */
     .person-item.ai {
         background: linear-gradient(180deg, #fff 0%, #fff 65%), linear-gradient(135deg, var(--role-clara), #FFA3F9);
         background-clip: padding-box, border-box;
@@ -219,6 +219,15 @@
             padding: 0 6px;
             border-radius: 999px;
         }
+
+    /* ======== HIDE CLARA FROM THE PEOPLE PANEL (UI-only; no backend changes) ======== */
+    .person-item.ai {
+        display: none !important;
+    }
+
+    .people-list .person-item[data-role="Clara"] {
+        display: none !important;
+    }
 
     /* Collapsed visuals */
     .messages-container.collapsed .people-title {
@@ -248,7 +257,7 @@
         height: 44px;
     }
 
-    /* ===== Dynamic role colours (higher specificity + !important to beat external css) ===== */
+    /* ===== Dynamic role colours ===== */
     .people-list .person-item[data-role="Admin"] .person-name {
         color: var(--role-admin) !important;
     }
@@ -463,7 +472,7 @@
         </div>
 
         <div class="people-list">
-            <!-- Pinned AI contact -->
+            <!-- Pinned AI contact (now hidden via CSS to avoid backend/markup changes) -->
             <div class="person-item ai" data-role="Clara" @onclick="SelectClara">
                 <div class="person-avatar">
                     <div class="avatar-placeholder">C</div>
@@ -570,7 +579,7 @@
                     {
                         var isOutgoing = (msg.SenderId == CurrentUserId);
                         bool isAttachment = msg.MessageText != null && msg.MessageText.StartsWith("ATTACH|");
-                        
+
                         // Debug logging for message text (only log once per message and only for new messages)
                         if (msg.MessageText != null && msg.MessageText.StartsWith("ATTACH") && msg.SentAt > DateTime.Now.AddMinutes(-1))
                         {
@@ -589,7 +598,7 @@
                                 attachType = parts.Length > 1 ? parts[1] : null;
                                 attachUrl = parts.Length > 2 ? parts[2] : null;
                                 attachName = parts.Length > 3 ? parts[3] : null;
-                                
+
                                 // Debug logging (only for new messages)
                                 if (msg.SentAt > DateTime.Now.AddMinutes(-1))
                                 {
@@ -608,7 +617,7 @@
                                 {
                                     if (attachType == "image")
                                     {
-                                        <img src="@attachUrl" alt="@attachName" class="chat-image" 
+                                        <img src="@attachUrl" alt="@attachName" class="chat-image"
                                              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
                                         <div class="image-error" style="display:none;">
                                             <span class="error-icon">🖼️</span>
@@ -633,7 +642,7 @@
                                 {
                                     @msg.MessageText
                                 }
-                                
+
                                 @if (isOutgoing)
                                 {
                                     <button class="message-delete-btn" @onclick="() => DeleteMessage(msg.Id)" title="Delete message">
@@ -841,17 +850,17 @@
         try
         {
             Console.WriteLine($"[Messages] Initializing SignalR for user {CurrentUserId}");
-            
+
             // Subscribe to message received events
             MessagingService.MessageReceived += OnMessageReceived;
-            
+
             // Start the messaging service
             await MessagingService.StartAsync();
-            
+
             // Check connection status
             Console.WriteLine($"[Messages] SignalR connection state: {MessagingService.ConnectionState}");
             Console.WriteLine($"[Messages] SignalR is connected: {MessagingService.IsConnected}");
-            
+
             if (MessagingService.IsConnected)
             {
                 // Join the messaging hub for this user
@@ -882,20 +891,20 @@
             try
             {
                 Console.WriteLine($"[Messages] Received live message: {message.MessageText}");
-                
+
                 // Check if this message is for the current user
                 if (message.SenderId == CurrentUserId || message.ReceiverId == CurrentUserId)
                 {
                     Console.WriteLine($"[Messages] Processing message from {message.SenderId} to {message.ReceiverId}, CurrentUserId: {CurrentUserId}");
-                    
+
                     // Add to current conversation if it matches
-                    if (SelectedUser != null && 
+                    if (SelectedUser != null &&
                         ((message.SenderId == CurrentUserId && message.ReceiverId == SelectedUser.Id) ||
                          (message.SenderId == SelectedUser.Id && message.ReceiverId == CurrentUserId)))
                     {
                         Console.WriteLine($"[Messages] Adding message to current conversation with {SelectedUser.FirstName}");
                         ConversationMessages ??= new List<DirectMessage>();
-                        
+
                         // Check if message already exists to avoid duplicates
                         if (!ConversationMessages.Any(m => m.Id == message.Id))
                         {
@@ -912,10 +921,10 @@
                     {
                         Console.WriteLine($"[Messages] Message not for current conversation. SelectedUser: {SelectedUser?.FirstName}");
                     }
-                    
+
                     // Update the conversation list to show the latest message
                     await UpdateConversationList(message);
-                    
+
                     StateHasChanged();
                 }
             }
@@ -932,7 +941,7 @@
         {
             // Find the other user in the conversation
             var otherUserId = message.SenderId == CurrentUserId ? message.ReceiverId : message.SenderId;
-            
+
             // Find the user in the followed users list and update their last message
             if (FollowedUsers != null)
             {
@@ -944,13 +953,9 @@
                     Console.WriteLine($"[Messages] Updated conversation list for user {user.FirstName} {user.LastName}");
                 }
             }
-            
-            // If we're not currently viewing this conversation, we might want to refresh the conversation list
-            // to show the latest message preview in the sidebar
+
             if (SelectedUser?.Id != otherUserId)
             {
-                // Optionally refresh the conversation list to show latest messages
-                // This ensures the sidebar shows the most recent message
                 Console.WriteLine($"[Messages] New message from different user, updating sidebar");
             }
         }
@@ -991,7 +996,7 @@
     public async ValueTask DisposeAsync()
     {
         _fallbackTimer?.Dispose();
-        
+
         if (MessagingService is not null)
         {
             if (_isConnected)
@@ -1008,9 +1013,9 @@
         try
         {
             Console.WriteLine($"[Messages] Attempting to delete message {messageId}");
-            
+
             var response = await Http.DeleteAsync($"api/Messaging/delete/{messageId}?userId={CurrentUserId}");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 // Remove the message from the local list
@@ -1081,7 +1086,7 @@
         if (isSidebarCollapsed) ToggleSidebar(); // clicking the white pill re-opens
     }
 
-    // Treat Clara like a selectable user so the chat panel loads normally
+    // Treat Clara like a selectable user so the chat panel loads normally (kept; unreachable now that it's hidden)
     private void SelectClara()
     {
         SelectedUser = new User

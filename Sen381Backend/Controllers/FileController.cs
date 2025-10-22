@@ -3,6 +3,7 @@ using Sen381Backend.Models;
 using Sen381.Data_Access;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sen381Backend.Controllers
@@ -34,36 +35,54 @@ namespace Sen381Backend.Controllers
             try
             {
                 var bucket = client.Storage.From("User_Uploads");
-                var originalName = string.IsNullOrWhiteSpace(input.Name) ? input.File.FileName : input.Name;
+                var originalName = string.IsNullOrWhiteSpace(input.Name)
+                    ? input.File.FileName
+                    : input.Name;
+
                 var fileName = $"{Guid.NewGuid()}_{originalName}";
 
-                // Upload to Supabase storage
+                // ✅ Upload file to private bucket
                 await bucket.Upload(fileBytes, fileName);
 
-                // Generate a signed URL valid for 24 hours (86400 seconds)
-                var signedUrl = await bucket.CreateSignedUrl(fileName, 86400);
+                // ✅ Generate signed URL (valid for 7 days)
+                var signedUrl = await bucket.CreateSignedUrl(fileName, 604800);
 
-                // Save metadata in DB if desired
+                // ✅ Save metadata in DB
                 var uploadedFile = new UploadedFile
                 {
+                    UploaderUserId = long.TryParse(User?.FindFirst("sub")?.Value, out var uid) ? uid : 0,
                     FileName = fileName,
-                    StorageUrl = signedUrl,
-                    UploaderId = User?.FindFirst("sub")?.Value ?? "anonymous",
+                    FileType = input.File.ContentType,
+                    SizeBytes = input.File.Length,
+                    StorageLocation = signedUrl,
                     CreatedAt = DateTime.UtcNow
                 };
 
-                try
+                var dbResponse = await client.From<UploadedFile>().Insert(uploadedFile);
+                var inserted = dbResponse.Models.FirstOrDefault();
+
+                if (inserted == null)
                 {
-                    await client.From<UploadedFile>().Insert(uploadedFile);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[FileController] DB insert warning: {ex.Message}");
+                    Console.WriteLine("⚠️ File inserted but no record returned from Supabase.");
+                    return Ok(new
+                    {
+                        FileId = 0,
+                        FileName = fileName,
+                        FileType = input.File.ContentType,
+                        SignedUrl = signedUrl
+                    });
                 }
 
-                Console.WriteLine($"✅ Uploaded file '{fileName}' successfully.");
-                // 🔥 lowercase key name to match frontend JSON parser
-                return Ok(new { signedUrl = signedUrl, fileName = fileName });
+                Console.WriteLine($"✅ Uploaded file '{fileName}' (FileId={inserted.FileId}) successfully.");
+                return Ok(new
+                {
+                    inserted.FileId,
+                    inserted.FileName,
+                    inserted.FileType,
+                    inserted.SizeBytes,
+                    SignedUrl = signedUrl,
+                    inserted.CreatedAt
+                });
             }
             catch (Exception ex)
             {
@@ -78,21 +97,16 @@ namespace Sen381Backend.Controllers
             if (input.File == null)
                 return BadRequest("No file provided.");
 
-            // Validate file type
             var allowedTypes = new[] { "application/pdf" };
             var allowedExtensions = new[] { ".pdf" };
-            
-            if (!allowedTypes.Contains(input.File.ContentType) && 
-                !allowedExtensions.Any(ext => input.File.FileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
-            {
-                return BadRequest("Only PDF files are allowed for transcripts.");
-            }
 
-            // Validate file size (10 MB limit)
+            if (!allowedTypes.Contains(input.File.ContentType) &&
+                !allowedExtensions.Any(ext =>
+                    input.File.FileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+                return BadRequest("Only PDF files are allowed for transcripts.");
+
             if (input.File.Length > 10 * 1024 * 1024)
-            {
                 return BadRequest("File size cannot exceed 10 MB.");
-            }
 
             await _supabase.InitializeAsync();
             var client = _supabase.Client;
@@ -104,39 +118,18 @@ namespace Sen381Backend.Controllers
             try
             {
                 var bucket = client.Storage.From("Transcripts");
-                var originalName = string.IsNullOrWhiteSpace(input.Name) ? input.File.FileName : input.Name;
+                var originalName = string.IsNullOrWhiteSpace(input.Name)
+                    ? input.File.FileName
+                    : input.Name;
                 var fileName = $"transcript_{Guid.NewGuid()}_{originalName}";
 
-                // Upload to Supabase storage
                 await bucket.Upload(fileBytes, fileName);
 
-                // Generate a signed URL valid for 1 hour (longer for transcripts)
-                var signedUrl = await bucket.CreateSignedUrl(fileName, 3600);
-
-                // Skip file metadata storage for now - just upload the file
-                // TODO: Uncomment below if you create the uploaded_files table
-                /*
-                var uploadedFile = new UploadedFile
-                {
-                    FileName = fileName,
-                    StorageUrl = signedUrl,
-                    UploaderId = User?.FindFirst("sub")?.Value ?? "anonymous",
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                try
-                {
-                    await client.From<UploadedFile>().Insert(uploadedFile);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[FileController] DB insert warning: {ex.Message}");
-                }
-                */
+                // ✅ Use signed URL for secure transcript access
+                var signedUrl = await bucket.CreateSignedUrl(fileName, 604800);
 
                 Console.WriteLine($"✅ Uploaded transcript '{fileName}' successfully.");
-                // 🔥 lowercase key name to match frontend JSON parser
-                return Ok(new { signedUrl = signedUrl, fileName = fileName, filePath = fileName });
+                return Ok(new { FileName = fileName, SignedUrl = signedUrl });
             }
             catch (Exception ex)
             {
@@ -155,14 +148,11 @@ namespace Sen381Backend.Controllers
             {
                 await _supabase.InitializeAsync();
                 var client = _supabase.Client;
-
                 var bucket = client.Storage.From("Transcripts");
-                
-                // Generate a signed URL valid for 1 hour
-                var signedUrl = await bucket.CreateSignedUrl(filePath, 3600);
 
+                var signedUrl = await bucket.CreateSignedUrl(filePath, 604800);
                 Console.WriteLine($"✅ Generated signed URL for transcript: {filePath}");
-                return Ok(new { signedUrl = signedUrl });
+                return Ok(new { signedUrl });
             }
             catch (Exception ex)
             {
@@ -171,55 +161,11 @@ namespace Sen381Backend.Controllers
             }
         }
 
-        [HttpGet("view-transcript")]
-        public async Task<IActionResult> ViewTranscript([FromQuery] string filePath)
-        {
-            if (string.IsNullOrEmpty(filePath))
-                return BadRequest("File path is required.");
-
-            try
-            {
-                await _supabase.InitializeAsync();
-                var client = _supabase.Client;
-
-                var bucket = client.Storage.From("Transcripts");
-                
-                // Download the file content - explicitly use the simple overload
-                var fileBytes = await bucket.Download(filePath, (EventHandler<float>?)null);
-
-                if (fileBytes == null || fileBytes.Length == 0)
-                {
-                    Console.WriteLine($"❌ [FileController] No file content returned for: {filePath}");
-                    return NotFound("File not found or empty");
-                }
-
-                Console.WriteLine($"✅ [FileController] Successfully retrieved {fileBytes.Length} bytes for: {filePath}");
-
-                // Create a FileContentResult with inline disposition
-                var result = new FileContentResult(fileBytes, "application/pdf")
-                {
-                    FileDownloadName = null // This prevents download
-                };
-                
-                // Set headers to force inline viewing
-                Response.Headers.Add("Content-Disposition", "inline; filename=\"" + Path.GetFileName(filePath) + "\"");
-                
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ [FileController] Error viewing transcript: {ex.Message}");
-                Console.WriteLine($"❌ [FileController] Stack trace: {ex.StackTrace}");
-                return StatusCode(500, $"Error retrieving file: {ex.Message}");
-            }
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetAllFiles()
         {
             await _supabase.InitializeAsync();
             var client = _supabase.Client;
-
             var response = await client.From<UploadedFile>().Get();
             return Ok(response.Models);
         }

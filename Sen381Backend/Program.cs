@@ -58,5 +58,7 @@ app.MapControllers();
 // Map SignalR hubs
 app.MapHub<TutoringSessionHub>("/tutoringsessionhub");
 app.MapHub<MessagingHub>("/messaginghub");
+app.MapHub<ForumChatHub>("/forumHub");
+
 
 app.Run();

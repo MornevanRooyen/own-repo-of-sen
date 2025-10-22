@@ -1,0 +1,404 @@
+﻿@using Frontend.Services
+@inherits LayoutComponentBase
+@inject NavigationManager Nav
+@inject AuthService AuthService
+@inject IJSRuntime _js
+
+@code {
+    public enum UserRole { Student, Tutor, Admin, Unknown }
+
+    private bool IsAdmin = false;
+    private UserRole Role = UserRole.Student;
+    private bool IsMenuOpen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckUserRole();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CheckUserRole();
+        }
+    }
+
+    private async Task CheckUserRole()
+    {
+        try
+        {
+            var currentUser = await AuthService.GetCurrentUserAsync();
+            Console.WriteLine($"[Navigation] Current user: {currentUser?.UserId}, Role: '{currentUser?.Role}'");
+
+            if (currentUser != null && !string.IsNullOrEmpty(currentUser.Role))
+            {
+                Role = currentUser.Role.ToLower() switch
+                {
+                    "admin" => UserRole.Admin,
+                    "tutor" => UserRole.Tutor,
+                    "student" => UserRole.Student,
+                    _ => UserRole.Unknown
+                };
+                IsAdmin = Role == UserRole.Admin;
+                Console.WriteLine($"[Navigation] Set Role: {Role}, IsAdmin: {IsAdmin}");
+            }
+            else
+            {
+                Console.WriteLine($"[Navigation] No user or role found");
+            }
+
+            StateHasChanged(); // Force re-render to update the UI
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Navigation] Error checking user role: {ex.Message}");
+        }
+    }
+
+    private void ToggleMenu() => IsMenuOpen = !IsMenuOpen;
+
+    private void NavigateTo(string path)
+    {
+        IsMenuOpen = false;
+        Nav.NavigateTo(path);
+    }
+
+    // Public method to refresh user role (can be called from other components)
+    public async Task RefreshUserRoleAsync()
+    {
+        await CheckUserRole();
+    }
+
+    // Temporary test method - remove in production
+    private async Task TestAdminRole()
+    {
+        try
+        {
+            // Toggle admin role for testing
+            if (Role == UserRole.Admin)
+            {
+                Role = UserRole.Student;
+                IsAdmin = false;
+                await _js.InvokeVoidAsync("sessionStorage.setItem", "role", "student");
+            }
+            else
+            {
+                Role = UserRole.Admin;
+                IsAdmin = true;
+                await _js.InvokeVoidAsync("sessionStorage.setItem", "role", "admin");
+            }
+            Console.WriteLine($"[Navigation] TEST: Toggled role to {Role}, IsAdmin: {IsAdmin}");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Navigation] TEST: Error toggling admin role: {ex.Message}");
+        }
+    }
+
+    private string AvatarGradientClass =>
+        Role switch
+        {
+            UserRole.Tutor => "ring-tutor",
+            UserRole.Admin => "ring-admin",
+            UserRole.Student => "ring-student",
+            _ => "ring-ai" // purple default
+        };
+}
+
+<nav class="cl-nav">
+    <div class="container nav-row">
+        <!-- Brand -->
+        <a class="brand" href="/landing">
+            <img class="brand-logo" src="images/logo.jpg" alt="CampusLearn logo" />
+            <h1 id="mainTitle">Campus<span>Learn</span></h1>
+        </a>
+
+
+        <!-- Right controls: avatar then burger (burger far right) -->
+        <div class="nav-actions">
+            <!-- round avatar (role ring) -->
+            <button class="user-avatar @AvatarGradientClass"
+                    title="My profile"
+                    @onclick="@(() => Nav.NavigateTo("/studentprofile"))">
+            </button>
+
+            <button class="hamburger @(IsMenuOpen ? "active" : "")"
+                    aria-label="Menu"
+                    aria-expanded="@IsMenuOpen.ToString().ToLowerInvariant()"
+                    type="button"
+                    @onclick="ToggleMenu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Backdrop (sits ABOVE the top bar) -->
+<button class="backdrop"
+        type="button"
+        data-open="@IsMenuOpen.ToString().ToLowerInvariant()"
+        @onclick="ToggleMenu"></button>
+
+<!-- Slide-out Drawer (z-index > nav) -->
+<aside class="drawer" data-open="@IsMenuOpen.ToString().ToLowerInvariant()">
+    <nav class="drawer-nav">
+        <a @onclick='() => NavigateTo("/dashboard")'>Dashboard</a>
+        <a @onclick='() => NavigateTo("/subjects")'>Subjects</a>
+        <a @onclick='() => NavigateTo("/peers")'>Peers</a>
+        <a @onclick='() => NavigateTo("/messages")'>Messages</a>
+
+        @if (IsAdmin)
+        {
+            <a @onclick='() => NavigateTo("/adminprofile")'>Admin</a>
+        }
+
+        @* Temporary test button - remove in production *@
+        <a @onclick='TestAdminRole' style="background: #ff6b6b; color: white;">TEST: Toggle Admin</a>
+
+        <a @onclick='() => NavigateTo("/")'>Logout</a>
+    </nav>
+</aside>
+
+<main class="page-body">
+    @Body
+</main>
+
+<style>
+    :root {
+        --nav-bg: #3f3f3f;
+        --ink: #2a2a2a;
+        --ink-on: #fff;
+        --ring: rgba(0,0,0,.15);
+        --radius: 1.25rem;
+        --container: min(1200px,92vw);
+        --nav-h: 88px;
+        /* role colours */
+        --stud-a: #2025B8;
+        --stud-b: #78D6FF;
+        --tutor-a: #E12929;
+        --tutor-b: #F3E17F;
+        --admin-a: #F4C430; /* warm yellow */
+        --admin-b: #FFD76A;
+        --ai-a: #B14CF4;
+        --ai-b: #FFA3F9;
+    }
+
+    .container {
+        width: var(--container);
+        margin-inline: auto;
+        padding-inline: clamp(12px,3vw,24px);
+    }
+
+    /* stick the bar */
+    .cl-nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--nav-bg);
+        border-bottom: 1px solid rgba(255,255,255,.12);
+        box-shadow: 0 8px 28px rgba(0,0,0,.25);
+    }
+
+    .nav-row {
+        height: var(--nav-h);
+        display: grid;
+        grid-template-columns: 1fr auto; /* brand | actions */
+        align-items: center;
+        gap: 16px;
+    }
+
+    #mainTitle {
+        margin: 0;
+        color: var(--ink-on);
+        font-weight: 900;
+        font-size: clamp(24px,3vw,32px);
+    }
+
+        #mainTitle span {
+            font-weight: 300;
+            color: var(--ink-on);
+        }
+
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: .8rem;
+    }
+
+    /* avatar ring per role + hover glow */
+    .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 0;
+        cursor: pointer;
+        position: relative;
+        background: radial-gradient(closest-side,#fff 71%,transparent 72%) center/100% 100% no-repeat;
+        box-shadow: 0 8px 18px rgba(0,0,0,.35);
+        transition: box-shadow .18s ease, transform .18s ease, width 0.2s, height 0.2s;
+    }
+
+        .user-avatar:hover {
+            box-shadow: 0 10px 24px rgba(0,0,0,.45);
+            transform: translateY(-1px);
+            width: 50px;
+            height: 50px;
+        }
+
+        .user-avatar::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            -webkit-mask: radial-gradient(farthest-side, transparent 70%, #000 71%);
+            mask: radial-gradient(farthest-side, transparent 70%, #000 71%);
+            background: conic-gradient(var(--ai-a), var(--ai-b), var(--ai-a));
+        }
+
+        .user-avatar.ring-student::before {
+            background: conic-gradient(var(--stud-a), var(--stud-b), var(--stud-a));
+        }
+
+        .user-avatar.ring-tutor::before {
+            background: conic-gradient(var(--tutor-a), var(--tutor-b), var(--tutor-a));
+        }
+
+        .user-avatar.ring-admin::before {
+            background: conic-gradient(var(--admin-a), var(--admin-b), var(--admin-a));
+        }
+
+        .user-avatar.ring-ai::before {
+            background: conic-gradient(var(--ai-a), var(--ai-b), var(--ai-a));
+        }
+
+    /* burger far right */
+    .hamburger {
+        background: none;
+        border: 0;
+        cursor: pointer;
+        width: 36px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        padding: 0;
+    }
+
+        .hamburger span {
+            width: 26px;
+            height: 3px;
+            background: #fff;
+            border-radius: 6px;
+            display: block;
+            transition: transform .25s, opacity .25s;
+        }
+
+            .hamburger span + span {
+                margin-top: 5px;
+            }
+
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+    /* Backdrop and Drawer sit well above the nav */
+    .backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.28);
+        border: 0;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .22s ease;
+        z-index: 1200;
+    }
+
+        .backdrop[data-open="true"] {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+    .drawer {
+        position: fixed;
+        inset: 0 0 0 auto;
+        width: min(78vw,360px);
+        translate: 100% 0;
+        transition: translate .22s ease;
+        background: #fff;
+        border-left: 1px solid var(--ring);
+        box-shadow: 0 12px 24px rgba(0,0,0,.30);
+        z-index: 1300;
+        padding: 18px 16px;
+    }
+
+        .drawer[data-open="true"] {
+            translate: 0 0;
+        }
+
+    .drawer-nav {
+        display: grid;
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+        .drawer-nav a {
+            display: block;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+            .drawer-nav a:hover {
+                background: rgba(0,0,0,.06);
+            }
+
+    /* allow content below nav */
+    .page-body {
+        display: block;
+    }
+
+    /* responsive */
+    @@media (max-width: 760px) {
+        .nav-row {
+            grid-template-columns: auto auto;
+        }
+    }
+    /* ===== BRAND LOGO & TITLE ===== */
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* space between logo and text */
+        text-decoration: none; /* remove underline */
+    }
+
+    .brand-logo {
+        width: clamp(38px, 6vw, 54px); /* scales smoothly with screen size */
+        height: auto;
+        display: block;
+        border-radius: 8px; /* optional: soft corners, can remove */
+    }
+
+    /* keep the title vertically centered with logo */
+    #mainTitle {
+        margin: 0;
+        color: var(--ink-on);
+        font-weight: 900;
+        font-size: clamp(22px, 3vw, 32px);
+        line-height: 1;
+    }
+
+</style>

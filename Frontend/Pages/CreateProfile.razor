@@ -1,785 +1,1474 @@
 ﻿@page "/create-profile"
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@using System.Net.Http.Json
 @using Sen381.Business.Models
-@using Sen381.Data_Access
-@inject SupaBaseAuthService SupabaseService
-@inject HttpClient Http
+@using Frontend.Services
+@inject Frontend.Services.AuthService AuthService
 @inject NavigationManager Nav
+@inject HttpClient Http
 @inject IJSRuntime JS
 
-<PageTitle>Create Profile | CampusLearn</PageTitle>
+<PageTitle>Create profile | CampusLearn</PageTitle>
 
-<!-- ===== Breadcrumb ===== -->
-<nav class="crumbs" aria-label="Breadcrumb">
-    <ol>
-        <li><a href="/">Home</a></li>
-        <li><a href="/dashboard">Dashboard</a></li>
-        <li aria-current="page">Create profile</li>
-    </ol>
-</nav>
+<div class="cp-scope">
+    <!-- header -->
+    <div class="cp-head">
+        <div class="cp-head-left">
+            <img class="cp-pfp @GetRolePfpClass(profileEdit.RoleString)"
+                 src="@(PreviewImageDataUrl ?? profileEdit.ProfilePicturePath ?? "https://placehold.co/160x160/png")"
+                 alt="Current profile picture" />
+            <div>
+                <h1 class="cp-title">Create your student profile</h1>
+                <p class="cp-sub">Tell us about your programme and year.</p>
+            </div>
+        </div>
 
-<!-- ===== Page Header ===== -->
-<header class="page-hd">
-    <div class="hd-left">
-        <img class="avatar-xl" src="@AvatarUrl" alt="Profile avatar" />
-        <div class="title-block">
-            <h1 class="title">Create your student profile</h1>
-            <div class="subtitle">Tell us about your programme and year.</div>
+        <div class="cp-head-right">
+            <label for="pfpUpload" class="cp-btn secondary">Change picture</label>
+            <InputFile id="pfpUpload" style="display:none" OnChange="OnImageSelected" />
         </div>
     </div>
 
-    <div class="hd-actions">
-        <label for="avatarFile" class="btn">Change picture</label>
-        <InputFile id="avatarFile" style="display:none" OnChange="HandleFileSelected" accept="image/*" />
-        @if (isUploading)
-        {
-            <span class="muted">Uploading…</span>
-        }
-        @if (!string.IsNullOrWhiteSpace(uploadError))
-        {
-            <span class="text-danger">@uploadError</span>
-        }
-    </div>
-</header>
+    <!-- tabs (aligned with StudentProfile) -->
+    <nav class="cp-tabs" aria-label="Edit sections">
+        <button class="tab @(activeTab == "profile" ? "active" : null)" @onclick='() => SetTab("profile")'>Profile</button>
+        <button class="tab @(activeTab == "tutor" ? "active" : null)" @onclick='() => SetTab("tutor")'>Tutor</button>
+        <button class="tab @(activeTab == "sessions" ? "active" : null)" @onclick='() => SetTab("sessions")'>Sessions</button>
+        <button class="tab @(activeTab == "settings" ? "active" : null)" @onclick='() => SetTab("settings")'>Settings</button>
+        <button class="tab @(activeTab == "schedule" ? "active" : null)" @onclick='() => SetTab("schedule")'>Schedule</button>
+        <button class="tab @(activeTab == "noodle" ? "active" : null)" @onclick='() => SetTab("noodle")'>Noodle</button>
+    </nav>
 
-<!-- ===== Tabs ===== -->
-<nav class="tabs" aria-label="Profile sections">
-    <button class="tab active" disabled>Profile</button>
-    <button class="tab" disabled title="Available after saving">Activity</button>
-    <button class="tab" disabled title="Available after saving">Enrolments</button>
-    <button class="tab" disabled title="Available after saving">Preferences</button>
-    <button class="tab" disabled title="Available after saving">Noodle</button>
-</nav>
-
-<main class="grid">
-    <EditForm Model="@Form" OnValidSubmit="@Save">
-        <DataAnnotationsValidator />
-        <ValidationSummary class="val-summary" />
-
-        <!-- ===== Left column ===== -->
-        <aside class="col-left">
-            <section id="details" class="card">
-                <h2 class="card-hd">Your details</h2>
-                <div class="props fields">
-                    <div class="field">
-                        <label>First name</label>
-                        <InputText class="input" @bind-Value="Form.FirstName" />
-                    </div>
-                    <div class="field">
-                        <label>Last name</label>
-                        <InputText class="input" @bind-Value="Form.LastName" />
-                    </div>
-                    <div class="field">
-                        <label>Email address</label>
-                        <InputText class="input" type="email" @bind-Value="Form.Email" />
-                    </div>
-                    <div class="field">
-                        <label>Phone</label>
-                        <InputText class="input" @bind-Value="Form.Phone" />
-                    </div>
-                    <div class="field">
-                        <label>City/town</label>
-                        <InputText class="input" @bind-Value="Form.City" />
-                    </div>
-                    <div class="field">
-                        <label>Country</label>
-                        <InputText class="input" @bind-Value="Form.Country" />
-                    </div>
-                    <div class="field">
-                        <label>Timezone</label>
-                        <InputText class="input" @bind-Value="Form.Timezone" placeholder="e.g., Africa/Johannesburg" />
-                    </div>
-                    <div class="field">
-                        <label>Website</label>
-                        <InputText class="input" @bind-Value="Form.Website" placeholder="https://…" />
-                    </div>
-                    <div class="field">
-                        <label>Programme</label>
-                        <InputText class="input" @bind-Value="Form.Program" placeholder="e.g., BComp" />
-                    </div>
-                    <div class="field">
-                        <label>Year of study</label>
-                        <InputText class="input" @bind-Value="Form.Year" placeholder="e.g., 2nd Year" />
-                    </div>
-                    <div class="field">
-                        <label>Student ID (optional)</label>
-                        <InputText class="input" @bind-Value="Form.StudentId" />
-                    </div>
-                </div>
-            </section>
-
-            <section class="card">
-                <h2 class="card-hd">Interests (optional)</h2>
-                <div class="subject-add">
-                    <InputText class="input" @bind-Value="NewInterest" placeholder="Add an interest (e.g., Web Dev)" />
-                    <button type="button" class="btn-cta" @onclick="AddInterest">Add</button>
-                </div>
-
-                @if (Form.Interests.Count > 0)
+    <!-- grid -->
+    <div class="cp-grid">
+        <!-- LEFT editor -->
+        <section class="cp-editor">
+            <div class="cp-block">
+                @if (activeTab == "profile")
                 {
-                    <ul class="chip-list">
-                        @foreach (var t in Form.Interests)
-                        {
-                            <li class="chip">
-                                <span class="chip-title">@t</span>
-                                <button class="chip-x" type="button" title="Remove" @onclick="() => RemoveInterest(t)">×</button>
-                            </li>
-                        }
-                    </ul>
+                    <div class="cp-block-hd">Your details</div>
+                    <div class="cp-block-body cp-fields">
+                        <!-- READ-ONLY -->
+                        <div class="f-row">
+                            <label>First name</label>
+                            <input @bind="profileEdit.FirstName" @bind:event="oninput" readonly title="Managed by campus identity" class="ro" />
+                        </div>
+                        <div class="f-row">
+                            <label>Last name</label>
+                            <input @bind="profileEdit.LastName" @bind:event="oninput" readonly title="Managed by campus identity" class="ro" />
+                        </div>
+
+                        <!-- About moved directly below Last name -->
+                        <div class="f-row">
+                            <label>About</label>
+                            <textarea @bind="profileEdit.About" @bind:event="oninput" rows="4" />
+                        </div>
+
+                        <div class="f-row">
+                            <label>Belgium Campus email</label>
+                            <input @bind="profileEdit.Email" @bind:event="oninput" readonly title="Managed by campus identity" class="ro" />
+                        </div>
+
+                        <!-- EDITABLE FIELDS -->
+                        <div class="f-row">
+                            <label>Phone</label>
+                            <input @bind="profileEdit.PhoneNum" @bind:event="oninput" />
+                        </div>
+
+                        <div class="f-row two">
+                            <div>
+                                <label>City/town</label>
+                                <input @bind="profileEdit.City" @bind:event="oninput" />
+                            </div>
+                            <div>
+                                <label>Country</label>
+                                <input @bind="profileEdit.Country" @bind:event="oninput" />
+                            </div>
+                        </div>
+
+                        <div class="f-row two">
+                            <div>
+                                <label>Programme</label>
+                                <input @bind="profileEdit.Program" @bind:event="oninput" />
+                            </div>
+                            <div>
+                                <label>Year</label>
+                                <input @bind="profileEdit.Year" @bind:event="oninput" readonly title="Year is managed by registry" class="ro" />
+                            </div>
+                        </div>
+
+                        <div class="f-row">
+                            <label>Timezone</label>
+                            <input @bind="profileEdit.Timezone" @bind:event="oninput" />
+                        </div>
+
+                        <div class="f-row">
+                            <label>Website</label>
+                            <input @bind="profileEdit.Website" @bind:event="oninput" />
+                        </div>
+
+                        <div class="f-row">
+                            <label>Interests (comma separated)</label>
+                            <input @bind="profileEdit.Interests" @bind:event="oninput" placeholder="AI, C#, UI Design" />
+                        </div>
+                    </div>
                 }
-                else
+                else if (activeTab == "tutor")
                 {
-                    <p class="muted">No interests added yet.</p>
+                    <div class="cp-block-hd">Tutor</div>
+                    <div class="cp-block-body">
+                        <p class="muted">Manage tutor subjects from the Tutor application.</p>
+                        <button class="cp-btn" @onclick='() => Nav.NavigateTo("/become-tutor")'>Open Tutor application</button>
+                    </div>
                 }
-            </section>
-
-            <section class="card">
-                <h2 class="card-hd">Contact preference</h2>
-                <div class="field">
-                    <InputSelect class="input" @bind-Value="Form.ContactPreference">
-                        <option value="">Select…</option>
-                        <option>Email</option>
-                        <option>Phone</option>
-                        <option>Either</option>
-                    </InputSelect>
-                </div>
-            </section>
-        </aside>
-
-        <!-- ===== Right column ===== -->
-        <section class="col-right">
-            <section class="card">
-                <h2 class="card-hd">About</h2>
-                <div class="field">
-                    <InputTextArea class="textarea" rows="5" @bind-Value="Form.About"
-                                   placeholder="A short description that appears on your profile…" />
-                </div>
-            </section>
-
-            <section class="card">
-                <h2 class="card-hd">Subjects</h2>
-                <div class="subject-add">
-                    <InputText class="input" @bind-Value="NewSubject" placeholder="Add subject code (e.g., BUM281)" />
-                    <button type="button" class="btn-cta" @onclick="AddSubject">Add subject</button>
-                </div>
-
-                @if (Form.Subjects.Count > 0)
+                else if (activeTab == "sessions")
                 {
-                    <ul class="chip-list">
-                        @foreach (var s in Form.Subjects)
-                        {
-                            <li class="chip">
-                                <span class="chip-title">@s</span>
-                                <button class="chip-x" type="button" title="Remove" @onclick="() => RemoveSubject(s)">×</button>
-                            </li>
-                        }
-                    </ul>
+                    <div class="cp-block-hd">Sessions</div>
+                    <div class="cp-block-body muted">Sessions are managed by bookings. This tab is preview-only here.</div>
                 }
-                else
+                else if (activeTab == "settings")
                 {
-                    <p class="muted">No subjects added yet.</p>
+                    <div class="cp-block-hd">Settings</div>
+                    <div class="cp-block-body">
+                        <label class="check">
+                            <input type="checkbox" checked="@isCalendarPublic" @onchange="OnCalendarVisibilityChanged" />
+                            Make my schedule public
+                        </label>
+                        <small class="muted">Controls whether your Schedule tab is visible to other users.</small>
+                    </div>
                 }
-            </section>
+                else if (activeTab == "schedule")
+                {
+                    <div class="cp-block-hd">Schedule</div>
+                    <div class="cp-block-body muted">Edit your events on the Dashboard calendar. This is a preview.</div>
+                }
+                else if (activeTab == "noodle")
+                {
+                    <div class="cp-block-hd">Noodle</div>
+                    <div class="cp-block-body muted">Noodle settings are preview-only here.</div>
+                }
+            </div>
 
-            <section class="card">
-                <h2 class="card-hd">Actions</h2>
-                <div class="actions">
-                    <button class="btn-cta" type="submit">Save profile</button>
-                    <NavLink class="btn-ghost" href="/dashboard">Skip for now</NavLink>
-                </div>
-            </section>
+            <div class="cp-actions">
+                <button class="cp-btn save" disabled="@isSaving" @onclick="SaveAsync">
+                    @(isSaving ? "Saving…" : "Save changes")
+                </button>
+                @if (saveMsg is not null)
+                {
+                    <span class="save-msg">@saveMsg</span>
+                }
+            </div>
         </section>
-    </EditForm>
-</main>
 
-<!-- === KEEP ALL STYLING BELOW === -->
+        <!-- RIGHT live preview -->
+        <aside class="cp-preview">
+            @if (activeTab == "profile")
+            {
+                <div class="sp-pane">
+                    <div class="sp-pane-hd">
+                        <h1 class="sp-name">@($"{profileEdit.FirstName} {profileEdit.LastName}".Trim())</h1>
+                        <div class="sp-role-row">
+                            <div class="sp-role-badge @GetRoleBadgeClass(profileEdit.RoleString)">@(" " + FormatRole(profileEdit.RoleString) + " ")</div>
+                        </div>
+                        <button class="sp-chat-btn" disabled title="Preview">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M4 5h16v10H8l-4 4V5z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="10" cy="10" r="1" fill="currentColor" />
+                                <circle cx="14" cy="10" r="1" fill="currentColor" />
+                                <circle cx="18" cy="10" r="1" fill="currentColor" />
+                            </svg>
+                        </button>
+                        <img class="sp-pfp @GetRolePfpClass(profileEdit.RoleString)"
+                             src="@(PreviewImageDataUrl ?? profileEdit.ProfilePicturePath ?? "https://placehold.co/160x160/png")"
+                             alt="Preview photo" />
+                    </div>
+
+                    <div class="sp-blocks">
+                        <div class="sp-block">
+                            <div class="sp-block-hd">About</div>
+                            <div class="sp-block-body">
+                                <p class="about">@(!string.IsNullOrWhiteSpace(profileEdit.About) ? profileEdit.About : "No description provided.")</p>
+                            </div>
+                        </div>
+
+                        <div class="sp-block">
+                            <div class="sp-block-hd">Connections</div>
+                            <div class="sp-block-body">
+                                <div class="sp-counters">
+                                    <div class="sp-counter"><div class="sp-counter-num">@followersCount</div><div class="sp-counter-lbl">followers</div></div>
+                                    <div class="sp-counter"><div class="sp-counter-num">@followingCount</div><div class="sp-counter-lbl">following</div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sp-block">
+                            <div class="sp-block-hd">Contact</div>
+                            <div class="sp-block-body">
+                                <dl class="contact-list sp-contact">
+                                    <div class="contact-item"><dt>Email</dt><dd>@(profileEdit.Email ?? "—")</dd></div>
+                                    <div class="contact-item"><dt>Phone</dt><dd>@(string.IsNullOrWhiteSpace(profileEdit.PhoneNum) ? "—" : profileEdit.PhoneNum)</dd></div>
+                                    <div class="contact-item"><dt>Website</dt><dd>@(string.IsNullOrWhiteSpace(profileEdit.Website) ? "—" : profileEdit.Website)</dd></div>
+                                </dl>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(profileEdit.Interests))
+                        {
+                            <div class="sp-block">
+                                <div class="sp-block-hd">Interests</div>
+                                <div class="sp-block-body">
+                                    <div class="tags">
+                                        @foreach (var tag in profileEdit.Interests.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()))
+                                        {
+                                            <span class="tag">@tag</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (AdditionalInfoPairs.Count > 0)
+                        {
+                            <div class="sp-block">
+                                <div class="sp-block-hd">Additional Info</div>
+                                <div class="sp-block-body">
+                                    <dl class="sp-ai">
+                                        @foreach (var kv in AdditionalInfoPairs)
+                                        {
+                                            <div class="ai-item">
+                                                <dt>@kv.Label</dt>
+                                                <dd>@kv.Value</dd>
+                                            </div>
+                                        }
+                                    </dl>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (activeTab == "tutor")
+            {
+                <div class="sp-pane">
+                    <div class="sp-pane-hd"><h1 class="sp-name">Tutor</h1></div>
+                    <div class="sp-blocks">
+                        @if (tutorSubjects?.Count > 0)
+                        {
+                            <div class="sp-block">
+                                <div class="sp-block-hd">Your subjects</div>
+                                <div class="sp-block-body">
+                                    <ul class="tutor-subj">
+                                        @foreach (var s in tutorSubjects)
+                                        {
+                                            <li><strong>@s.SubjectCode</strong> — @s.Name (@s.Year)</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="sp-block">
+                                <div class="sp-block-body muted">No tutor subjects yet. Use the button on the left to apply.</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (activeTab == "sessions")
+            {
+                <div class="sp-pane">
+                    <div class="sp-pane-hd"><h1 class="sp-name">Sessions</h1></div>
+                    <div class="sp-blocks">
+                        @if (sessions is not null && sessions.Count > 0)
+                        {
+                            <div class="sp-block">
+                                <div class="sp-block-body">
+                                    <ul class="sess-list">
+                                        @foreach (var s in sessions.OrderByDescending(x => x.SessionDate))
+                                        {
+                                            <li class="sess-li">
+                                                <div class="sess-title">@s.Title</div>
+                                                <div class="sess-meta">
+                                                    <span class="badge @StatusBadgeClass(s.Status)">@s.Status</span>
+                                                    <span>@s.SessionDate.ToString("yyyy-MM-dd HH:mm")</span>
+                                                    <span>@s.DurationMinutes mins</span>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="sp-block">
+                                <div class="sp-block-body muted">No sessions to show yet.</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (activeTab == "settings")
+            {
+                <div class="sp-pane">
+                    <div class="sp-pane-hd"><h1 class="sp-name">Settings</h1></div>
+                    <div class="sp-blocks">
+                        <div class="sp-block">
+                            <div class="sp-block-body">
+                                <div>Schedule visibility: <strong>@(isCalendarPublic ? "Public" : "Private")</strong></div>
+                                <small class="muted">Others @((isCalendarPublic ? "can" : "cannot")) see your Schedule tab.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (activeTab == "schedule")
+            {
+                <div class="sp-pane">
+                    <div class="sp-pane-hd"><h1 class="sp-name">Schedule (Preview)</h1></div>
+                    <div class="sp-blocks">
+                        <div class="sp-block">
+                            <div class="sp-block-body">
+                                <div class="sched-grid">
+                                    <div class="sched-row sched-head">
+                                        <div></div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
+                                    </div>
+                                    @for (var h = 8; h <= 16; h += 2)
+                                    {
+                                        <div class="sched-row">
+                                            <div class="sched-time">@h:00</div>
+                                            <div class="sched-cell">@(h == 10 ? RenderBusy("Study") : null)</div>
+                                            <div class="sched-cell">@((h == 12 || h == 14) ? RenderBusy("Lab") : null)</div>
+                                            <div class="sched-cell">@((h == 16) ? RenderBusy("Tutoring") : null)</div>
+                                            <div class="sched-cell"></div>
+                                            <div class="sched-cell"></div>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="muted" style="margin-top:8px">Preview only. Edit events on Dashboard.</div>
+                                @if (!isCalendarPublic)
+                                {
+                                    <div class="muted">Your schedule is currently <strong>private</strong> to others.</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (activeTab == "noodle")
+            {
+                <div class="sp-pane">
+                    <div class="sp-pane-hd"><h1 class="sp-name">Noodle</h1></div>
+                    <div class="sp-blocks">
+                        <div class="sp-block">
+                            <div class="sp-block-body">
+                                <div class="noodle-stats">
+                                    <div><strong>Energy:</strong> 72%</div>
+                                    <div><strong>Mood:</strong> Happy</div>
+                                    <div><strong>Cleanliness:</strong> Good</div>
+                                </div>
+                                <small class="muted">Preview only here. Actions live on your profile page.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="sp-pane placeholder-center"><div class="muted">Preview for “@activeTab”</div></div>
+            }
+        </aside>
+    </div>
+</div>
+
+<!-- CROP MODAL (square) -->
+<div id="cropperModal" class="cp-cropper hidden">
+    <div class="cp-cropper-card">
+        <div class="cp-cropper-hd">
+            <div class="cp-cropper-title">Crop your photo</div>
+            <button id="cropperClose" class="cp-x">✕</button>
+        </div>
+
+        <div class="cp-cropper-body">
+            <div class="crop-stage">
+                <div class="crop-frame">
+                    <img id="cropImg" alt="Crop" draggable="false" />
+                </div>
+                <div class="crop-mask"></div>
+            </div>
+            <div class="crop-controls">
+                <label>Zoom</label>
+                <input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1" />
+                <small class="muted">Drag the image to adjust position</small>
+            </div>
+        </div>
+
+        <div class="cp-cropper-actions">
+            <button id="cropperCancel" class="cp-btn secondary">Cancel</button>
+            <button id="cropperApply" class="cp-btn save">Crop &amp; use</button>
+        </div>
+    </div>
+</div>
+
 <style>
-    /* ===== Tokens (same as profile) ===== */ :root {
+    :root {
         --bg: #f5f7fb;
         --panel: #fff;
         --ink: #2D3034;
-        --muted: color-mix(in oklab, var(--ink) 55%, white);
-        --ring: color-mix(in oklab, var(--ink) 12%, white);
-        --primary: #1B998B;
-        --accent: #3a7bdb;
+        --muted: color-mix(in oklab,var(--ink) 55%,#fff);
+        --ring: color-mix(in oklab,var(--ink) 12%,#fff);
         --chip: #DBE4EE;
-        --radius: 14px;
         --shadow: 0 6px 18px rgba(0,0,0,.06);
-        --container: min(1150px,92vw);
-        
-        /* Add smooth transitions for all elements */
-        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    /* Dark mode overrides */
-    .dark-mode {
-        --bg: #1a1a1a;
-        --panel: #2d2d2d;
-        --ink: #ffffff;
-        --muted: #b3b3b3;
-        --ring: #404040;
-        --primary: #1B998B;
+        --radius: 16px;
         --accent: #3a7bdb;
-        --chip: #404040;
-        --shadow: 0 6px 18px rgba(0,0,0,.3);
+        --success: #10B981;
+        --student-blue: #1D4ED8;
+        --tutor-orange: #F59E0B;
+        --admin-yellow: #FACC15;
     }
 
-    * {
-        box-sizing: border-box
-    }
-
-    html, body {
-        height: 100%
-    }
-
-    body {
-        margin: 0;
-        background: var(--bg);
+    .cp-scope {
+        max-width: min(1200px,92vw);
+        margin: 14px auto 36px;
         color: var(--ink);
-        font-family: system-ui,-apple-system,"Segoe UI",Inter,Roboto,Arial,sans-serif;
-        line-height: 1.45;
-        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    a {
-        color: var(--accent);
-        text-decoration: none
+    .muted {
+        color: var(--muted);
     }
 
-        a:hover {
-            text-decoration: underline
-        }
-    /* ===== Shell / Shared with profile ===== */
-
-    .crumbs {
-        width: var(--container);
-        margin: 10px auto 0;
-        font-size: .92rem
-    }
-
-        .crumbs ol {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap
-        }
-
-        .crumbs li::after {
-            content: "/";
-            margin: 0 6px;
-            color: var(--muted)
-        }
-
-        .crumbs li:last-child::after {
-            content: ""
-        }
-
-        .crumbs [aria-current="page"] {
-            color: var(--muted);
-            font-weight: 700
-        }
-
-    .page-hd {
-        width: var(--container);
-        margin: 8px auto 10px;
+    /* header */
+    .cp-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         background: var(--panel);
         border: 1px solid var(--ring);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .hd-left {
-        display: flex;
-        align-items: center;
-        gap: 14px
-    }
-
-    .avatar-xl {
-        width: 84px;
-        height: 84px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #cfd5da;
-        flex: 0 0 84px;
-        border: 2px solid var(--ring);
-    }
-
-    .title {
-        margin: 0;
-        font-weight: 800;
-        letter-spacing: .2px;
-        font-size: clamp(20px,3.2vw,28px)
-    }
-
-    .subtitle {
-        margin-top: 2px;
-        color: var(--muted);
-        font-weight: 700
-    }
-
-    .hd-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap
-    }
-
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 10px 14px;
-        border-radius: 10px;
-        border: 1px solid var(--ring);
-        background: #eef3f8;
-        color: #122;
-        font-weight: 800;
+        border-radius: 22px;
+        padding: 16px 18px;
         box-shadow: var(--shadow)
     }
 
-        .btn.primary {
-            background: var(--primary);
-            color: #fff;
-            border-color: transparent
+    .cp-head-left {
+        display: flex;
+        gap: 16px;
+        align-items: center
+    }
+
+    .cp-title {
+        margin: 0;
+        font-size: clamp(20px,2.4vw,28px);
+        font-weight: 900
+    }
+
+    .cp-sub {
+        margin: 4px 0 0
+    }
+
+    .cp-pfp {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #d9d9d9;
+        border: 2px solid #BFC7D1
+    }
+
+        .cp-pfp.pfp-student {
+            border-color: var(--student-blue)
         }
 
-        .btn:hover {
-            filter: brightness(.98);
-            text-decoration: none
+        .cp-pfp.pfp-tutor {
+            border-color: var(--tutor-orange)
         }
 
-    .tabs {
-        width: var(--container);
-        margin: 0 auto 10px;
+        .cp-pfp.pfp-admin {
+            border-color: var(--admin-yellow)
+        }
+
+    .cp-head-right .cp-btn {
+        cursor: pointer
+    }
+
+    /* tabs */
+    .cp-tabs {
         display: flex;
         gap: 8px;
-        flex-wrap: wrap
+        margin: 12px 0
     }
 
-    .tab {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 36px;
-        padding: 0 14px;
-        border-radius: 999px;
-        font-weight: 800;
-        background: #e8eef7;
-        color: #1b2b3b;
-        border: 1px solid var(--ring);
-        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    }
-
-        .tab.active {
-            background: #d9e6ff;
-            color: #14315f;
-            border-color: #c7d7fb;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        .cp-tabs .tab {
+            height: 36px;
+            padding: 0 14px;
+            border-radius: 999px;
+            background: #e8eef7;
+            border: 1px solid var(--ring);
+            font-weight: 800
         }
 
-        .tab[aria-disabled="true"] {
+            .cp-tabs .tab.active {
+                background: #d9e6ff;
+                border-color: #c7d7fb;
+                color: #14315f
+            }
+
+    /* grid */
+    .cp-grid {
+        display: grid;
+        grid-template-columns: 520px 1fr;
+        gap: 18px;
+        align-items: start
+    }
+
+    @@media (max-width:1020px) {
+        .cp-grid {
+            grid-template-columns: 1fr
+        }
+    }
+
+    /* editor */
+    .cp-editor {
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: 22px;
+        padding: 16px;
+        box-shadow: var(--shadow)
+    }
+
+    .cp-block {
+        background: #f1f3f6;
+        border: 1px solid #e5e9f0;
+        border-radius: 18px;
+        padding: 12px
+    }
+
+        .cp-block + .cp-block {
+            margin-top: 12px
+        }
+
+    .cp-block-hd {
+        font-weight: 900;
+        margin: 6px 8px 10px
+    }
+
+    .cp-block-body {
+        background: #fff;
+        border: 1px solid #e9edf5;
+        border-radius: 12px;
+        padding: 12px
+    }
+
+    /* fields */
+    .cp-fields {
+        display: block
+    }
+
+        .cp-fields .f-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+            min-width: 0
+        }
+
+            .cp-fields .f-row.two {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px
+            }
+
+                .cp-fields .f-row.two > div {
+                    min-width: 0
+                }
+
+        .cp-fields label {
+            font-weight: 800;
+            color: #6a717c
+        }
+
+        .cp-fields input, .cp-fields textarea {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            border: 1.5px solid #d7dee8;
+            border-radius: 999px;
+            padding: 12px 14px;
+            background: #fff;
+            font-weight: 700
+        }
+
+        .cp-fields textarea {
+            border-radius: 14px
+        }
+
+        .cp-fields input.ro {
+            background: #f6f7fa;
+            cursor: not-allowed
+        }
+
+    .check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700
+    }
+
+    /* actions */
+    .cp-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 14px
+    }
+
+    .cp-btn {
+        height: 40px;
+        padding: 0 16px;
+        border-radius: 12px;
+        border: 1px solid var(--ring);
+        background: #eef3f8;
+        font-weight: 800;
+        cursor: pointer
+    }
+
+        .cp-btn.secondary {
+            background: #eef3f8
+        }
+
+        .cp-btn.save {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+            height: 48px;
+            padding: 0 22px;
+            border-radius: 16px
+        }
+
+        .cp-btn[disabled] {
             opacity: .6;
             cursor: not-allowed
         }
 
-    .grid {
-        width: var(--container);
-        margin: 0 auto 24px;
-        display: grid;
-        grid-template-columns: 320px 1fr;
-        gap: clamp(14px,3vw,22px)
+    .save-msg {
+        font-weight: 700;
+        color: #6a717c
     }
 
-    .card {
+    /* preview pane */
+    .cp-preview {
+        position: relative
+    }
+
+    .sp-pane {
+        position: relative;
         background: var(--panel);
         border: 1px solid var(--ring);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 14px
+        border-radius: 28px;
+        box-shadow: 0 10px 28px rgba(0,0,0,.06);
+        padding: 28px 22px 26px
     }
 
-    .card-hd {
-        margin: 0 0 8px;
+    .sp-pane-hd {
+        text-align: center;
+        position: relative
+    }
+
+    .sp-name {
+        margin: 10px 0 0;
         font-weight: 900;
-        font-size: 1.05rem;
-        letter-spacing: .2px
+        font-size: clamp(22px,2.6vw,30px)
     }
-    /* ===== Form styling to match profile visual ===== */
 
-    .props.fields {
+    .sp-role-row {
+        margin-top: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px
+    }
+
+    .sp-role-badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 800;
+        color: #6a717c;
+        background: #f3f6fb;
+        border: 1px solid #e3e8f0
+    }
+
+        .sp-role-badge.badge-student {
+            border-color: color-mix(in oklab,var(--student-blue) 35%,#fff)
+        }
+
+        .sp-role-badge.badge-tutor {
+            border-color: color-mix(in oklab,var(--tutor-orange) 35%,#fff)
+        }
+
+        .sp-role-badge.badge-admin {
+            border-color: color-mix(in oklab,var(--admin-yellow) 35%,#fff)
+        }
+
+    .sp-chat-btn {
+        position: absolute;
+        right: 14px;
+        top: 14px;
+        width: 56px;
+        height: 56px;
+        border-radius: 999px;
+        border: 2px solid #5aa0ff;
+        background: #fff;
+        color: #7c8aa0;
         display: grid;
-        gap: 12px
+        place-items: center
     }
 
-    .field label {
-        display: block;
+    .sp-pfp {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #d9d9d9;
+        border: 2px solid #BFC7D1;
+        margin-top: 8px
+    }
+
+        .sp-pfp.pfp-student {
+            border-color: var(--student-blue)
+        }
+
+        .sp-pfp.pfp-tutor {
+            border-color: var(--tutor-orange)
+        }
+
+        .sp-pfp.pfp-admin {
+            border-color: var(--admin-yellow)
+        }
+
+    .sp-blocks {
+        display: grid;
+        gap: 18px;
+        margin-top: 18px
+    }
+
+    .sp-block {
+        background: #f1f3f6;
+        border: 1px solid #e5e9f0;
+        border-radius: 22px;
+        padding: 16px
+    }
+
+    .sp-block-hd {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #6a717c;
+        margin-bottom: 10px
+    }
+
+    .sp-block-body {
+        padding: 4px;
+        background: #fff;
+        border: 1px solid #e9edf5;
+        border-radius: 12px
+    }
+
+    .sp-counters {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(140px,1fr));
+        gap: 16px
+    }
+
+    .sp-counter {
+        background: #fff;
+        border: 1.5px solid #D7DEE8;
+        border-radius: 18px;
+        padding: 18px 12px;
+        text-align: center;
+        box-shadow: 0 2px 0 rgba(0,0,0,.03) inset
+    }
+
+    .sp-counter-num {
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: #1B998B
+    }
+
+    .sp-counter-lbl {
+        margin-top: 4px;
+        font-size: .8rem;
+        color: #7f8a98;
+        font-weight: 700
+    }
+
+    .sp-contact .contact-item {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 8px
+    }
+
+    .sp-contact dt {
+        color: #6a717c;
+        font-weight: 800
+    }
+
+    .sp-contact dd {
+        font-weight: 700;
+        color: var(--ink);
+        margin: 0
+    }
+
+    .tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap
+    }
+
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: var(--chip);
+        border: 1px solid var(--ring);
+        font-weight: 800;
+        color: #203040
+    }
+
+    /* Additional Info list */
+    .sp-ai .ai-item {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 8px;
+        padding: 8px 10px
+    }
+
+        .sp-ai .ai-item + .ai-item {
+            border-top: 1px dashed #e6eaf2
+        }
+
+    .sp-ai dt {
+        font-weight: 800;
+        color: #6a717c
+    }
+
+    .sp-ai dd {
+        margin: 0;
+        font-weight: 700
+    }
+
+    .placeholder-center {
+        display: grid;
+        place-items: center;
+        min-height: 240px
+    }
+
+    .prefs {
+        margin: 0;
+        padding-left: 18px
+    }
+
+    .pref-li {
+        font-weight: 700;
+        margin: 6px 0
+    }
+
+    /* sessions preview */
+    .sess-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 8px
+    }
+
+    .sess-li {
+        padding: 10px 12px;
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        background: #fff
+    }
+
+    .sess-title {
         font-weight: 800;
         margin-bottom: 6px
     }
 
-    .input {
-        width: 100%;
-        height: 38px;
-        border: 0;
-        border-radius: 999px;
-        background: #fff;
-        padding: 0 14px;
-        outline: none;
-        box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
-        font: inherit;
-        color: var(--ink);
-        transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .input:focus {
-            box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--ink) 16%, white), 0 0 0 2px color-mix(in oklab, var(--ink) 8%, white)
-        }
-
-    .textarea {
-        width: 100%;
-        min-height: 120px;
-        border: 0;
-        border-radius: 12px;
-        background: #fff;
-        padding: 10px 12px;
-        outline: none;
-        box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
-        font: inherit;
-        color: var(--ink);
-        resize: vertical;
-    }
-
-    .val-summary {
-        margin: 8px 0 0;
-        color: #b00020;
-        font-weight: 700
-    }
-
-    .validation-message {
-        color: #b00020;
-        font-size: .9rem;
-        margin-top: 4px
-    }
-
-    .text-danger { color: #b00020; font-weight: 700 }
-
-    .subject-add {
+    .sess-meta {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
-        align-items: center
+        color: #526070;
+        font-weight: 700
     }
 
-    .chip-list {
-        list-style: none;
-        margin: 12px 0 0;
-        padding: 0;
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap
-    }
-
-    .chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: var(--chip);
-        border: 1px solid var(--ring);
+    .badge {
+        padding: 2px 8px;
         border-radius: 999px;
-        padding: 6px 10px;
-        box-shadow: var(--shadow)
+        font-weight: 800;
+        border: 1px solid var(--ring)
     }
 
-    .chip-title {
-        font-weight: 800
+        .badge.pending {
+            background: #fff7e6
+        }
+
+        .badge.confirmed {
+            background: #e6fff1
+        }
+
+        .badge.completed {
+            background: #eef3ff
+        }
+
+        .badge.cancelled {
+            background: #ffeef0
+        }
+
+    /* schedule preview */
+    .sched-grid {
+        width: 100%;
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        overflow: hidden
     }
 
-    .chip-x {
-        border: 0;
-        background: transparent;
-        font-size: 18px;
-        line-height: 1;
-        cursor: pointer;
-        color: #333
+    .sched-row {
+        display: grid;
+        grid-template-columns: 70px repeat(5, 1fr);
+        border-top: 1px solid #eef1f6
     }
 
-    /* ========== Dark Mode Styles ========== */
-    .dark-mode .page-hd {
-        background: var(--panel);
-        border-color: var(--ring);
-        color: var(--ink);
+        .sched-row:first-child {
+            border-top: 0
+        }
+
+    .sched-head {
+        background: #f8faff;
+        font-weight: 800;
+        color: #5a6472
     }
 
-    .dark-mode .tab {
-        background: var(--mist);
-        color: var(--ink);
-        border-color: var(--ring);
+        .sched-head > div {
+            padding: 8px 10px;
+            border-right: 1px solid #eef1f6
+        }
+
+    .sched-time {
+        padding: 8px 10px;
+        font-weight: 800;
+        color: #5a6472;
+        background: #fafbfe;
+        border-right: 1px solid #eef1f6
     }
 
-    .dark-mode .tab.active {
-        background: color-mix(in oklab, var(--accent) 20%, var(--panel));
-        color: var(--ink);
-        border-color: var(--accent);
+    .sched-cell {
+        min-height: 42px;
+        position: relative;
+        border-right: 1px solid #eef1f6
     }
 
-    .dark-mode .input {
-        background: var(--panel);
-        color: var(--ink);
-        box-shadow: inset 0 0 0 1px var(--ring);
+        .sched-cell:last-child, .sched-head > div:last-child {
+            border-right: 0
+        }
+
+    .busy {
+        position: absolute;
+        inset: 6px;
+        border-radius: 10px;
+        background: linear-gradient(135deg,#e9efff,#d9e6ff);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        color: #23324a;
+        border: 1px solid #cfe0ff
     }
 
-    .dark-mode .input:focus {
-        box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 2px color-mix(in oklab, var(--accent) 20%, transparent);
+    /* noodle */
+    .noodle-stats {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 10px
     }
 
-    .dark-mode .textarea {
-        background: var(--panel);
-        color: var(--ink);
-        border-color: var(--ring);
+    /* CROP MODAL */
+    .cp-cropper.hidden {
+        display: none
     }
 
-    .dark-mode .btn {
-        background: var(--mist);
-        color: var(--ink);
-        border-color: var(--ring);
+    .cp-cropper {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0,0,0,.38);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px
     }
 
-    .dark-mode .btn.primary {
-        background: var(--primary);
-        color: #fff;
+    .cp-cropper-card {
+        width: min(680px,92vw);
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid var(--ring);
+        box-shadow: 0 20px 60px rgba(0,0,0,.18);
+        overflow: hidden
     }
 
-    .dark-mode .field label {
-        color: var(--ink);
+    .cp-cropper-hd {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--ring)
     }
 
-    .dark-mode .muted {
-        color: var(--muted);
+    .cp-cropper-title {
+        font-weight: 900
+    }
+
+    .cp-x {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid var(--ring);
+        background: #f4f6f8
+    }
+
+    .cp-cropper-body {
+        padding: 14px;
+        display: grid;
+        gap: 12px
+    }
+
+    .crop-stage {
+        position: relative
+    }
+
+    .crop-frame {
+        width: 340px;
+        height: 340px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px;
+        background: #f3f6fb;
+        border: 1px solid #e6eaf1
+    }
+
+        .crop-frame img {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%) scale(1);
+            user-select: none;
+            pointer-events: auto;
+            cursor: grab
+        }
+
+            .crop-frame img.dragging {
+                cursor: grabbing
+            }
+
+    .crop-mask {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        border-radius: 16px;
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,.9),0 0 0 9999px rgba(0,0,0,.25)
+    }
+
+    .crop-controls {
+        display: grid;
+        gap: 8px;
+        justify-items: center
+    }
+
+    .cp-cropper-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 12px 14px;
+        border-top: 1px solid var(--ring)
     }
 </style>
 
+<script>
+    /* minimal vanilla JS square cropper (unchanged) */
+    (function () {
+      const modal = document.getElementById('cropperModal');
+      const img = document.getElementById('cropImg');
+      const zoom = document.getElementById('cropZoom');
+      const btnClose = document.getElementById('cropperClose');
+      const btnCancel = document.getElementById('cropperCancel');
+      const btnApply = document.getElementById('cropperApply');
+      const FRAME = 340;
+      let compRef = null;
+
+      let natW=0,natH=0,baseScale=1,zoomScale=1,offsetX=0,offsetY=0,dragging=false,lastX=0,lastY=0;
+
+      function fitScale(){ baseScale = FRAME / Math.min(natW, natH); }
+      function applyTransform(){
+        const s = baseScale * zoomScale;
+        img.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${s})`;
+      }
+
+      function pointerDown(e){ dragging=true; img.classList.add('dragging'); const p=(e.touches&&e.touches[0])||e; lastX=p.clientX; lastY=p.clientY; e.preventDefault(); }
+      function pointerMove(e){ if(!dragging) return; const p=(e.touches&&e.touches[0])||e; const dx=p.clientX-lastX, dy=p.clientY-lastY; offsetX+=dx; offsetY+=dy; lastX=p.clientX; lastY=p.clientY; applyTransform(); e.preventDefault(); }
+      function pointerUp(){ dragging=false; img.classList.remove('dragging'); }
+
+      function cropToCanvas(){
+        const c=document.createElement('canvas'); c.width=FRAME; c.height=FRAME; const ctx=c.getContext('2d');
+        const disp=baseScale*zoomScale;
+        const imgLeft=(FRAME/2)-(natW*disp)/2+offsetX, imgTop=(FRAME/2)-(natH*disp)/2+offsetY;
+        let sx=(0-imgLeft)/disp, sy=(0-imgTop)/disp, sw=FRAME/disp, sh=FRAME/disp;
+        sx=Math.max(0, Math.min(natW - sw, sx)); sy=Math.max(0, Math.min(natH - sh, sy));
+        ctx.imageSmoothingQuality='high'; ctx.drawImage(img, sx, sy, sw, sh, 0, 0, FRAME, FRAME);
+        return c.toDataURL('image/png');
+      }
+
+      window.openSquareCropper = function (dataUrl, dotNetComponentRef) {
+        compRef = dotNetComponentRef;
+        zoomScale=1; offsetX=0; offsetY=0; zoom.value="1";
+        img.onload = function () { natW=img.naturalWidth; natH=img.naturalHeight; fitScale(); applyTransform(); };
+        img.src = dataUrl;
+        modal.classList.remove('hidden');
+
+        img.addEventListener('mousedown', pointerDown); document.addEventListener('mousemove', pointerMove); document.addEventListener('mouseup', pointerUp);
+        img.addEventListener('touchstart', pointerDown, { passive:false }); document.addEventListener('touchmove', pointerMove, { passive:false }); document.addEventListener('touchend', pointerUp);
+        zoom.oninput = function(){ zoomScale=parseFloat(zoom.value||"1"); applyTransform(); };
+
+        function close(){ cleanup(); modal.classList.add('hidden'); }
+        btnClose.onclick = btnCancel.onclick = close;
+        btnApply.onclick = function(){ const out=cropToCanvas(); if(compRef) compRef.invokeMethodAsync('OnImageCropped', out); close(); };
+      };
+
+      function cleanup(){
+        img.removeEventListener('mousedown', pointerDown); document.removeEventListener('mousemove', pointerMove); document.removeEventListener('mouseup', pointerUp);
+        img.removeEventListener('touchstart', pointerDown); document.removeEventListener('touchmove', pointerMove); document.removeEventListener('touchend', pointerUp);
+      }
+    })();
+</script>
+
 @code {
-    private string AvatarUrl = "https://placehold.co/160x160/png";
-    private bool isUploading = false;
-    private string? uploadError;
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    private class EditProfileModel
     {
-        try
-        {
-            uploadError = null;
-            isUploading = true;
-            var file = e.File;
-            if (file is null) return;
-
-            // Validate type
-            var mime = file.ContentType ?? "";
-            if (!mime.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-            {
-                uploadError = "Please select an image file.";
-                return;
-            }
-
-            // Max original size 5 MB
-            const long maxBytes = 5 * 1024 * 1024;
-
-            // Client-side resize to max 512x512 and get JPEG stream
-            var resized = await file.RequestImageFileAsync("image/jpeg", 512, 512);
-            using var stream = resized.OpenReadStream(maxBytes);
-
-            // Preview immediately as data URL
-            using var msPreview = new MemoryStream();
-            await stream.CopyToAsync(msPreview);
-            var base64 = Convert.ToBase64String(msPreview.ToArray());
-            AvatarUrl = $"data:image/jpeg;base64,{base64}";
-
-            // Upload to backend
-            using var content = new MultipartFormDataContent();
-            var fileContent = new ByteArrayContent(msPreview.ToArray());
-            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
-            content.Add(fileContent, "File", Path.ChangeExtension(file.Name, ".jpg"));
-
-            var resp = await Http.PostAsync("https://localhost:7228/api/File/uploadfile", content);
-            if (resp.IsSuccessStatusCode)
-            {
-                var json = await resp.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-                if (json != null && json.TryGetValue("SignedUrl", out var url) && !string.IsNullOrWhiteSpace(url))
-                {
-                    AvatarUrl = url; // use signed URL from storage
-                    uploadError = null;
-                }
-            }
-            else
-            {
-                var details = await resp.Content.ReadAsStringAsync();
-                uploadError = $"Upload failed: {resp.StatusCode}{(string.IsNullOrWhiteSpace(details) ? string.Empty : $" — {details}")}";
-            }
-        }
-        catch (Exception ex)
-        {
-            uploadError = ex.Message;
-        }
-        finally { isUploading = false; }
+        public int Id { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Email { get; set; }             // campus email (read-only)
+        public string? PhoneNum { get; set; }
+        public string? City { get; set; }
+        public string? Country { get; set; }
+        public string? Timezone { get; set; }
+        public string? Program { get; set; }
+        public string? Year { get; set; }
+        public string? Website { get; set; }
+        public string? About { get; set; }
+        public string? Interests { get; set; }         // CSV
+        public string? RoleString { get; set; } = "Student";
+        public string? ProfilePicturePath { get; set; }
     }
 
-    private ProfileForm Form = new();
-    private string NewSubject = string.Empty;
-    private string NewInterest = string.Empty;
+    private class BookingSessionVM
+    {
+        public int BookingId { get; set; }
+        public string Title { get; set; } = "";
+        public string Status { get; set; } = "pending";
+        public DateTime SessionDate { get; set; }
+        public int DurationMinutes { get; set; }
+        public int TutorId { get; set; }
+        public int StudentId { get; set; }
+        public string TutorFullName { get; set; } = "";
+        public string StudentFullName { get; set; } = "";
+    }
+
+    private class SubjectVM
+    {
+        public int SubjectId { get; set; }
+        public string SubjectCode { get; set; } = "";
+        public string Name { get; set; } = "";
+        public int Year { get; set; }
+    }
+
+    private EditProfileModel profileEdit = new();
+    private EditProfileModel? originalProfile; // snapshot for Additional Info comparisons
+    private string activeTab = "profile";
+    private string? PreviewImageDataUrl;
+
+    private bool isSaving = false;
+    private string? saveMsg;
+
+    private int followersCount = 0;
+    private int followingCount = 0;
+
+    // visibility flag (separate endpoint from User)
+    private bool isCalendarPublic = false;
+
+    // sessions & tutor subjects (for previews)
+    private List<BookingSessionVM> sessions = new();
+    private List<SubjectVM> tutorSubjects = new();
 
     protected override async Task OnInitializedAsync()
     {
+        var isLogged = await AuthService.IsUserLoggedInAsync();
+        if (!isLogged) { Nav.NavigateTo("/login"); return; }
+
+        var uid = await AuthService.GetCurrentUserIdAsync();
+        if (uid == null) { Nav.NavigateTo("/login"); return; }
+
         try
         {
-            var uid = await JS.InvokeAsync<string>("sessionStorage.getItem", "userId");
-            if (string.IsNullOrEmpty(uid) || !int.TryParse(uid, out int userId))
+            var res = await Http.GetAsync($"api/Profile/{uid}");
+            if (res.IsSuccessStatusCode)
             {
-                Console.WriteLine("⚠️ Missing or invalid userId — cannot load profile.");
-                return;
+                var u = await res.Content.ReadFromJsonAsync<User>();
+                if (u != null)
+                {
+                    profileEdit = new EditProfileModel
+                    {
+                        Id = u.Id,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        Email = u.Email,
+                        PhoneNum = u.PhoneNum,
+                        City = u.City,
+                        Country = u.Country,
+                        Timezone = u.Timezone,
+                        Program = u.Program,
+                        Year = u.Year,
+                        Website = u.Website,
+                        About = u.About,
+                        Interests = u.Interests,
+                        RoleString = u.RoleString,
+                        ProfilePicturePath = u.ProfilePicturePath
+                    };
+                    // snapshot for Additional Info
+                    originalProfile = new EditProfileModel
+                    {
+                        Id = profileEdit.Id,
+                        FirstName = profileEdit.FirstName,
+                        LastName = profileEdit.LastName,
+                        Email = profileEdit.Email,
+                        PhoneNum = profileEdit.PhoneNum,
+                        City = profileEdit.City,
+                        Country = profileEdit.Country,
+                        Timezone = profileEdit.Timezone,
+                        Program = profileEdit.Program,
+                        Year = profileEdit.Year,
+                        Website = profileEdit.Website,
+                        About = profileEdit.About,
+                        Interests = profileEdit.Interests,
+                        RoleString = profileEdit.RoleString,
+                        ProfilePicturePath = profileEdit.ProfilePicturePath
+                    };
+                }
             }
 
-            // ✅ Fetch full user record by ID
-            var response = await Http.GetAsync($"https://localhost:7228/api/Profile/by-id/{userId}");
-            if (response.IsSuccessStatusCode)
-            {
-                var user = await response.Content.ReadFromJsonAsync<User>();
-                if (user != null)
-                {
-                    Form.FirstName = user.FirstName ?? "";
-                    Form.LastName = user.LastName ?? "";
-                    Form.Email = user.Email ?? "";
-                    Form.Phone = user.PhoneNum ?? "";
-                    Form.Program = user.Program ?? "";
-                    Form.Year = user.Year ?? "";
-                    Form.City = user.City ?? "";
-                    Form.Country = user.Country ?? "";
-                    Form.Timezone = user.Timezone ?? "";
-                    Form.Website = user.Website ?? "";
-                    Form.About = user.About ?? "";
-                    Form.ContactPreference = user.ContactPreference ?? "";
-                    Form.Subjects = (user.Subjects ?? "").Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
-                    Form.Interests = (user.Interests ?? "").Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+            // followers/following counts
+            var f1 = await Http.GetAsync($"api/Follow/followers-count/{uid}");
+            if (f1.IsSuccessStatusCode) followersCount = (await f1.Content.ReadFromJsonAsync<CountResponse>())?.Count ?? 0;
+            var f2 = await Http.GetAsync($"api/Follow/following-count/{uid}");
+            if (f2.IsSuccessStatusCode) followingCount = (await f2.Content.ReadFromJsonAsync<CountResponse>())?.Count ?? 0;
 
-                    Console.WriteLine($"✅ Profile data loaded for userId {userId}");
-                }
-                else
-                {
-                    Console.WriteLine("⚠️ User record returned null.");
-                }
-            }
-            else
+            // calendar visibility
+            await LoadCalendarVisibility(uid.Value);
+
+            // sessions preview
+            try
             {
-                Console.WriteLine($"⚠️ Failed to load user data. Status: {response.StatusCode}");
+                var sres = await Http.GetAsync($"api/bookingsession/user/{uid}");
+                if (sres.IsSuccessStatusCode)
+                {
+                    var list = await sres.Content.ReadFromJsonAsync<List<BookingSessionVM>>();
+                    if (list is not null) sessions = list;
+                }
             }
+            catch { /* preview-only; ignore */ }
+
+            // tutor subjects preview (if an endpoint exists; ignore errors)
+            try
+            {
+                var tRes = await Http.GetAsync($"api/subjects/tutor/{uid}");
+                if (tRes.IsSuccessStatusCode)
+                {
+                    var ts = await tRes.Content.ReadFromJsonAsync<List<SubjectVM>>();
+                    if (ts is not null) tutorSubjects = ts;
+                }
+            }
+            catch { /* optional */ }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ Error loading profile: {ex.Message}");
-        }
+        catch { /* show editor even if these fail */ }
     }
 
-    private async Task Save()
+    private void SetTab(string t) => activeTab = t;
+
+    private async Task OnImageSelected(InputFileChangeEventArgs e)
     {
+        var file = e.File; if (file is null) return;
+        using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024);
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        var base64 = Convert.ToBase64String(ms.ToArray());
+        var dataUrl = $"data:{file.ContentType};base64,{base64}";
+        await JS.InvokeVoidAsync("openSquareCropper", dataUrl, DotNetObjectReference.Create(this));
+    }
+
+    [JSInvokable]
+    public void OnImageCropped(string dataUrl)
+    {
+        PreviewImageDataUrl = dataUrl; // preview only; upload on save if required
+        StateHasChanged();
+    }
+
+    private async Task SaveAsync()
+    {
+        isSaving = true; saveMsg = null;
         try
         {
-            var uid = await JS.InvokeAsync<string>("sessionStorage.getItem", "userId");
-            if (!int.TryParse(uid, out int userId))
+            var dto = new
             {
-                Console.WriteLine("⚠️ Invalid userId — cannot save.");
-                return;
-            }
-
-            // ✅ Build a plain DTO that matches ProfileUpdateDto in backend
-            var updateDto = new
-            {
-                FirstName = Form.FirstName,
-                LastName = Form.LastName,
-                Email = Form.Email,
-                PhoneNum = Form.Phone,
-                City = Form.City,
-                Country = Form.Country,
-                Timezone = Form.Timezone,
-                Website = Form.Website,
-                Program = Form.Program,
-                Year = Form.Year,
-                StudentId = Form.StudentId,
-                About = Form.About,
-                ContactPreference = Form.ContactPreference,
-                Interests = string.Join(", ", Form.Interests),
-                Subjects = string.Join(", ", Form.Subjects),
-                ProfilePicturePath = AvatarUrl
+                profileEdit.FirstName,
+                profileEdit.LastName,
+                profileEdit.Email,
+                PhoneNum = profileEdit.PhoneNum,
+                profileEdit.City,
+                profileEdit.Country,
+                profileEdit.Timezone,
+                profileEdit.Program,
+                profileEdit.Year,
+                profileEdit.Website,
+                profileEdit.About,
+                Interests = profileEdit.Interests
             };
+            var resp = await Http.PutAsJsonAsync($"api/Profile/{profileEdit.Id}", dto);
+            saveMsg = resp.IsSuccessStatusCode ? "Saved!" : "Could not save. Check API route.";
 
-            // ✅ Send the clean DTO instead of the User model
-            var response = await Http.PutAsJsonAsync(
-                $"https://localhost:7228/api/Profile/{userId}", updateDto);
-
-            if (response.IsSuccessStatusCode)
+            // refresh snapshot for Additional Info
+            if (resp.IsSuccessStatusCode)
             {
-                Console.WriteLine("✅ Profile saved successfully.");
-                Nav.NavigateTo("/dashboard");
+                originalProfile = new EditProfileModel
+                {
+                    Id = profileEdit.Id,
+                    FirstName = profileEdit.FirstName,
+                    LastName = profileEdit.LastName,
+                    Email = profileEdit.Email,
+                    PhoneNum = profileEdit.PhoneNum,
+                    City = profileEdit.City,
+                    Country = profileEdit.Country,
+                    Timezone = profileEdit.Timezone,
+                    Program = profileEdit.Program,
+                    Year = profileEdit.Year,
+                    Website = profileEdit.Website,
+                    About = profileEdit.About,
+                    Interests = profileEdit.Interests,
+                    RoleString = profileEdit.RoleString,
+                    ProfilePicturePath = profileEdit.ProfilePicturePath
+                };
             }
-            else
+        }
+        catch (Exception ex) { saveMsg = "Save failed."; Console.WriteLine(ex.Message); }
+        finally { isSaving = false; }
+    }
+
+    private async Task LoadCalendarVisibility(int uid)
+    {
+        try
+        {
+            var r = await Http.GetAsync($"api/Profile/{uid}/calendar-visibility");
+            if (!r.IsSuccessStatusCode) return;
+
+            // try bool first
+            var asBool = await r.Content.ReadFromJsonAsync<bool?>();
+            if (asBool.HasValue) { isCalendarPublic = asBool.Value; return; }
+
+            // fallback to { isPublic: bool }
+            var obj = await r.Content.ReadFromJsonAsync<CalendarVisDto?>();
+            if (obj is not null) isCalendarPublic = obj.isPublic;
+        }
+        catch { /* ignore */ }
+    }
+
+    private async Task OnCalendarVisibilityChanged(ChangeEventArgs e)
+    {
+        // e.Value is "true"/"false" or "on". Normalize:
+        var str = e?.Value?.ToString()?.Trim().ToLowerInvariant();
+        isCalendarPublic = str == "true" || str == "on";
+
+        try
+        {
+            var payload = new CalendarVisDto { isPublic = isCalendarPublic };
+            await Http.PutAsJsonAsync($"api/Profile/{profileEdit.Id}/calendar-visibility", payload);
+        }
+        catch { /* ignore preview errors */ }
+        StateHasChanged();
+    }
+
+    private string StatusBadgeClass(string status)
+    {
+        switch ((status ?? "").ToLowerInvariant())
+        {
+            case "confirmed": return "badge confirmed";
+            case "completed": return "badge completed";
+            case "cancelled": return "badge cancelled";
+            default: return "badge pending";
+        }
+    }
+
+    // Additional Info pairs (non-contact changes vs. original snapshot)
+    private record LabeledValue(string Label, string Value);
+    private List<LabeledValue> AdditionalInfoPairs
+        => BuildAdditionalInfo();
+
+    private List<LabeledValue> BuildAdditionalInfo()
+    {
+        var list = new List<LabeledValue>();
+        if (originalProfile is null) return list;
+
+        void AddIfChanged(string label, string? orig, string? cur)
+        {
+            var a = (orig ?? "").Trim();
+            var b = (cur ?? "").Trim();
+            if (!string.Equals(a, b, StringComparison.Ordinal))
             {
-                var errorText = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"⚠️ Save failed. Status: {response.StatusCode}, Response: {errorText}");
+                if (!string.IsNullOrWhiteSpace(b))
+                    list.Add(new LabeledValue(label, b));
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ Error saving profile: {ex.Message}");
-        }
+
+        // Only non-contact fields that don't already have a dedicated block
+        AddIfChanged("Programme", originalProfile.Program, profileEdit.Program);
+        AddIfChanged("City/Town", originalProfile.City, profileEdit.City);
+        AddIfChanged("Country", originalProfile.Country, profileEdit.Country);
+        AddIfChanged("Timezone", originalProfile.Timezone, profileEdit.Timezone);
+        // Year is intentionally excluded (read-only)
+
+        return list;
     }
 
-
-    private void AddSubject()
+    private string GetRolePfpClass(string? role) => (role ?? "").ToLower() switch
     {
-        var s = (NewSubject ?? string.Empty).Trim().ToUpperInvariant();
-        if (!string.IsNullOrWhiteSpace(s) && !Form.Subjects.Contains(s))
-        {
-            Form.Subjects.Add(s);
-            NewSubject = "";
-        }
-    }
-
-    private void RemoveSubject(string s) => Form.Subjects.Remove(s);
-
-    private void AddInterest()
+        "admin" => "pfp-admin",
+        "tutor" => "pfp-tutor",
+        _ => "pfp-student"
+    };
+    private string GetRoleBadgeClass(string? role) => (role ?? "").ToLower() switch
     {
-        var t = (NewInterest ?? string.Empty).Trim();
-        if (!string.IsNullOrWhiteSpace(t) && !Form.Interests.Contains(t, StringComparer.OrdinalIgnoreCase))
-        {
-            Form.Interests.Add(t);
-            NewInterest = "";
-        }
+        "admin" => "badge-admin",
+        "tutor" => "badge-tutor",
+        _ => "badge-student"
+    };
+    private string FormatRole(string? role)
+    {
+        if (string.IsNullOrWhiteSpace(role)) return "Student";
+        var r = role.Trim().ToLower(); return char.ToUpper(r[0]) + r[1..];
     }
 
-    private void RemoveInterest(string t)
-    {
-        var hit = Form.Interests.FirstOrDefault(x => string.Equals(x, t, StringComparison.OrdinalIgnoreCase));
-        if (hit is not null) Form.Interests.Remove(hit);
-    }
+    private MarkupString RenderBusy(string title)
+        => (MarkupString)$"<div class='busy'>{title}</div>";
 
-    public class ProfileForm
-    {
-        public string FirstName { get; set; } = "";
-        public string LastName { get; set; } = "";
-        public string Email { get; set; } = "";
-        public string Phone { get; set; } = "";
-        public string Program { get; set; } = "";
-        public string Year { get; set; } = "";
-        public string StudentId { get; set; } = "";
-        public string City { get; set; } = "";
-        public string Country { get; set; } = "";
-        public string Timezone { get; set; } = "";
-        public string Website { get; set; } = "";
-        public string About { get; set; } = "";
-        public string ContactPreference { get; set; } = "";
-        public List<string> Subjects { get; set; } = new();
-        public List<string> Interests { get; set; } = new();
-    }
+    private class CountResponse { public int Count { get; set; } }
+    private class CalendarVisDto { public bool isPublic { get; set; } }
 }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "JZFkneobQoI=",
+  "dgSpecHash": "iV9Vi48dGRA=",
   "success": true,
-  "projectFilePath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen\\Sen381\\Sen381.csproj",
+  "projectFilePath": "C:\\Sen381 github repo\\own repo\\own-repo-of-sen381\\Sen381\\Sen381.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\morne\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\9.0.9\\microsoft.bcl.asyncinterfaces.9.0.9.nupkg.sha512",
     "C:\\Users\\morne\\.nuget\\packages\\microsoft.bcl.hashcode\\6.0.0\\microsoft.bcl.hashcode.6.0.0.nupkg.sha512",

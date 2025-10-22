@@ -65,8 +65,7 @@
                                         </svg>
                                     </span>
                                 }
-                                <!-- spinning halo sits BEHIND the image, not over it -->
-                                <span class="spin-ring" aria-hidden="true"></span>
+                                @* removed the spinning halo *@
                             </div>
 
                             <div class="id">
@@ -285,19 +284,16 @@
         .peer-card[data-role="student"] {
             --card-glow-strong: color-mix(in oklab,var(--student-blue) 72%,transparent);
             --card-glow-soft: color-mix(in oklab,var(--student-blue) 28%,transparent);
-            --ring-gradient: conic-gradient(from 0deg,#0B1E7A,var(--student-blue),var(--student-blue-2),#0B1E7A)
         }
 
         .peer-card[data-role="tutor"] {
             --card-glow-strong: color-mix(in oklab,var(--tutor-orange-2) 72%,transparent);
             --card-glow-soft: color-mix(in oklab,var(--tutor-orange-1) 28%,transparent);
-            --ring-gradient: conic-gradient(from 0deg,#8A3F05,var(--tutor-orange-1),var(--tutor-orange-2),#8A3F05)
         }
 
         .peer-card[data-role="admin"] {
             --card-glow-strong: color-mix(in oklab,var(--admin-yellow) 72%,transparent);
             --card-glow-soft: color-mix(in oklab,var(--admin-yellow) 28%,transparent);
-            --ring-gradient: conic-gradient(from 0deg,#6D4704,var(--admin-yellow),var(--admin-yellow-2),#6D4704)
         }
 
     .row-top {
@@ -306,7 +302,6 @@
         gap: 12px
     }
 
-    /* Allow ellipses to actually work inside flex */
     .id {
         min-width: 0
     }
@@ -369,7 +364,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 48%;
-        min-width: 0; /* cut long pills */
+        min-width: 0;
     }
 
         .pill.year {
@@ -378,7 +373,7 @@
             border-color: #111827
         }
 
-    /* Avatar + halo behind the photo (not covering it) */
+    /* Avatar — minimalist role ring on hover (no animation) */
     .avatar {
         position: relative;
         width: 64px;
@@ -387,8 +382,8 @@
         display: grid;
         place-items: center;
         background: #fff;
-        border: 1px solid var(--ring);
-        overflow: visible; /* let the spin ring sit outside */
+        border: 2px solid var(--ring);
+        transition: border-color .18s ease, box-shadow .18s ease;
     }
 
     .avatar-img {
@@ -415,22 +410,20 @@
             stroke-width: 1.8
         }
 
-    .spin-ring {
-        position: absolute;
-        inset: -7px;
-        border-radius: 50%;
-        pointer-events: none;
-        background: var(--ring-gradient,transparent);
-        -webkit-mask: radial-gradient(farthest-side,transparent calc(50% - 7px),#000 0);
-        mask: radial-gradient(farthest-side,transparent calc(50% - 7px),#000 0);
-        opacity: 0;
-        z-index: 0; /* behind the image */
-        filter: saturate(1.2);
+    /* subtle, semi-transparent “role” outline when hovering the card */
+    .peer-card[data-role="student"]:hover .avatar {
+        border-color: color-mix(in oklab, var(--student-blue) 60%, #fff);
+        box-shadow: 0 0 0 4px color-mix(in oklab, var(--student-blue) 22%, transparent);
     }
 
-    .peer-card:hover .spin-ring {
-        opacity: 1;
-        animation: spin 1.1s linear infinite
+    .peer-card[data-role="tutor"]:hover .avatar {
+        border-color: color-mix(in oklab, var(--tutor-orange-2) 60%, #fff);
+        box-shadow: 0 0 0 4px color-mix(in oklab, var(--tutor-orange-2) 24%, transparent);
+    }
+
+    .peer-card[data-role="admin"]:hover .avatar {
+        border-color: color-mix(in oklab, var(--admin-yellow-2) 60%, #fff);
+        box-shadow: 0 0 0 4px color-mix(in oklab, var(--admin-yellow-2) 24%, transparent);
     }
 
     .empty-state {
@@ -441,12 +434,7 @@
         padding: 20px 0
     }
 
-    @@keyframes spin {
-        to {
-            transform: rotate(360deg)
-        }
-    }
-
+    /* responsive */
     @@media (max-width:1100px) {
         .grid {
             grid-template-columns: repeat(3,minmax(0,1fr))
@@ -559,8 +547,7 @@
 
     private void NavigateToProfile(long userId, bool isTutor)
     {
-        var profileType = isTutor ? "tutorprofile" : "studentprofile";
-        NavManager.NavigateTo($"/{profileType}/{userId}");
+        NavManager.NavigateTo($"/studentprofile/{userId}");
     }
 
     private void NavigateToPeerProfile(PeerUser peer)

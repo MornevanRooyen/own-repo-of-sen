@@ -1,0 +1,96 @@
+﻿@using Frontend.Services
+@inherits LayoutComponentBase
+@inject NavigationManager Nav
+@inject AuthService AuthService
+@inject IJSRuntime _js
+
+<nav class="cl-nav">
+    <div class="container nav-row">
+        <!-- Brand -->
+        <a class="brand" href="/landing">
+            <img class="brand-logo" src="images/logo.jpg" alt="CampusLearn logo" />
+            <h1 id="mainTitle">Campus<span>Learn</span></h1>
+        </a>
+    </div>
+</nav>
+
+<main class="page-body">
+    @Body
+</main>
+
+<style>
+    :root {
+        --nav-bg: #3f3f3f;
+        --ink: #2a2a2a;
+        --ink-on: #fff;
+        --ring: rgba(0,0,0,.15);
+        --radius: 1.25rem;
+        --container: min(1200px,92vw);
+        --nav-h: 88px;
+    }
+
+    .container {
+        width: var(--container);
+        margin-inline: auto;
+        padding-inline: clamp(12px,3vw,24px);
+    }
+
+    /* stick the bar */
+    .cl-nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--nav-bg);
+        border-bottom: 1px solid rgba(255,255,255,.12);
+        box-shadow: 0 8px 28px rgba(0,0,0,.25);
+    }
+
+    .nav-row {
+        height: var(--nav-h);
+        display: grid;
+        grid-template-columns: 1fr; /* brand only */
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* ===== BRAND LOGO & TITLE ===== */
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .brand-logo {
+        width: clamp(38px, 6vw, 54px);
+        height: auto;
+        display: block;
+        border-radius: 8px;
+    }
+
+    #mainTitle {
+        margin: 0;
+        color: var(--ink-on);
+        font-weight: 900;
+        font-size: clamp(22px, 3vw, 32px);
+        line-height: 1;
+    }
+
+        #mainTitle span {
+            font-weight: 300;
+            color: var(--ink-on);
+        }
+
+    /* allow content below nav */
+    .page-body {
+        display: block;
+    }
+
+    /* responsive */
+    @@media (max-width: 760px) {
+        .nav-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+

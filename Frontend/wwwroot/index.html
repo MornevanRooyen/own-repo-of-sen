@@ -14,7 +14,45 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="https://unpkg.com/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
-    <script src="js/clarabot.js"></script>
     <script src="js/tutoring-session.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+
+    <script>
+        window.BotpressHelper = {
+            initialized: false,
+
+            init: function () {
+                if (this.initialized) return;
+                this.initialized = true;
+
+                try {
+                    window.botpressWebChat.init({
+                        container: '#bp-widget-container',
+                        botId: '40c50581-30d9-47a6-b80d-39f56fed2eb0',
+                        host: 'https://files.bpcontent.cloud',
+                        botName: 'Clara'
+                    });
+                    console.log('[Botpress] Initialized');
+                } catch (e) {
+                    console.error('[Botpress] init failed', e);
+                }
+            },
+
+            show: function () {
+                const el = document.getElementById('bp-widget-container');
+                if (el) el.style.display = 'block';
+            },
+
+            hide: function () {
+                const el = document.getElementById('bp-widget-container');
+                if (el) el.style.display = 'none';
+            }
+        };
+
+        // Initialize immediately, but will only run once
+        BotpressHelper.init();
+    </script>
+
 </body>
 </html>
