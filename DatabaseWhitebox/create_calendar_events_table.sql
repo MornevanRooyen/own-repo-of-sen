@@ -66,3 +66,4 @@ GRANT SELECT ON calendar_events_details TO authenticated;
 
 
 
+

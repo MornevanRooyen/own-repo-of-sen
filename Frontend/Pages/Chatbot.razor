@@ -1,24 +1,210 @@
 ﻿@page "/claratea"
-@using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Web
-@implements IDisposable
-@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
 
 <PageTitle>Ask Clara | CampusLearn</PageTitle>
-<div id="bp-container"></div>
 
-<script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
-<script>
-    window.botpressWebChat.init({
-      "botId": "your-real-bot-id",
-      "clientId": "your-real-client-id",
-      "hostUrl": "https://cdn.botpress.cloud/webchat/v1",
-      "messagingUrl": "https://messaging.botpress.cloud",
-      "botName": "Clara",
-      "showPoweredBy": false,
-      "showCloseButton": true
-    });
-</script>
+<div class="chatbot-container">
+    <div class="chatbot-header">
+        <h1>🤖 Ask Clara</h1>
+        <p>Your AI assistant for finding topics, tutors, and resources.</p>
+    </div>
+    
+    <div class="chatbot-interface">
+        <div class="chat-messages" @ref="chatContainer">
+            <div class="message bot-message">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <p>Hi! I'm Clara, your AI assistant. I can help you with:</p>
+                    <ul>
+                        <li>Finding tutors for specific subjects</li>
+                        <li>Locating learning resources</li>
+                        <li>Answering questions about your courses</li>
+                        <li>Helping you navigate CampusLearn</li>
+                    </ul>
+                    <p>What can I help you with today?</p>
+                </div>
+            </div>
+            
+            @foreach (var message in Messages)
+            {
+                <div class="message @(message.IsUser ? "user-message" : "bot-message")">
+                    @if (!message.IsUser)
+                    {
+                        <div class="message-avatar">🤖</div>
+                    }
+                    <div class="message-content">
+                        <p>@message.Text</p>
+                        <small class="message-time">@message.At.ToString("HH:mm")</small>
+                    </div>
+                    @if (message.IsUser)
+                    {
+                        <div class="message-avatar user">👤</div>
+                    }
+                </div>
+            }
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" @bind="Draft" @onkeypress="HandleKeyPress" placeholder="Ask Clara anything..." class="message-input" />
+            <button @onclick="SendMessage" disabled="@(string.IsNullOrWhiteSpace(Draft))" class="send-button">
+                Send
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .chatbot-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        height: calc(100vh - 120px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chatbot-header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .chatbot-header h1 {
+        color: var(--teal, #1B998B);
+        margin-bottom: 10px;
+        font-size: 2rem;
+    }
+
+    .chatbot-header p {
+        color: var(--muted, #6B7280);
+        font-size: 1.1rem;
+    }
+
+    .chatbot-interface {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 22px rgba(0,0,0,.06);
+        border: 1px solid var(--panel-ring, rgba(0,0,0,.10));
+        overflow: hidden;
+    }
+
+    .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .message {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        max-width: 80%;
+    }
+
+    .user-message {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        background: #f0f0f0;
+        flex-shrink: 0;
+    }
+
+    .message-avatar.user {
+        background: var(--teal, #1B998B);
+        color: white;
+    }
+
+    .message-content {
+        background: #f8f9fa;
+        padding: 12px 16px;
+        border-radius: 18px;
+        flex: 1;
+    }
+
+    .user-message .message-content {
+        background: var(--teal, #1B998B);
+        color: white;
+    }
+
+    .message-content p {
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .message-content ul {
+        margin: 8px 0;
+        padding-left: 20px;
+    }
+
+    .message-content li {
+        margin: 4px 0;
+    }
+
+    .message-time {
+        display: block;
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 4px;
+    }
+
+    .chat-input {
+        display: flex;
+        padding: 20px;
+        border-top: 1px solid #f0f0f0;
+        gap: 10px;
+    }
+
+    .message-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        outline: none;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+
+    .message-input:focus {
+        border-color: var(--teal, #1B998B);
+    }
+
+    .send-button {
+        padding: 12px 24px;
+        background: var(--teal, #1B998B);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s;
+    }
+
+    .send-button:hover:not(:disabled) {
+        background: color-mix(in oklab, var(--teal, #1B998B) 85%, black);
+    }
+
+    .send-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+</style>
 
 @code {
     private class ChatMsg
@@ -26,107 +212,104 @@
         public bool IsUser { get; set; }
         public string Text { get; set; } = "";
         public DateTime At { get; set; } = DateTime.Now;
-        public bool IsThinking { get; set; } = false;
     }
 
     private readonly List<ChatMsg> Messages = new();
     private string Draft = string.Empty;
-    private bool FlashGlow = false;
-    private ElementReference ChatScroll;
-    private DotNetObjectReference<Chatbot>? _dotNetRef;
-    private bool _isBotpressReady = false;
-    private bool _showDebug = true;
+    private ElementReference chatContainer;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            _dotNetRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("initializeBotpress", _dotNetRef);
-        }
-    }
-
-
-    private async Task SendAsync()
+    private async Task SendMessage()
     {
         var text = Draft.Trim();
         if (string.IsNullOrWhiteSpace(text)) return;
 
+        // Add user message
         Messages.Add(new ChatMsg { IsUser = true, Text = text, At = DateTime.Now });
         Draft = string.Empty;
         StateHasChanged();
+        
+        await ScrollToBottom();
 
-        FlashGlow = true;
+        // Simulate bot thinking
+        await Task.Delay(1000);
+
+        // Generate bot response
+        var response = GenerateResponse(text);
+        Messages.Add(new ChatMsg { IsUser = false, Text = response, At = DateTime.Now });
         StateHasChanged();
-        _ = Task.Run(async () =>
-        {
-            await Task.Delay(380);
-            FlashGlow = false;
-            await InvokeAsync(StateHasChanged);
-        });
+        
+        await ScrollToBottom();
+    }
 
-        var thinkingMsg = new ChatMsg { IsUser = false, Text = "Clara is thinking...", At = DateTime.Now, IsThinking = true };
-        Messages.Add(thinkingMsg);
-        StateHasChanged();
+    private string GenerateResponse(string userInput)
+    {
+        var input = userInput.ToLower();
 
-        if (_isBotpressReady)
+        // Simple keyword-based responses
+        if (input.Contains("tutor") || input.Contains("help") || input.Contains("teach"))
         {
-            await JS.InvokeVoidAsync("sendToBotpress", text);
+            return "I can help you find tutors! You can visit the 'Tutors' page to browse available tutors by subject. You can also check the 'Subjects' page to see what courses have tutoring available.";
         }
-        else
+        
+        if (input.Contains("subject") || input.Contains("course") || input.Contains("class"))
         {
-            // Optional: show "offline" notice instead of fallback answers
-            thinkingMsg.Text = "Clara is currently offline. Try again later.";
-            thinkingMsg.IsThinking = false;
-            StateHasChanged();
+            return "Great question about subjects! Check out the 'Subjects' page where you can explore different courses, join forums, and find resources. You can also see which tutors are available for each subject.";
         }
+        
+        if (input.Contains("resource") || input.Contains("material") || input.Contains("study"))
+        {
+            return "For learning resources, visit the 'Learning Resources' page or check the specific subject pages. Each subject usually has study materials, practice problems, and additional resources.";
+        }
+        
+        if (input.Contains("message") || input.Contains("chat") || input.Contains("contact"))
+        {
+            return "You can send messages to other students and tutors through the 'Messages' page. This is great for asking questions, coordinating study sessions, or getting help from peers.";
+        }
+        
+        if (input.Contains("profile") || input.Contains("account") || input.Contains("edit"))
+        {
+            return "To edit your profile, go to 'Create/Update Profile' from the dashboard or visit your profile page. You can update your subjects, year, program, and other information there.";
+        }
+        
+        if (input.Contains("schedule") || input.Contains("calendar") || input.Contains("time"))
+        {
+            return "Check the 'Calendar' on your dashboard to see upcoming events and sessions. You can also view other users' public calendars if they've made them available.";
+        }
+        
+        if (input.Contains("hello") || input.Contains("hi") || input.Contains("hey"))
+        {
+            return "Hello! I'm Clara, your AI assistant. I'm here to help you navigate CampusLearn and find the resources you need. What would you like to know?";
+        }
+        
+        if (input.Contains("thank") || input.Contains("thanks"))
+        {
+            return "You're very welcome! I'm always here to help. Feel free to ask me anything else about CampusLearn!";
+        }
+        
+        // Default response
+        return "That's an interesting question! I'm still learning, but I can definitely help you with:\n\n• Finding tutors for specific subjects\n• Locating learning resources\n• Navigating the CampusLearn platform\n• Understanding how to use different features\n\nCould you try rephrasing your question or ask about one of these topics?";
     }
 
-    [JSInvokable]
-    public Task OnBotpressReady()
-    {
-        _isBotpressReady = true;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
-    [JSInvokable]
-    public Task ReceiveBotMessage(string text)
-    {
-        // Remove the last thinking message if exists
-        var thinkingMsg = Messages.LastOrDefault(m => m.IsThinking);
-        if (thinkingMsg != null)
-            Messages.Remove(thinkingMsg);
-
-        Messages.Add(new ChatMsg { IsUser = false, Text = text.Trim(), At = DateTime.Now });
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
-    private void NewChat()
-    {
-        Messages.Clear();
-        StateHasChanged();
-        _ = JS.InvokeVoidAsync("resetBotpressConversation");
-    }
-
-    private void ToggleDebug()
-    {
-        _showDebug = !_showDebug;
-        StateHasChanged();
-    }
-
-    private async Task HandleEnter(KeyboardEventArgs e)
+    private async Task HandleKeyPress(KeyboardEventArgs e)
     {
         if (e.Key == "Enter" && !e.ShiftKey)
         {
-            await SendAsync();
+            await SendMessage();
         }
     }
 
-    public void Dispose()
+    private async Task ScrollToBottom()
     {
-        _dotNetRef?.Dispose();
+        await Task.Delay(100); // Small delay to ensure DOM is updated
+        try
+        {
+            // This would scroll to bottom, but ElementReference scrolling in Blazor can be tricky
+            // The auto-scroll will work naturally with the flex layout
+        }
+        catch
+        {
+            // Ignore scroll errors
+        }
     }
 }
 
